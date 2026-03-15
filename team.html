@@ -679,7 +679,12 @@ header{
       <div id="otherAdminLabel" class="login-label" style="margin-bottom:8px"></div>
       <div id="otherAdminGrid" class="user-grid"></div>
     </div>
-    <!-- Section 3: team members -->
+    <!-- Section 3: lab manager (admins only) -->
+    <div id="labSection" style="margin-bottom:14px">
+      <div class="login-label" style="margin-bottom:8px">🔬 מנהל מעבדה</div>
+      <div class="user-grid" id="labGrid"></div>
+    </div>
+    <!-- Section 4: team members -->
     <div id="memberSection">
       <div class="login-label" style="margin-bottom:8px">👥 צוות</div>
       <div class="user-grid" id="memberGrid"></div>
@@ -845,6 +850,7 @@ header{
     alik:   { name:'אליק אברמזון', role:'member', initials:'אא', pin:'9195' },
     rif:    { name:'ריף פרץ',      role:'member', initials:'רפ', pin:'5090' },
     tal:    { name:'טל כהן',       role:'member', initials:'טכ', pin:'4810' },
+    omer:   { name:'עומר תורג\'מן',   role:'lab',    initials:'עת', pin:'1082' },
   };
   const PRIO_LABEL = {1:'🔴 דחוף',2:'🟡 גבוה',3:'🔵 רגיל',4:'⚪ נמוך'};
   const STATUS_LABEL = {open:'🔵 פתוח',progress:'🟡 בביצוע',blocked:'⏳ ממתין',done:'✅ בוצע'};
@@ -1283,6 +1289,9 @@ header{
       // Section 2 — other admin (hide moshe from assaf's view if needed)
       const showOther = !(loggedInAs === 'assaf' && otherAdmin === 'moshe');
       document.getElementById('otherAdminSection').style.display = showOther ? 'block' : 'none';
+      // lab section only for admins
+      const labSec = document.getElementById('labSection');
+      if (labSec) labSec.style.display = (loggedInAs === 'moshe' || loggedInAs === 'assaf') ? 'block' : 'none';
       if (showOther) {
         document.getElementById('otherAdminLabel').textContent = otherLabel;
       }
@@ -1335,6 +1344,15 @@ header{
         if (loggedInAs === 'assaf' && uid === 'moshe') return;
         otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
         otherGrid.style.gridTemplateColumns = '1fr';
+      } else if (u.role === 'lab') {
+        // omer — only visible to moshe and assaf
+        if (loggedInAs === 'moshe' || loggedInAs === 'assaf') {
+          const labGrid = document.getElementById('labGrid');
+          if (labGrid) {
+            labGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
+            labGrid.style.gridTemplateColumns = '1fr';
+          }
+        }
       } else {
         memberGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
       }
@@ -1486,7 +1504,7 @@ header{
     const blocked  = myTasks.filter(t=>t.status==='blocked').length;
     const done     = myTasks.filter(t=>t.status==='done').length;
 
-    const uidsAll = ['elad','alik','rif','tal','moshe','assaf'];
+    const uidsAll = ['elad','alik','rif','tal','moshe','assaf','omer'];
     const statusListA = [
       { key:'open',     cls:'blue',   lbl:'🔵 פתוח',   cnt:open },
       { key:'progress', cls:'yellow', lbl:'🟡 בביצוע', cnt:progress },
@@ -1527,8 +1545,9 @@ header{
     if (u.role === 'admin') {
       // team load
       html += `<div class="sec-lbl">📊 עומס צוות</div><div class="team-load">`;
-      ['elad','alik','rif','tal','moshe','assaf'].forEach(uid => {
+      ['elad','alik','rif','tal','moshe','assaf','omer'].forEach(uid => {
         if (loggedInAs === 'assaf' && uid === 'moshe') return;
+        if (USERS[uid]?.role === 'lab' && USERS[currentUser]?.role !== 'admin') return;
         const ut = tasks.filter(t=>t.assignee===uid && t.status!=='done');
         const max = 8;
         const pct = Math.min(ut.length/max*100,100);
