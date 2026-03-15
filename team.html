@@ -1500,7 +1500,7 @@ header{
   // ── DASHBOARD ──────────────────────────────────────
   function renderDash(wrap) {
     const u = USERS[currentUser];
-    const myTasks = u.role === 'admin' ? tasks : tasks.filter(t=>t.assignee===currentUser);
+    const myTasks = u.role === 'admin' ? tasks : tasks.filter(t=>t.assignee===currentUser || (t.assignees && t.assignees.includes(currentUser)));
     const open     = myTasks.filter(t=>t.status==='open').length;
     const progress = myTasks.filter(t=>t.status==='progress').length;
     const blocked  = myTasks.filter(t=>t.status==='blocked').length;
@@ -1688,7 +1688,18 @@ header{
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
           <span class="badge">${STAT[t.status]||t.status}</span>
           <span class="badge">${PRIO[t.priority]||'רגיל'}</span>
-          <span class="badge assignee">👤 ${assignee}</span>
+          ${(() => {
+            const allAssignees = t.assignees && t.assignees.length > 1 ? t.assignees : [t.assignee];
+            const visibleAssignees = allAssignees.filter(uid => {
+              if (!uid) return false;
+              if (USERS[uid]?.role === 'lab') return isAdmin || uid === currentUser;
+              return true;
+            });
+            return visibleAssignees.map(uid => {
+              const n = USERS[uid] ? USERS[uid].name.split(' ')[0] : uid;
+              return '<span class="badge assignee">👤 '+n+'</span>';
+            }).join('');
+          })()}
           ${t.deadline ? '<span class="badge deadline">📅 '+t.deadline+'</span>' : ''}
         </div>
         ${t.notes ? '<div style="font-size:13px;color:var(--text2);background:var(--card2);border-radius:8px;padding:10px 12px;margin-bottom:12px">'+esc(t.notes)+'</div>' : ''}
@@ -2182,8 +2193,16 @@ header{
     // load existing assignees into mAssigneesList
     mAssigneesList = t.assignees ? [...t.assignees] : (t.assignee ? [t.assignee] : []);
     document.querySelectorAll('#mAssigneeRow .mchip').forEach(c => {
-      c.classList.toggle('sel', mAssigneesList.includes(c.dataset.u));
-      if (c.dataset.u === 'omer') c.style.display = (USERS[currentUser]?.role === 'admin') ? 'inline-flex' : 'none';
+      const uid = c.dataset.u;
+      const isSel = mAssigneesList.includes(uid);
+      c.classList.toggle('sel', isSel);
+      // omer: show if assigned OR if admin; hide if not assigned and not admin
+      if (uid === 'omer') {
+        const showOmer = USERS[currentUser]?.role === 'admin' || isSel;
+        c.style.display = showOmer ? 'inline-flex' : 'none';
+        // non-admins can see omer is assigned but can't change it
+        if (USERS[currentUser]?.role !== 'admin') c.style.pointerEvents = 'none';
+      }
     });
     document.querySelectorAll('#mPrioRow .mchip').forEach(c=>{c.className='mchip';if(parseInt(c.dataset.p)===mPrio)c.classList.add('sp'+mPrio)});
     document.querySelectorAll('#mStatusRow .mchip').forEach(c=>c.classList.toggle('sel',c.dataset.s===mStatus));
