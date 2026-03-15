@@ -1686,7 +1686,7 @@ header{
     const STAT  = {open:'🔵 פתוח', progress:'🟡 בביצוע', blocked:'⏳ ממתין', done:'✅ בוצע'};
     const PRIO  = {1:'🔴 דחוף',2:'🟠 גבוה',3:'🟡 רגיל',4:'🟢 נמוך'};
     const isAdmin = USERS[currentUser]?.role === 'admin';
-    const canEdit = isAdmin || t.assignee === currentUser;
+    const canEdit = isAdmin || isAssignedTo(t, currentUser);
     const assignee = USERS[t.assignee] ? USERS[t.assignee].name : t.assignee;
     const steps = t.steps ? Object.entries(t.steps) : [];
 
@@ -2116,9 +2116,8 @@ header{
       else                deadlineBadge = `<span class="deadline-badge ok">📅 ${t.deadline}</span>`;
     }
     const isAdmin = USERS[currentUser]?.role==='admin';
-    const isAssigned = isAssignedTo(t, currentUser);
-    const canEdit = isAdmin || isAssigned;
-    const canDelete = isAdmin || isAssigned;
+    const canEdit = isAdmin || isAssignedTo(t, currentUser);
+    const canDelete = isAdmin || isAssignedTo(t, currentUser);
 
     const statusMap = {open:'status-open',progress:'status-progress',blocked:'status-blocked',done:'status-done'};
 
@@ -2194,6 +2193,7 @@ header{
 
   // ── EDIT MODAL ─────────────────────────────────────
   function openEdit(id) {
+    // admins can edit any task
     const t = tasks.find(x=>x.id===id);
     if (!t) return;
     editId   = id;
@@ -2217,7 +2217,7 @@ header{
         const showOmer = USERS[currentUser]?.role === 'admin' || isSel;
         c.style.display = showOmer ? 'inline-flex' : 'none';
         // non-admins can see omer is assigned but can't change it
-        if (USERS[currentUser]?.role !== 'admin') c.style.pointerEvents = 'none';
+        // admins can always change assignees
       }
     });
     document.querySelectorAll('#mPrioRow .mchip').forEach(c=>{c.className='mchip';if(parseInt(c.dataset.p)===mPrio)c.classList.add('sp'+mPrio)});
