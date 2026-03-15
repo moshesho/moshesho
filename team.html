@@ -1832,7 +1832,7 @@ header{
   // ── TASKS LIST ─────────────────────────────────────
   function renderTasks(wrap) {
     const u = USERS[currentUser];
-    const myTasks = u.role==='admin' ? tasks : tasks.filter(t=>t.assignee===currentUser||(t.assignees&&t.assignees.includes(currentUser)));
+    const myTasks = u.role==='admin' ? tasks : tasks.filter(t=> t.assignee===currentUser || (t.assignees && t.assignees.includes(currentUser) && t.assignees.length > 0));
     const isAdmin = u.role==='admin';
 
     let html = '';
@@ -2118,7 +2118,7 @@ header{
         <div class="tc-name">${esc(t.name)}</div>
         <div class="tc-actions">
           ${canEdit ? `<button class="iBtn edit" onclick="openEdit('${t.id}')">✏️</button>` : ''}
-          ${isAdmin ? `<button class="iBtn del" onclick="delTask('${t.id}')">🗑</button>` : ''}
+          ${(isAdmin || (currentUser === 'omer' && (t.assignee === 'omer' || (t.assignees && t.assignees.includes('omer'))))) ? `<button class="iBtn del" onclick="delTask('${t.id}')">🗑</button>` : ''}
         </div>
       </div>
       <div class="tc-meta">
