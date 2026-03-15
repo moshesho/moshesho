@@ -1907,8 +1907,8 @@ header{
     </div>
     <div class="m-lbl">שייך ל <span style="font-size:10px;color:var(--text3);font-weight:400">(ניתן לבחור כמה)</span></div>
     <div class="meta-row" id="qAssigneeRow">
-      ${['elad','alik','rif','tal','moshe','assaf'].map(uid=>`
-        <button class="mchip ${mAssignees.includes(uid)?'sel':''}" data-u="${uid}" onclick="toggleQA(this)">${USERS[uid].name.split(' ')[0]}</button>
+      ${Object.entries(USERS).filter(([uid,u]) => u.role !== 'lab' || USERS[currentUser]?.role === 'admin').map(([uid,u])=>`
+        <button class="mchip ${mAssignees.includes(uid)?'sel':''}" data-u="${uid}" onclick="toggleQA(this)">${u.name.split(' ')[0]}</button>
       `).join('')}
     </div>
     <div class="m-lbl">עדיפות</div>
