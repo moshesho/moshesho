@@ -812,7 +812,7 @@ header{
       <button class="mchip" data-u="tal" onclick="toggleMA(this)">טל</button>
       <button class="mchip" data-u="moshe" onclick="toggleMA(this)">משה</button>
       <button class="mchip" data-u="assaf" onclick="toggleMA(this)">אסף</button>
-      <button class="mchip" data-u="omer" onclick="toggleMA(this)" id="omerChipAdd">עומר</button>
+      <button class="mchip" data-u="omer" onclick="toggleMA(this)" id="omerChipAdd" style="display:none">עומר</button>
     </div>
 
     <div class="m-lbl">עדיפות</div>
@@ -1898,10 +1898,8 @@ header{
 
   function renderAdd(wrap) {
     // show/hide omer chip for admins only
-    setTimeout(() => {
-      const omerChip = document.getElementById('omerChipAdd');
-      if (omerChip) omerChip.style.display = (USERS[currentUser]?.role === 'admin') ? '' : 'none';
-    }, 10);
+    const omerChip = document.getElementById('omerChipAdd');
+    if (omerChip) omerChip.style.display = (USERS[currentUser]?.role === 'admin') ? '' : 'none';
     wrap.innerHTML = `
     <div class="sec-lbl">➕ משימה חדשה לצוות</div>
     <div class="add-bar">
