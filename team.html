@@ -1169,6 +1169,11 @@ header{
       document.getElementById('syncDot').className = 'sync-dot live';
     }
     if (currentUser) render();
+    // update counts on user select screen if visible
+    const userSelectEl = document.getElementById('userSelectScreen');
+    if (userSelectEl && userSelectEl.style.display !== 'none') {
+      renderUserSelectButtons();
+    }
   });
 
   // ── LOGIN ──────────────────────────────────────────
