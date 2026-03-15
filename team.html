@@ -1530,7 +1530,7 @@ header{
     statusListA.forEach(st => {
       let breakdown = '';
       uidsAll.forEach(uid => {
-        const c = myTasks.filter(t=>t.assignee===uid && t.status===st.key).length;
+        const c = myTasks.filter(t=>isAssignedTo(t,uid) && t.status===st.key).length;
         if (c > 0) {
           const firstName = USERS[uid].name.split(' ')[0];
           breakdown += `<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
@@ -1563,7 +1563,7 @@ header{
       ['elad','alik','rif','tal','moshe','assaf','omer'].forEach(uid => {
         if (loggedInAs === 'assaf' && uid === 'moshe') return;
         if (USERS[uid]?.role === 'lab' && USERS[currentUser]?.role !== 'admin') return;
-        const ut = tasks.filter(t=>t.assignee===uid && t.status!=='done');
+        const ut = tasks.filter(t=>isAssignedTo(t,uid) && t.status!=='done');
         const max = 8;
         const pct = Math.min(ut.length/max*100,100);
         const cls = pct<40?'low':pct<75?'mid':'high';
@@ -1600,7 +1600,7 @@ header{
       statusList.forEach(st => {
         let breakdown = '';
         uids.forEach(uid => {
-          const c = tasks.filter(t=>t.assignee===uid && t.status===st.key).length;
+          const c = tasks.filter(t=>isAssignedTo(t,uid) && t.status===st.key).length;
           if (c > 0) {
             const firstName = USERS[uid].name.split(' ')[0];
             breakdown += `<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
