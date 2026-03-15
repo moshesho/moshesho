@@ -1849,14 +1849,14 @@ header{
       html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px">
         <button class="mchip ${taskPersonFilter==='all'?'sel':''}" style="grid-column:span 3" onclick="setTPF('all')">📋 כולם (${tasks.filter(t=>t.status!=='done').length})</button>
         ${['elad','alik','rif','tal','moshe','assaf','omer'].map(uid=>{
-          const cnt = tasks.filter(t=>t.assignee===uid&&t.status!=='done').length;
+          const cnt = tasks.filter(t=>isAssignedTo(t,uid)&&t.status!=='done').length;
           return `<button class="mchip ${taskPersonFilter===uid?'sel':''}" onclick="setTPF('${uid}')">${USERS[uid].name.split(' ')[0]} <span style="font-size:10px;opacity:.7">${cnt}</span></button>`;
         }).join('')}
       </div>`;
     }
 
     const filtered = isAdmin
-      ? (taskPersonFilter==='all' ? tasks : tasks.filter(t=>t.assignee===taskPersonFilter))
+      ? (taskPersonFilter==='all' ? tasks : tasks.filter(t=>isAssignedTo(t,taskPersonFilter)))
       : myTasks;
 
     const byStatus = {open:[],progress:[],blocked:[],done:[]};
