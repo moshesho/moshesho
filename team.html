@@ -669,7 +669,11 @@ header{
     <div class="login-sub">בחר את שמך להמשך</div>
   </div>
   <div class="login-right">
-    <div class="login-label">👑 מנהלים</div>
+    <div id="currentUserHeader" style="display:none;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:10px 14px;margin-bottom:16px;text-align:center">
+      <div id="currentUserRole" style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--blue);text-transform:uppercase;margin-bottom:2px"></div>
+      <div id="currentUserName" style="font-size:15px;font-weight:900;color:#fff"></div>
+    </div>
+    <div class="login-label">👑 <span id="adminSectionLabel">מנהלים</span></div>
     <div class="user-grid" id="adminGrid" style="margin-bottom:16px"></div>
     <div class="login-label">👥 צוות</div>
     <div class="user-grid" id="memberGrid"></div>
@@ -1258,6 +1262,24 @@ header{
   }
 
   function showUserSelect() {
+    setTimeout(() => {
+      // update admin section label
+      const lbl = document.getElementById('adminSectionLabel');
+      if (lbl) lbl.textContent = loggedInAs === 'assaf' ? 'ראש צוות' : 'מנהלים';
+
+      // show current user header
+      const header = document.getElementById('currentUserHeader');
+      const roleEl = document.getElementById('currentUserRole');
+      const nameEl = document.getElementById('currentUserName');
+      if (header && loggedInAs && USERS[loggedInAs]) {
+        const u = USERS[loggedInAs];
+        header.style.display = 'block';
+        roleEl.textContent = loggedInAs === 'moshe' ? 'מוביל תשתיות טכנולוגיות' : loggedInAs === 'assaf' ? 'ראש צוות' : 'צוות';
+        nameEl.textContent = u.name;
+      } else if (header) {
+        header.style.display = 'none';
+      }
+    }, 10);
     renderUserSelectButtons();
     document.getElementById('userSelectScreen').style.display = 'flex';
     document.getElementById('loginScreen').style.display = 'none';
