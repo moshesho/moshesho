@@ -1948,15 +1948,14 @@ header{
     if (!mAssignees.length) return toast('⚠️ בחר לפחות אחראי אחד');
     const deadline = document.getElementById('qDeadline')?.value || null;
     const notes    = document.getElementById('qNotes')?.value?.trim() || null;
-    mAssignees.forEach(uid => {
-      const newRef = db.ref('team/tasks').push({
-        name, assignee:uid, priority:mPrio, status:'open',
-        deadline, notes, createdAt:Date.now(), createdBy:currentUser
-      });
-      if (pendingSteps.length) {
-        pendingSteps.forEach(s => db.ref('team/tasks/'+newRef.key+'/steps').push({...s}));
-      }
+    const [firstUid, ...restUids] = mAssignees;
+    const newRef = db.ref('team/tasks').push({
+      name, assignee:firstUid, assignees:[...mAssignees], priority:mPrio, status:'open',
+      deadline, notes, createdAt:Date.now(), createdBy:currentUser
     });
+    if (pendingSteps.length) {
+      pendingSteps.forEach(s => db.ref('team/tasks/'+newRef.key+'/steps').push({...s}));
+    }
     pendingSteps = [];
     const names = mAssignees.map(u=>USERS[u].name.split(' ')[0]).join(', ');
     mAssignees.forEach(uid => pushNotif(uid, name));
