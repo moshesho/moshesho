@@ -1334,7 +1334,7 @@ header{
     if (labGrid) labGrid.innerHTML = '';
 
     function makeBtn(uid, onclick) {
-      const taskCnt = tasks.filter(t=>t.assignee===uid && t.status!=='done').length;
+      const taskCnt = tasks.filter(t=>isAssignedTo(t,uid) && t.status!=='done').length;
       const btn = document.createElement('button');
       btn.className = 'user-btn' + (USERS[uid].role==='admin' ? ' admin-btn' : '');
       btn.innerHTML = USERS[uid].name
