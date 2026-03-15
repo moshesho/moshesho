@@ -1087,7 +1087,10 @@ header{
               <div class="backup-date">📅 ${dateStr}</div>
               <div class="backup-count">${b.taskCount || 0} משימות${savedTime ? ' · נשמר ב-'+savedTime : ''}</div>
             </div>
-            <button class="backup-restore-btn" onclick="confirmRestore('${date}')">♻️ שחזר</button>
+            <div style="display:flex;gap:6px">
+              <button class="backup-restore-btn" onclick="downloadFirebaseBackup('${date}')" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:var(--blue)" title="הורד לקובץ">⬇️</button>
+              <button class="backup-restore-btn" onclick="confirmRestore('${date}')">♻️ שחזר</button>
+            </div>
           </div>`;
         });
       }
@@ -1208,6 +1211,30 @@ header{
     toast('💾 קובץ גיבוי הורד!');
   }
 
+
+  function downloadFirebaseBackup(date) {
+    db.ref('team/backups/'+date).once('value', snap => {
+      const b = snap.val();
+      if (!b) { toast('⚠️ גיבוי לא נמצא'); return; }
+      const d = new Date(date);
+      const dateStr = d.getDate()+'_'+(d.getMonth()+1)+'_'+d.getFullYear();
+      const exportData = {
+        version: 1,
+        exportedAt: new Date(b.savedAt||Date.now()).toISOString(),
+        taskCount: b.taskCount||0,
+        tasks: b.tasks||{}
+      };
+      const json = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([json], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'SPYDER_backup_'+dateStr+'.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('⬇️ גיבוי '+dateStr+' הורד!');
+    });
+  }
   function triggerLocalRestore() {
     const inp = document.createElement('input');
     inp.type = 'file';
