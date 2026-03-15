@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>משה שושה | מרכז שליטה</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:      #0b0b15;
+      --card:    #131320;
+      --card2:   #1a1a2e;
+      --accent:  #4f8ef7;
+      --accent2: #a78bfa;
+      --accent3: #34d399;
+      --gold:    #fbbf24;
+      --text:    #e2e8ff;
+      --text2:   #7777aa;
+      --border:  rgba(79,142,247,0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px 40px;
+      overflow-x: hidden;
+    }
+
+    /* bg grid */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(79,142,247,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,142,247,0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* glow orbs */
+    .orb1 {
+      position: fixed; top: -100px; right: -80px;
+      width: 380px; height: 380px; border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(79,142,247,0.08) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
+      animation: orb1 9s ease-in-out infinite;
+    }
+    .orb2 {
+      position: fixed; bottom: -120px; left: -60px;
+      width: 320px; height: 320px; border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(167,139,250,0.07) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
+      animation: orb1 12s ease-in-out infinite reverse;
+    }
+    @keyframes orb1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-20px,25px)} }
+
+    .wrap {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 400px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+    }
+
+    /* ── LOGO / TITLE ── */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 36px;
+      animation: fadeUp .6s ease both;
+    }
+
+    .logo-icon {
+      font-size: 52px;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 20px rgba(79,142,247,0.5));
+      display: block;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+    .logo-title {
+      font-size: 26px; font-weight: 900;
+      background: linear-gradient(135deg, #4f8ef7, #a78bfa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 10px rgba(79,142,247,0.3));
+      letter-spacing: -0.5px; margin-bottom: 6px;
+    }
+
+    .logo-sub {
+      font-size: 13px; color: var(--text2); font-weight: 500;
+    }
+
+    /* ── APP CARDS ── */
+    .app-card {
+      width: 100%;
+      background: linear-gradient(145deg, var(--card2), var(--card));
+      border: 1px solid rgba(255,255,255,0.08);
+      border-top: 1px solid rgba(255,255,255,0.13);
+      border-radius: 22px;
+      padding: 22px 22px 20px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      box-shadow: 0 10px 36px rgba(0,0,0,0.5), 0 2px 0 rgba(255,255,255,0.04) inset;
+      transition: transform .22s cubic-bezier(.34,1.4,.64,1), box-shadow .22s;
+      position: relative; overflow: hidden;
+      animation: fadeUp .6s ease both;
+    }
+    .app-card:nth-child(2) { animation-delay: .1s; }
+    .app-card:nth-child(3) { animation-delay: .2s; }
+    .app-card:nth-child(4) { animation-delay: .3s; }
+
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+
+    .app-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 18px 48px rgba(0,0,0,0.6);
+    }
+    .app-card:active { transform: scale(.97); }
+
+    /* glowing stripe */
+    .app-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      border-radius: 22px 22px 0 0;
+    }
+    .card-tasks::before   { background: linear-gradient(90deg, var(--accent), var(--accent2)); box-shadow: 0 0 12px rgba(79,142,247,0.5); }
+    .card-family::before  { background: linear-gradient(90deg, var(--gold), #f97316);          box-shadow: 0 0 12px rgba(251,191,36,0.4); }
+
+    /* shimmer */
+    .app-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.02) 50%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .card-top {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 12px;
+    }
+
+    .card-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; flex-shrink: 0;
+    }
+    .card-tasks  .card-icon { background: rgba(79,142,247,0.15); box-shadow: 0 0 16px rgba(79,142,247,0.2); }
+    .card-family .card-icon { background: rgba(251,191,36,0.12);  box-shadow: 0 0 16px rgba(251,191,36,0.15); }
+
+    .card-info {}
+    .card-title {
+      font-size: 18px; font-weight: 900; line-height: 1.2;
+      margin-bottom: 3px;
+    }
+    .card-tasks  .card-title { color: #93b8fb; }
+    .card-family .card-title { color: #fcd34d; }
+
+    .card-desc { font-size: 12px; color: var(--text2); font-weight: 500; line-height: 1.5; }
+
+    .card-features {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .feat-tag {
+      font-size: 10px; font-weight: 700;
+      border-radius: 5px; padding: 3px 8px;
+    }
+    .card-tasks  .feat-tag { background: rgba(79,142,247,0.1);  color: #93b8fb; border: 1px solid rgba(79,142,247,0.2);  }
+    .card-family .feat-tag { background: rgba(251,191,36,0.08); color: #fcd34d; border: 1px solid rgba(251,191,36,0.18); }
+    .card-team::before  { background: linear-gradient(90deg, #06b6d4, #3b82f6);          box-shadow: 0 0 12px rgba(6,182,212,0.4); }
+    .card-team  .card-icon { background: rgba(6,182,212,0.12);  box-shadow: 0 0 16px rgba(6,182,212,0.2); }
+    .card-team  .card-title { color: #67e8f9; }
+    .card-team  .feat-tag { background: rgba(6,182,212,0.08); color: #67e8f9; border: 1px solid rgba(6,182,212,0.2); }
+
+    .card-arrow {
+      position: absolute; left: 20px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 20px; opacity: 0.25;
+      transition: opacity .2s, transform .2s;
+    }
+    .app-card:hover .card-arrow { opacity: 0.7; transform: translateY(-50%) translateX(-4px); }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 11px; color: var(--text2);
+      animation: fadeUp .6s .3s ease both;
+    }
+    .footer span {
+      display: inline-block;
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent3);
+      box-shadow: 0 0 8px var(--accent3);
+      margin-left: 5px; vertical-align: middle;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ── DESKTOP ── */
+    @media (min-width: 768px) {
+      .wrap { max-width: 600px; }
+      .logo-icon { font-size: 68px; }
+      .logo-title { font-size: 36px; }
+      .logo-sub { font-size: 16px; }
+      .app-card { padding: 28px 28px 24px; border-radius: 26px; margin-bottom: 18px; }
+      .card-icon { width: 64px; height: 64px; border-radius: 18px; font-size: 32px; }
+      .card-title { font-size: 22px; }
+      .card-desc { font-size: 14px; }
+      .feat-tag { font-size: 12px; padding: 4px 10px; }
+      .footer { font-size: 13px; }
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="orb1"></div>
+<div class="orb2"></div>
+
+<div class="wrap">
+
+  <div class="logo-area">
+    <span class="logo-icon">🛡</span>
+    <div class="logo-title">משה שושה</div>
+    <div class="logo-sub">מרכז ניהול אישי · Rafael</div>
+  </div>
+
+  <a class="app-card card-tasks" href="tasks.html">
+    <div class="card-top">
+      <div class="card-icon">🎯</div>
+      <div class="card-info">
+        <div class="card-title">ניהול משימות ופרויקטים</div>
+        <div class="card-desc">משימות אישיות, פרויקטים עם צ'קליסט והתקדמות</div>
+      </div>
+    </div>
+    <div class="card-features">
+      <span class="feat-tag">PRV</span>
+      <span class="feat-tag">SPADS</span>
+      <span class="feat-tag">ADSS</span>
+      <span class="feat-tag">RO_AD</span>
+      <span class="feat-tag">SHERLOC</span>
+      <span class="feat-tag">+ עוד</span>
+    </div>
+    <div class="card-arrow">←</div>
+  </a>
+
+  <a class="app-card card-family" href="family.html">
+    <div class="card-top">
+      <div class="card-icon">🏠</div>
+      <div class="card-info">
+        <div class="card-title">אודליה ומשה שושה</div>
+        <div class="card-desc">רשימת קניות ומטלות משפחתיות משותפת</div>
+      </div>
+    </div>
+    <div class="card-features">
+      <span class="feat-tag">🛒 קניות</span>
+      <span class="feat-tag">🏠 בית</span>
+      <span class="feat-tag">👶 ילדים</span>
+      <span class="feat-tag">⚡ דחוף</span>
+      <span class="feat-tag">סנכרון חי</span>
+    </div>
+    <div class="card-arrow">←</div>
+  </a>
+
+  <a class="app-card card-team" href="team.html">
+    <div class="card-top">
+      <div class="card-icon">🛡️</div>
+      <div class="card-info">
+        <div class="card-title">ניהול צוות IT</div>
+        <div class="card-desc">ניהול משימות צוות עם דשבורד, התראות וסל מחזור</div>
+      </div>
+    </div>
+    <div class="card-features">
+      <span class="feat-tag">📊 דשבורד</span>
+      <span class="feat-tag">✅ משימות</span>
+      <span class="feat-tag">🔔 התראות</span>
+      <span class="feat-tag">🗑️ סל מחזור</span>
+      <span class="feat-tag">📊 Excel</span>
+    </div>
+    <div class="card-arrow">←</div>
+  </a>
+
+  <div class="footer">
+    <span></span> מחובר ל-Firebase · Real-time sync
+  </div>
+
+</div>
+</body>
+</html>

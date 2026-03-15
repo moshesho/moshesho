@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>משה | ניהול משימות</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet"/>
+
+  <!-- Firebase compat (גלובלי, ללא module) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey:            "AIzaSyDCtJtgIP-bSko4oqvDnArohUdwp1_QZAo",
+      authDomain:        "my-task-list-7f8cb.firebaseapp.com",
+      databaseURL:       "https://my-task-list-7f8cb-default-rtdb.firebaseio.com",
+      projectId:         "my-task-list-7f8cb",
+      storageBucket:     "my-task-list-7f8cb.firebasestorage.app",
+      messagingSenderId: "893970489708",
+      appId:             "1:893970489708:web:72a1468afc8fe2482d5349"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const _db = firebase.database();
+
+    // listeners — יופעלו אחרי שה-DOM וה-render מוכנים
+    window._fbReady = function() {
+      _db.ref('moshe/tasks').on('value', snap => {
+        const raw = snap.val() || {};
+        window._tasks = Object.entries(raw).map(([id,v])=>({id,...v}))
+          .sort((a,b)=>(a.priority||3)-(b.priority||3));
+        window._tasksLoaded = true;
+        if (typeof window.render==='function') window.render();
+      });
+
+      _db.ref('moshe/projects').on('value', snap => {
+        const raw = snap.val() || {};
+        window._projects = Object.entries(raw).map(([id,v])=>({id,...v}))
+          .sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        const dot = document.getElementById('syncDot');
+        if (dot) dot.className='sync-dot live';
+        if (typeof window.render==='function') window.render();
+      });
+    };
+
+    // Firebase helpers — גלובליים
+    window._fb = {
+      push:   (path, data)        => _db.ref(path).push(data),
+      update: (path, data)        => _db.ref(path).update(data),
+      remove: (path)              => _db.ref(path).remove(),
+      tasksPath:    'moshe/tasks',
+      projectsPath: 'moshe/projects'
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg:       #0e0e18;
+      --surface:  #16162a;
+      --card:     #1c1c32;
+      --card2:    #22223a;
+      --card3:    #282845;
+      --accent:   #4f8ef7;
+      --accent2:  #a78bfa;
+      --accent3:  #34d399;
+      --warn:     #f97316;
+      --danger:   #f87171;
+      --gold:     #fbbf24;
+      --text:     #e2e8ff;
+      --text2:    #9999cc;
+      --text3:    #555580;
+      --border:   rgba(79,142,247,0.15);
+      --radius:   18px;
+      --radius-sm:11px;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+    body{
+      font-family:'Heebo',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100dvh;
+      max-width:430px;
+      margin:0 auto;
+      overflow-x:hidden;
+    }
+
+    /* grid bg */
+    body::before{
+      content:'';position:fixed;inset:0;
+      background-image:
+        linear-gradient(rgba(79,142,247,0.03) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(79,142,247,0.03) 1px,transparent 1px);
+      background-size:28px 28px;
+      pointer-events:none;z-index:0;
+    }
+
+    /* glow orb */
+    body::after{
+      content:'';position:fixed;
+      top:-150px;right:-80px;
+      width:400px;height:400px;
+      background:radial-gradient(ellipse,rgba(79,142,247,0.07) 0%,transparent 65%);
+      pointer-events:none;z-index:0;
+      animation:orb 10s ease-in-out infinite;
+    }
+    @keyframes orb{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,40px)}}
+
+    /* ── HEADER ── */
+    header{
+      position:sticky;top:0;z-index:100;
+      background:rgba(14,14,24,0.92);
+      backdrop-filter:blur(24px);
+      border-bottom:1px solid var(--border);
+      padding:14px 18px 10px;
+    }
+    .hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+
+    .app-title{
+      font-size:15px;font-weight:900;
+      background:linear-gradient(135deg,#4f8ef7,#a78bfa);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      filter:drop-shadow(0 0 8px rgba(79,142,247,0.4));
+      letter-spacing:0.2px;
+    }
+
+    .sync-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:#333;display:inline-block;
+      margin-left:6px;transition:all .4s;vertical-align:middle;
+    }
+    .sync-dot.live{
+      background:var(--accent3);
+      box-shadow:0 0 8px var(--accent3);
+      animation:pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse{0%,100%{box-shadow:0 0 6px var(--accent3)}50%{box-shadow:0 0 16px var(--accent3)}}
+
+    .hdr-stats{display:flex;gap:6px}
+    .hdr-stat{
+      background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:50px;
+      padding:4px 11px;
+      font-size:11px;font-weight:700;color:var(--text2);
+      display:flex;align-items:center;gap:3px;
+    }
+    .hdr-stat b{color:var(--text);font-weight:800}
+
+    /* ── TABS ── */
+    .tabs{display:flex;gap:5px}
+    .tab{
+      flex:1;padding:7px 0;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:50px;
+      color:var(--text3);
+      font-family:'Heebo',sans-serif;font-weight:700;font-size:12px;
+      cursor:pointer;transition:all .2s;
+    }
+    .tab.active{
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#fff;border-color:transparent;
+      box-shadow:0 4px 16px rgba(79,142,247,0.4);
+    }
+
+    /* ── CONTENT ── */
+    .content{padding:10px 16px 110px;position:relative;z-index:1}
+
+    /* ── ADD BAR ── */
+    .add-bar{
+      display:flex;gap:8px;margin-bottom:10px;
+    }
+    .add-input{
+      flex:1;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius:var(--radius-sm);
+      padding:11px 13px;
+      color:var(--text);
+      font-family:'Heebo',sans-serif;font-size:14px;
+      outline:none;transition:all .2s;
+    }
+    .add-input::placeholder{color:var(--text3)}
+    .add-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,0.15)}
+
+    .add-btn{
+      width:44px;height:44px;flex-shrink:0;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none;border-radius:var(--radius-sm);
+      color:#fff;font-size:24px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 16px rgba(79,142,247,0.4);
+      transition:transform .15s;
+    }
+    .add-btn:active{transform:scale(.88)}
+
+    /* ── PRIO + CAT ROW ── */
+    .meta-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+    .pchip{
+      padding:5px 10px;border-radius:50px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.04);
+      font-family:'Heebo',sans-serif;font-weight:700;font-size:11px;
+      color:var(--text3);cursor:pointer;transition:all .18s;white-space:nowrap;
+    }
+    .pchip.sp1{background:rgba(248,113,113,0.15);border-color:#f87171;color:#f87171}
+    .pchip.sp2{background:rgba(251,191,36,0.12);border-color:#fbbf24;color:#fbbf24}
+    .pchip.sp3{background:rgba(79,142,247,0.1);border-color:#4f8ef7;color:#93b8fb}
+    .pchip.sp4{background:rgba(255,255,255,0.05);border-color:#555580;color:#7777aa}
+
+    .cchip{
+      padding:5px 10px;border-radius:50px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.04);
+      font-family:'Heebo',sans-serif;font-weight:700;font-size:11px;
+      color:var(--text3);cursor:pointer;transition:all .18s;white-space:nowrap;
+    }
+    .cchip.sel{background:rgba(167,139,250,0.15);border-color:var(--accent2);color:var(--accent2)}
+
+    /* ── TASK CARD ── */
+    .task-card{
+      background:linear-gradient(145deg,var(--card2),var(--card));
+      border:1px solid rgba(255,255,255,0.07);
+      border-top:1px solid rgba(255,255,255,0.11);
+      border-radius:var(--radius);
+      padding:13px 14px 13px 16px;
+      margin-bottom:8px;
+      display:flex;align-items:flex-start;gap:11px;
+      box-shadow:0 8px 28px rgba(0,0,0,0.45),0 2px 0 rgba(255,255,255,0.04) inset;
+      transition:transform .2s,box-shadow .2s;
+      animation:cardIn .25s ease;
+      position:relative;overflow:hidden;
+    }
+    .task-card:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(0,0,0,0.55)}
+    @keyframes cardIn{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:none}}
+
+    .task-card::before{
+      content:'';position:absolute;
+      left:0;top:8px;bottom:8px;width:3px;border-radius:2px;
+    }
+    .task-card.p1::before{background:#f87171;box-shadow:0 0 8px #f87171}
+    .task-card.p2::before{background:#fbbf24;box-shadow:0 0 8px #fbbf24}
+    .task-card.p3::before{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+    .task-card.p4::before{background:#555580}
+    .task-card.done-card::before{background:var(--accent3);box-shadow:0 0 8px var(--accent3)}
+    .task-card.done-card{opacity:.55;filter:saturate(.4)}
+
+    .chk{
+      width:26px;height:26px;flex-shrink:0;margin-top:1px;
+      border-radius:50%;border:1.5px solid rgba(255,255,255,0.2);
+      background:transparent;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;font-size:13px;
+      transition:all .2s;
+    }
+    .chk.done{background:var(--accent3);border-color:var(--accent3);color:#000;box-shadow:0 0 10px rgba(52,211,153,.4)}
+
+    .task-body{flex:1;min-width:0}
+    .task-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.3}
+    .task-card.done-card .task-name{text-decoration:line-through;color:var(--text3)}
+
+    .task-meta{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap;align-items:center}
+    .tbadge{
+      font-size:10px;font-weight:700;border-radius:5px;padding:2px 6px;
+    }
+    .tbadge.cat{background:rgba(255,255,255,0.06);color:var(--text2);border:1px solid rgba(255,255,255,0.08)}
+    .tbadge.prio1{background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.25)}
+    .tbadge.prio2{background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.22)}
+    .tbadge.prio3{background:rgba(79,142,247,0.1);color:#93b8fb;border:1px solid rgba(79,142,247,0.2)}
+    .tbadge.prio4{background:rgba(255,255,255,0.04);color:#6666aa;border:1px solid rgba(255,255,255,0.07)}
+    .tbadge.done-t{background:rgba(52,211,153,0.1);color:var(--accent3);border:1px solid rgba(52,211,153,0.2)}
+
+    .undo-btn{
+      font-size:11px;font-weight:700;
+      background:rgba(79,142,247,0.1);
+      border:1px solid rgba(79,142,247,0.2);
+      border-radius:5px;padding:2px 8px;
+      color:#93b8fb;cursor:pointer;
+      font-family:'Heebo',sans-serif;transition:all .15s;
+    }
+
+    .task-actions{display:flex;gap:5px;flex-shrink:0;padding-top:1px}
+    .iBtn{
+      width:30px;height:30px;border-radius:8px;
+      border:1px solid rgba(255,255,255,0.07);
+      background:rgba(255,255,255,0.04);
+      color:var(--text3);font-size:13px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:all .15s;
+    }
+    .iBtn:active{transform:scale(.85)}
+    .iBtn.edit-btn{color:#a78bfa}
+    .iBtn.del-btn{color:#f87171}
+
+    /* ── PROJECT CARD ── */
+    .project-card{
+      background:linear-gradient(145deg,var(--card3),var(--card2));
+      border:1px solid rgba(255,255,255,0.08);
+      border-top:1px solid rgba(255,255,255,0.13);
+      border-radius:var(--radius);
+      padding:16px;
+      margin-bottom:10px;
+      box-shadow:0 10px 32px rgba(0,0,0,0.5);
+      animation:cardIn .25s ease;
+      position:relative;overflow:hidden;
+    }
+
+    .project-card::after{
+      content:'';position:absolute;
+      top:0;right:0;width:80px;height:80px;
+      background:radial-gradient(ellipse at top right,rgba(79,142,247,0.06),transparent);
+      pointer-events:none;
+    }
+
+    .proj-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+    .proj-name{font-size:15px;font-weight:800;color:var(--text);line-height:1.3}
+    .proj-cat{
+      font-size:10px;font-weight:700;
+      background:rgba(167,139,250,0.12);
+      color:var(--accent2);border:1px solid rgba(167,139,250,0.2);
+      border-radius:5px;padding:2px 7px;white-space:nowrap;margin-top:2px;
+    }
+
+    /* progress bar */
+    .progress-wrap{margin-bottom:10px}
+    .progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+    .progress-label{font-size:11px;font-weight:700;color:var(--text2)}
+    .progress-pct{
+      font-size:13px;font-weight:900;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .progress-bar{
+      height:6px;background:rgba(255,255,255,0.07);
+      border-radius:3px;overflow:hidden;
+    }
+    .progress-fill{
+      height:100%;border-radius:3px;
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      transition:width .4s cubic-bezier(.34,1.2,.64,1);
+      box-shadow:0 0 8px rgba(79,142,247,0.5);
+    }
+    .progress-fill.full{background:linear-gradient(90deg,var(--accent3),#059669)}
+
+    /* checklist */
+    .checklist{list-style:none;margin-bottom:10px}
+    .checklist li{
+      display:flex;align-items:center;gap:8px;
+      padding:6px 0;
+      border-bottom:1px solid rgba(255,255,255,0.04);
+      font-size:13px;color:var(--text2);
+      cursor:pointer;transition:color .15s;
+    }
+    .checklist li:last-child{border-bottom:none}
+    .checklist li.done-step{color:var(--text3);text-decoration:line-through}
+    .step-chk{
+      width:18px;height:18px;flex-shrink:0;
+      border-radius:4px;border:1.5px solid rgba(255,255,255,0.2);
+      background:transparent;display:flex;align-items:center;justify-content:center;
+      font-size:11px;transition:all .18s;
+    }
+    .checklist li.done-step .step-chk{
+      background:var(--accent3);border-color:var(--accent3);color:#000;
+      box-shadow:0 0 6px rgba(52,211,153,.3);
+    }
+
+    /* add step row */
+    .add-step-row{display:flex;gap:6px;margin-bottom:10px}
+    .step-input{
+      flex:1;background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:8px;padding:7px 10px;
+      color:var(--text);font-family:'Heebo',sans-serif;font-size:13px;
+      outline:none;transition:border-color .2s;
+    }
+    .step-input::placeholder{color:var(--text3)}
+    .step-input:focus{border-color:var(--accent)}
+    .step-add-btn{
+      padding:7px 12px;background:rgba(79,142,247,0.15);
+      border:1px solid rgba(79,142,247,0.25);
+      border-radius:8px;color:#93b8fb;
+      font-family:'Heebo',sans-serif;font-weight:700;font-size:12px;
+      cursor:pointer;white-space:nowrap;transition:all .15s;
+    }
+
+    .proj-actions{display:flex;gap:6px;justify-content:flex-end}
+    .proj-btn{
+      padding:5px 12px;border-radius:8px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.04);
+      font-family:'Heebo',sans-serif;font-weight:700;font-size:12px;
+      color:var(--text2);cursor:pointer;transition:all .15s;
+    }
+    .proj-btn.del{color:#f87171;border-color:rgba(248,113,113,0.2)}
+
+    /* ── SECTION LABEL ── */
+    .sec-lbl{
+      font-size:10px;font-weight:800;letter-spacing:2px;
+      text-transform:uppercase;color:var(--text3);
+      margin:14px 0 7px;padding-right:2px;
+    }
+
+    /* ── EMPTY ── */
+    .empty{text-align:center;padding:50px 20px;color:var(--text3)}
+    .empty-ico{font-size:46px;margin-bottom:10px;filter:drop-shadow(0 0 14px rgba(79,142,247,.3))}
+
+    /* ── MODAL ── */
+    .m-overlay{
+      position:fixed;inset:0;
+      background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);
+      z-index:300;display:flex;align-items:flex-end;
+      opacity:0;pointer-events:none;transition:opacity .25s;
+    }
+    .m-overlay.open{opacity:1;pointer-events:all}
+
+    .m-box{
+      background:linear-gradient(160deg,var(--card3),var(--card));
+      border-radius:26px 26px 0 0;
+      padding:20px 20px 44px;width:100%;
+      border-top:1px solid rgba(79,142,247,0.25);
+      transform:translateY(40px);transition:transform .3s cubic-bezier(.34,1.2,.64,1);
+      box-shadow:0 -20px 60px rgba(0,0,0,.7);
+    }
+    .m-overlay.open .m-box{transform:translateY(0)}
+
+    .m-handle{width:36px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin:0 auto 16px}
+    .m-title{
+      font-size:16px;font-weight:900;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      margin-bottom:14px;text-align:center;
+    }
+    .m-input{
+      width:100%;background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.13);
+      border-radius:11px;padding:12px 13px;
+      color:var(--text);font-family:'Heebo',sans-serif;font-size:15px;
+      outline:none;margin-bottom:10px;transition:all .2s;
+    }
+    .m-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,.15)}
+
+    .m-save{
+      width:100%;padding:13px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border:none;border-radius:11px;color:#fff;
+      font-family:'Heebo',sans-serif;font-weight:800;font-size:15px;
+      cursor:pointer;box-shadow:0 5px 18px rgba(79,142,247,.4);
+      transition:transform .15s;margin-bottom:8px;
+    }
+    .m-save:active{transform:scale(.97)}
+    .m-cancel{
+      width:100%;padding:11px;background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.09);border-radius:11px;
+      font-family:'Heebo',sans-serif;font-weight:700;font-size:14px;
+      color:var(--text3);cursor:pointer;
+    }
+
+
+    .proj-filter-btn {
+      padding: 5px 11px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-family: 'Heebo', sans-serif;
+      font-weight: 700; font-size: 11px;
+      color: var(--text3);
+      cursor: pointer; white-space: nowrap;
+      flex-shrink: 0; transition: all .18s;
+    }
+    .proj-filter-btn.pf-active {
+      background: rgba(79,142,247,0.15);
+      border-color: var(--accent);
+      color: #93b8fb;
+      box-shadow: 0 0 10px rgba(79,142,247,0.2);
+    }
+
+
+    /* ── TASK FILTER GRID ── */
+    .tf-btn {
+      padding: 7px 4px;
+      border-radius: 9px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-family: 'Heebo', sans-serif;
+      font-weight: 700; font-size: 11px;
+      color: var(--text3);
+      cursor: pointer; transition: all .18s;
+      text-align: center; line-height: 1.3;
+      white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tf-btn:active { transform: scale(.92); }
+    .tf-btn.tf-active {
+      background: rgba(79,142,247,0.18);
+      border-color: var(--accent);
+      color: #93b8fb;
+      box-shadow: 0 0 12px rgba(79,142,247,0.25);
+    }
+    .tf-btn.tf-empty {
+      opacity: 0.35;
+    }
+    .tf-cnt {
+      display: inline-block;
+      background: rgba(79,142,247,0.3);
+      border-radius: 50px;
+      padding: 1px 5px;
+      font-size: 10px;
+      color: #fff;
+      margin-right: 2px;
+    }
+    .tf-btn.tf-active .tf-cnt {
+      background: rgba(79,142,247,0.6);
+    }
+
+    /* ── TASK STEPS & STATUS ────────────────────────── */
+    .task-expand {
+      width: 100%;
+      margin-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 10px;
+    }
+
+    .status-row {
+      display: flex; gap: 6px; margin-bottom: 8px; align-items: flex-start;
+    }
+    .status-input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 7px 10px;
+      color: var(--text);
+      font-family: 'Heebo', sans-serif; font-size: 13px;
+      outline: none; resize: none;
+      transition: border-color .2s;
+      min-height: 34px; max-height: 80px;
+    }
+    .status-input::placeholder { color: var(--text3); }
+    .status-input:focus { border-color: var(--accent2); }
+
+    .status-save-btn {
+      padding: 7px 10px;
+      background: rgba(167,139,250,0.15);
+      border: 1px solid rgba(167,139,250,0.25);
+      border-radius: 8px; color: var(--accent2);
+      font-family: 'Heebo', sans-serif; font-weight: 700; font-size: 12px;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: all .15s;
+    }
+    .status-save-btn:active { transform: scale(.92); }
+
+    .status-display {
+      font-size: 12px; color: var(--accent2);
+      background: rgba(167,139,250,0.08);
+      border: 1px solid rgba(167,139,250,0.15);
+      border-radius: 8px; padding: 6px 10px;
+      margin-bottom: 8px; line-height: 1.5;
+      cursor: pointer;
+    }
+    .status-display::before { content: '💬 '; }
+
+    .task-steps-wrap { margin-bottom: 6px; }
+
+    .task-progress-bar {
+      height: 4px; background: rgba(255,255,255,0.07);
+      border-radius: 2px; overflow: hidden; margin-bottom: 8px;
+    }
+    .task-progress-fill {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width .4s cubic-bezier(.34,1.2,.64,1);
+      box-shadow: 0 0 6px rgba(79,142,247,0.5);
+    }
+    .task-progress-fill.full { background: linear-gradient(90deg, var(--accent3), #059669); }
+
+    .task-steps-list { list-style: none; margin-bottom: 6px; }
+    .task-steps-list li {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 12px; color: var(--text2);
+      cursor: pointer; transition: color .15s;
+    }
+    .task-steps-list li:last-child { border-bottom: none; }
+    .task-steps-list li.done-step { color: var(--text3); text-decoration: line-through; }
+    .ts-chk {
+      width: 16px; height: 16px; flex-shrink: 0;
+      border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.2);
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; transition: all .18s;
+    }
+    .task-steps-list li.done-step .ts-chk {
+      background: var(--accent3); border-color: var(--accent3); color: #000;
+    }
+    .ts-del {
+      margin-right: auto; font-size: 11px;
+      background: none; border: none; color: var(--text3);
+      cursor: pointer; padding: 0 2px; opacity: 0;
+      transition: opacity .15s;
+    }
+    .task-steps-list li:hover .ts-del { opacity: 1; }
+
+    .add-task-step-row { display: flex; gap: 5px; }
+    .ts-input {
+      flex: 1; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 7px; padding: 6px 9px;
+      color: var(--text); font-family: 'Heebo', sans-serif; font-size: 12px;
+      outline: none; transition: border-color .2s;
+    }
+    .ts-input::placeholder { color: var(--text3); }
+    .ts-input:focus { border-color: var(--accent); }
+    .ts-add-btn {
+      padding: 6px 10px;
+      background: rgba(79,142,247,0.12);
+      border: 1px solid rgba(79,142,247,0.2);
+      border-radius: 7px; color: #93b8fb;
+      font-family: 'Heebo', sans-serif; font-weight: 700; font-size: 11px;
+      cursor: pointer; white-space: nowrap; transition: all .15s;
+    }
+
+    .expand-toggle {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 700; color: var(--text3);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Heebo', sans-serif; padding: 0;
+      margin-top: 6px; transition: color .15s;
+    }
+    .expand-toggle:hover { color: var(--accent); }
+
+    /* ── TOAST ── */
+    .toast{
+      position:fixed;bottom:28px;left:50%;
+      transform:translateX(-50%) translateY(16px);
+      background:var(--card3);border:1px solid var(--border);
+      color:#93b8fb;border-radius:50px;
+      padding:9px 20px;font-size:13px;font-weight:700;
+      opacity:0;pointer-events:none;transition:all .28s;
+      white-space:nowrap;z-index:500;
+      box-shadow:0 8px 24px rgba(0,0,0,.5);
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-top">
+    <div class="app-title">
+      משה שושה | ניהול אישי
+      <span class="sync-dot" id="syncDot"></span>
+    </div>
+    <div class="hdr-stats" id="hdrStats"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('tasks',this)">✅ משימות</button>
+    <button class="tab" onclick="setTab('projects',this)">📁 פרויקטים</button>
+    <button class="tab" onclick="setTab('done',this)">🏁 בוצע</button>
+  </div>
+</header>
+
+<div class="content" id="mainContent">
+  <div style="text-align:center;padding:40px;color:var(--text3)">⏳ מתחבר...</div>
+</div>
+
+<!-- Task edit modal -->
+<div class="m-overlay" id="taskModal" onclick="maybeClose(event,'taskModal')">
+  <div class="m-box">
+    <div class="m-handle"></div>
+    <div class="m-title">✏️ עריכת משימה</div>
+    <input class="m-input" id="editTaskName" placeholder="שם המשימה..."/>
+    <div class="meta-row" id="editPrioRow">
+      <button class="pchip" data-p="1" onclick="setEditPrio(this)">🔴 דחוף</button>
+      <button class="pchip" data-p="2" onclick="setEditPrio(this)">🟡 גבוה</button>
+      <button class="pchip" data-p="3" onclick="setEditPrio(this)">🔵 רגיל</button>
+      <button class="pchip" data-p="4" onclick="setEditPrio(this)">⚪ נמוך</button>
+    </div>
+    <div class="meta-row" id="editCatRow" style="overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px">
+      <button class="cchip" data-c="prv"     onclick="setEditCat(this)">🔵 PRV</button>
+      <button class="cchip" data-c="sil"     onclick="setEditCat(this)">⚫ SIL</button>
+      <button class="cchip" data-c="shorad"  onclick="setEditCat(this)">🟢 SHORAD</button>
+      <button class="cchip" data-c="gryphon" onclick="setEditCat(this)">🦅 GRYPHON</button>
+      <button class="cchip" data-c="ro_ad"   onclick="setEditCat(this)">🌍 RO_AD</button>
+      <button class="cchip" data-c="aio"     onclick="setEditCat(this)">🔷 AIO</button>
+      <button class="cchip" data-c="kenya"   onclick="setEditCat(this)">🌍 קניה</button>
+      <button class="cchip" data-c="spads"   onclick="setEditCat(this)">🟠 SPADS</button>
+      <button class="cchip" data-c="adss"    onclick="setEditCat(this)">📡 ADSS</button>
+      <button class="cchip" data-c="sherloc" onclick="setEditCat(this)">🔍 SHERLOC</button>
+      <button class="cchip" data-c="we"      onclick="setEditCat(this)">💻 WE</button>
+      <button class="cchip" data-c="it"      onclick="setEditCat(this)">🖥 IT</button>
+      <button class="cchip" data-c="cyber"   onclick="setEditCat(this)">🔐 סייבר</button>
+      <button class="cchip" data-c="network" onclick="setEditCat(this)">🌐 רשתות</button>
+    </div>
+    <button class="m-save" onclick="saveTaskEdit()">💾 שמור</button>
+    <button class="m-cancel" onclick="closeModal('taskModal')">ביטול</button>
+  </div>
+</div>
+
+<!-- Project add/edit modal -->
+<div class="m-overlay" id="projModal" onclick="maybeClose(event,'projModal')">
+  <div class="m-box">
+    <div class="m-handle"></div>
+    <div class="m-title" id="projModalTitle">➕ פרויקט חדש</div>
+    <input class="m-input" id="projNameInput" placeholder="שם הפרויקט..."/>
+    <input class="m-input" id="projDescInput" placeholder="תיאור קצר (אופציונלי)..."/>
+    <div class="meta-row" id="projCatRow" style="overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px">
+      <button class="cchip" data-c="prv"     onclick="setProjCat(this)">🔵 PRV</button>
+      <button class="cchip" data-c="sil"     onclick="setProjCat(this)">⚫ SIL</button>
+      <button class="cchip" data-c="shorad"  onclick="setProjCat(this)">🟢 SHORAD</button>
+      <button class="cchip" data-c="gryphon" onclick="setProjCat(this)">🦅 GRYPHON</button>
+      <button class="cchip" data-c="ro_ad"   onclick="setProjCat(this)">🌍 RO_AD</button>
+      <button class="cchip" data-c="aio"     onclick="setProjCat(this)">🔷 AIO</button>
+      <button class="cchip" data-c="kenya"   onclick="setProjCat(this)">🌍 קניה</button>
+      <button class="cchip" data-c="spads"   onclick="setProjCat(this)">🟠 SPADS</button>
+      <button class="cchip" data-c="adss"    onclick="setProjCat(this)">📡 ADSS</button>
+      <button class="cchip" data-c="sherloc" onclick="setProjCat(this)">🔍 SHERLOC</button>
+      <button class="cchip" data-c="we"      onclick="setProjCat(this)">💻 WE</button>
+      <button class="cchip" data-c="it"      onclick="setProjCat(this)">🖥 IT</button>
+      <button class="cchip" data-c="cyber"   onclick="setProjCat(this)">🔐 סייבר</button>
+      <button class="cchip" data-c="network" onclick="setProjCat(this)">🌐 רשתות</button>
+    </div>
+    <button class="m-save" onclick="saveProjModal()">💾 שמור</button>
+    <button class="m-cancel" onclick="closeModal('projModal')">ביטול</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  window._tasks    = [];
+  window._projects = [];
+
+  const CATS = {
+    prv:     '🔵 PRV',
+    sil:     '⚫ SIL',
+    shorad:  '🟢 SHORAD',
+    gryphon: '🦅 GRYPHON',
+    ro_ad:   '🌍 RO_AD',
+    aio:     '🔷 AIO',
+    kenya:   '🌍 קניה',
+    spads:   '🟠 SPADS',
+    adss:    '📡 ADSS',
+    sherloc: '🔍 SHERLOC',
+    we:      '💻 WE',
+    it:      '🖥 IT',
+    cyber:   '🔐 סייבר',
+    network: '🌐 רשתות'
+  };
+  const PRIO_LABEL = {1:'🔴 דחוף',2:'🟡 גבוה',3:'🔵 רגיל',4:'⚪ נמוך'};
+  const PRIO_CLS   = {1:'prio1',2:'prio2',3:'prio3',4:'prio4'};
+
+  let currentTab  = 'tasks';
+  let addPrio     = 3;
+  let addCat      = 'prv';
+  let editTaskId  = null;
+  let editPrioVal = 3;
+  let editCatVal  = 'prv';
+  let editProjId  = null;
+  const expandedTasks = new Set();
+  let taskFilter = 'all';
+
+  function setTaskFilter(f) { taskFilter=f; render(); }
+
+  function toggleExpand(id) {
+    if (expandedTasks.has(id)) expandedTasks.delete(id);
+    else expandedTasks.add(id);
+    render();
+  }
+
+  function saveStatus(taskId) {
+    if (!window._fb) return;
+    const el = document.getElementById('statusInp_'+taskId);
+    if (!el) return;
+    window._fb.update('moshe/tasks/'+taskId, { status: el.value.trim() });
+    toast('💬 סטטוס עודכן');
+  }
+
+  function addTaskStep(taskId) {
+    const el = document.getElementById('tsInp_'+taskId);
+    if (!el) return;
+    const name = el.value.trim();
+    if (!name || !window._fb) return;
+    window._fb.push('moshe/tasks/'+taskId+'/steps', { name, done: false });
+    el.value = '';
+  }
+
+  function toggleTaskStep(taskId, stepId) {
+    if (!window._fb) return;
+    const t = window._tasks.find(x=>x.id===taskId);
+    if (!t||!t.steps||!t.steps[stepId]) return;
+    window._fb.update('moshe/tasks/'+taskId+'/steps/'+stepId, {
+      done: !t.steps[stepId].done
+    });
+  }
+
+  function delTaskStep(taskId, stepId) {
+    if (!window._fb) return;
+    window._fb.remove('moshe/tasks/'+taskId+'/steps/'+stepId);
+  }
+  let projFilter  = 'all';
+
+  function setProjFilter(f) { projFilter=f; render(); }
+  let projCatVal  = 'prv';
+
+  // ── render ──────────────────────────────────────────
+  function render() {
+    const tasks    = window._tasks    || [];
+    const projects = window._projects || [];
+    const open     = tasks.filter(t=>!t.done);
+    const done     = tasks.filter(t=>t.done);
+    const projDone = projects.filter(p=>calcPct(p)===100).length;
+
+    document.getElementById('hdrStats').innerHTML = `
+      <div class="hdr-stat">✅ <b>${open.length}</b></div>
+      <div class="hdr-stat">📁 <b>${projects.length}</b></div>
+    `;
+
+    const content = document.getElementById('mainContent');
+
+    if (currentTab === 'tasks') {
+      renderTasks(open, content);
+    } else if (currentTab === 'projects') {
+      renderProjects(projects, content);
+    } else {
+      renderDone(done, content);
+    }
+  }
+
+  // ── TASKS TAB ───────────────────────────────────────
+  function renderTasks(items, wrap) {
+    let html = addTaskBar();
+
+    const filtered = taskFilter==='all' ? items : items.filter(t=>t.cat===taskFilter);
+
+    if (!filtered.length) {
+      const msg = taskFilter==='all' ? 'אין משימות פתוחות' : 'אין משימות ב-' + (CATS[taskFilter]||taskFilter);
+      html += `<div class="empty"><div class="empty-ico">🎯</div><div>${msg}</div></div>`;
+      wrap.innerHTML = html; return;
+    }
+
+    const byPrio = {1:[],2:[],3:[],4:[]};
+    filtered.forEach(t => (byPrio[t.priority||3]||byPrio[3]).push(t));
+
+    [1,2,3,4].forEach(p => {
+      if (!byPrio[p].length) return;
+      const labels = {1:'🔴 דחוף',2:'🟡 גבוה',3:'🔵 רגיל',4:'⚪ נמוך'};
+      html += `<div class="sec-lbl">${labels[p]}</div>`;
+      byPrio[p].forEach(t => html += taskCard(t));
+    });
+
+    wrap.innerHTML = html;
+  }
+
+  function addTaskBar() {
+    return `
+    <div class="add-bar">
+      <input class="add-input" id="taskInp" placeholder="משימה חדשה..." onkeydown="if(event.key==='Enter')addTask()"/>
+      <button class="add-btn" onclick="addTask()">+</button>
+    </div>
+    <div class="meta-row" id="addPrioRow">
+      <button class="pchip ${addPrio==1?'sp1':''}" data-p="1" onclick="pickAddPrio(this)">🔴 דחוף</button>
+      <button class="pchip ${addPrio==2?'sp2':''}" data-p="2" onclick="pickAddPrio(this)">🟡 גבוה</button>
+      <button class="pchip ${addPrio==3?'sp3':''}" data-p="3" onclick="pickAddPrio(this)">🔵 רגיל</button>
+      <button class="pchip ${addPrio==4?'sp4':''}" data-p="4" onclick="pickAddPrio(this)">⚪ נמוך</button>
+    </div>
+    <div class="meta-row" id="addCatRow">
+      ${Object.entries(CATS).map(([k,v])=>`<button class="cchip ${addCat===k?'sel':''}" data-c="${k}" onclick="pickAddCat(this)">${v}</button>`).join('')}
+    </div>
+    <div style="margin-bottom:6px">
+      <div style="font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--text3);margin-bottom:7px">🔍 סינון לפי פרויקט</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">
+        <button class="tf-btn ${taskFilter==='all'?'tf-active':''}" onclick="setTaskFilter('all')" style="grid-column:span 4">📋 הכל (${(window._tasks||[]).filter(t=>!t.done).length} משימות)</button>
+        ${Object.entries(CATS).map(([k,v])=>{
+          const cnt = (window._tasks||[]).filter(t=>!t.done && t.cat===k).length;
+          const active = taskFilter===k ? 'tf-active' : '';
+          const cls = cnt>0 ? active : 'tf-empty';
+          const badge = cnt>0 ? '<span class="tf-cnt">'+cnt+'</span>' : '';
+          return '<button class="tf-btn '+cls+'" onclick="setTaskFilter(\'' +k+ '\')">' + v + badge + '</button>';
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  function taskCard(t) {
+    const p = t.priority||3;
+    const steps = t.steps ? Object.entries(t.steps) : [];
+    const stepsDone = steps.filter(([,s])=>s.done).length;
+    const pct = steps.length ? Math.round(stepsDone/steps.length*100) : 0;
+    const expanded = expandedTasks.has(t.id);
+
+    let stepsHtml = '';
+    if (expanded) {
+      // status update area
+      const statusHtml = `
+        <div class="status-row">
+          <textarea class="status-input" id="statusInp_${t.id}" placeholder="עדכון סטטוס / הערות..." rows="1">${esc(t.status||'')}</textarea>
+          <button class="status-save-btn" onclick="saveStatus('${t.id}')">💾 שמור</button>
+        </div>`;
+
+      // steps list
+      let stepsListHtml = '';
+      steps.forEach(([sid,s]) => {
+        stepsListHtml += `
+        <li class="${s.done?'done-step':''}" onclick="toggleTaskStep('${t.id}','${sid}')">
+          <div class="ts-chk">${s.done?'✓':''}</div>
+          ${esc(s.name)}
+          <button class="ts-del" onclick="event.stopPropagation();delTaskStep('${t.id}','${sid}')">✕</button>
+        </li>`;
+      });
+
+      stepsHtml = `
+      <div class="task-expand">
+        ${statusHtml}
+        <div class="task-steps-wrap">
+          ${steps.length ? `
+          <div class="task-progress-bar">
+            <div class="task-progress-fill ${pct===100?'full':''}" style="width:${pct}%"></div>
+          </div>
+          <ul class="task-steps-list">${stepsListHtml}</ul>` : ''}
+          <div class="add-task-step-row">
+            <input class="ts-input" id="tsInp_${t.id}" placeholder="הוסף שלב..." onkeydown="if(event.key==='Enter')addTaskStep('${t.id}')"/>
+            <button class="ts-add-btn" onclick="addTaskStep('${t.id}')">+ שלב</button>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    const stepsSummary = steps.length && !expanded
+      ? `<span class="tbadge" style="background:rgba(79,142,247,0.1);color:#93b8fb;border:1px solid rgba(79,142,247,0.2)">${stepsDone}/${steps.length} שלבים</span>`
+      : '';
+    const statusPreview = t.status && !expanded
+      ? `<div class="status-display" onclick="toggleExpand('${t.id}')">${esc(t.status)}</div>`
+      : '';
+
+    return `
+    <div class="task-card p${p} ${t.done?'done-card':''}">
+      <button class="chk ${t.done?'done':''}" onclick="toggleTask('${t.id}')">${t.done?'✓':''}</button>
+      <div class="task-body" style="width:100%">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between">
+          <div style="flex:1;min-width:0">
+            <div class="task-name">${esc(t.name)}</div>
+            <div class="task-meta">
+              <span class="tbadge cat">${CATS[t.cat]||t.cat||''}</span>
+              <span class="tbadge ${PRIO_CLS[p]}">${PRIO_LABEL[p]}</span>
+              ${stepsSummary}
+              ${t.done?`<span class="tbadge done-t">✅ ${t.doneAt||''}</span>`:''}
+            </div>
+          </div>
+          <div class="task-actions" style="padding-top:1px">
+            ${!t.done?`<button class="iBtn edit-btn" onclick="openTaskEdit('${t.id}')">✏️</button>`:''}
+            <button class="iBtn del-btn" onclick="delTask('${t.id}')">🗑</button>
+          </div>
+        </div>
+        ${statusPreview}
+        ${!t.done ? `<button class="expand-toggle" onclick="toggleExpand('${t.id}')">
+          ${expanded ? '▲ סגור' : '▼ ' + (steps.length ? steps.length+' שלבים' : 'פרטים + שלבים')}
+        </button>` : ''}
+        ${stepsHtml}
+      </div>
+    </div>`;
+  }
+
+  // ── PROJECTS TAB ────────────────────────────────────
+  function renderProjects(projects, wrap) {
+    let html = `
+    <div class="add-bar">
+      <button class="add-btn" style="width:100%;border-radius:var(--radius-sm);font-size:14px;font-weight:800" onclick="openNewProj()">+ פרויקט חדש</button>
+    </div>
+    <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;margin-bottom:4px">
+      <button class="proj-filter-btn ${projFilter==='all'?'pf-active':''}" onclick="setProjFilter('all')">הכל</button>
+      ${Object.entries(CATS).map(([k,v])=>`<button class="proj-filter-btn ${projFilter===k?'pf-active':''}" onclick="setProjFilter('${k}')">${v}</button>`).join('')}
+    </div>`;
+
+    const filtered = projFilter==='all' ? projects : projects.filter(p=>p.cat===projFilter);
+    if (!filtered.length) {
+      html += `<div class="empty"><div class="empty-ico">📁</div><div>אין פרויקטים עדיין</div></div>`;
+      wrap.innerHTML = html; return;
+    }
+
+    filtered.forEach(p => html += projectCard(p));
+    wrap.innerHTML = html;
+  }
+
+  function calcPct(proj) {
+    const steps = proj.steps ? Object.values(proj.steps) : [];
+    if (!steps.length) return 0;
+    return Math.round(steps.filter(s=>s.done).length / steps.length * 100);
+  }
+
+  function projectCard(proj) {
+    const steps = proj.steps ? Object.values(proj.steps) : [];
+    const stepEntries = proj.steps ? Object.entries(proj.steps) : [];
+    const pct = calcPct(proj);
+    const full = pct===100;
+
+    let stepsHtml = '';
+    stepEntries.forEach(([sid, s]) => {
+      stepsHtml += `
+      <li class="${s.done?'done-step':''}" onclick="toggleStep('${proj.id}','${sid}')">
+        <div class="step-chk">${s.done?'✓':''}</div>
+        ${esc(s.name)}
+      </li>`;
+    });
+
+    return `
+    <div class="project-card">
+      <div class="proj-header">
+        <div>
+          <div class="proj-name">${esc(proj.name)}</div>
+          ${proj.desc?`<div style="font-size:12px;color:var(--text2);margin-top:3px">${esc(proj.desc)}</div>`:''}
+        </div>
+        <div class="proj-cat">${CATS[proj.cat]||proj.cat||''}</div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-top">
+          <span class="progress-label">התקדמות — ${steps.length} שלבים</span>
+          <span class="progress-pct">${pct}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill ${full?'full':''}" style="width:${pct}%"></div>
+        </div>
+      </div>
+
+      ${steps.length ? `<ul class="checklist">${stepsHtml}</ul>` : ''}
+
+      <div class="add-step-row">
+        <input class="step-input" id="stepInp_${proj.id}" placeholder="הוסף שלב..." onkeydown="if(event.key==='Enter')addStep('${proj.id}')"/>
+        <button class="step-add-btn" onclick="addStep('${proj.id}')">+ שלב</button>
+      </div>
+
+      <div class="proj-actions">
+        <button class="proj-btn" onclick="openEditProj('${proj.id}')">✏️ ערוך</button>
+        <button class="proj-btn del" onclick="delProj('${proj.id}')">🗑 מחק</button>
+      </div>
+    </div>`;
+  }
+
+  // ── DONE TAB ────────────────────────────────────────
+  function renderDone(done, wrap) {
+    let html = '';
+    if (!done.length) {
+      html = `<div class="empty"><div class="empty-ico">🏁</div><div>עדיין לא בוצעה אף משימה</div></div>`;
+      wrap.innerHTML = html; return;
+    }
+    html += `<div class="sec-lbl">✅ בוצע (${done.length})</div>`;
+    done.forEach(t => {
+      html += `
+      <div class="task-card done-card p${t.priority||3}">
+        <button class="chk done" onclick="toggleTask('${t.id}')">✓</button>
+        <div class="task-body">
+          <div class="task-name">${esc(t.name)}</div>
+          <div class="task-meta">
+            <span class="tbadge cat">${CATS[t.cat]||''}</span>
+            <span class="tbadge done-t">✅ ${t.doneAt||''}</span>
+            <button class="undo-btn" onclick="toggleTask('${t.id}')">↩ החזר</button>
+          </div>
+        </div>
+        <div class="task-actions">
+          <button class="iBtn del-btn" onclick="delTask('${t.id}')">🗑</button>
+        </div>
+      </div>`;
+    });
+    wrap.innerHTML = html;
+  }
+
+  // ── Firebase actions ─────────────────────────────────
+  function addTask() {
+    const el = document.getElementById('taskInp');
+    if (!el) return;
+    const name = el.value.trim();
+    if (!name || !window._fb) return;
+    window._fb.push('moshe/tasks', { name, priority: addPrio, cat: addCat, done: false, createdAt: Date.now() });
+    el.value = '';
+    toast('✅ משימה נוספה');
+  }
+
+  function toggleTask(id) {
+    if (!window._fb) return;
+    const t = window._tasks.find(x=>x.id===id);
+    if (!t) return;
+    window._fb.update('moshe/tasks/'+id, {
+      done: !t.done,
+      doneAt: !t.done ? new Date().toLocaleDateString('he-IL') : null
+    });
+  }
+
+  function delTask(id) {
+    if (!window._fb) return;
+    window._fb.remove('moshe/tasks/'+id);
+    toast('🗑️ נמחק');
+  }
+
+  function addStep(projId) {
+    const el = document.getElementById('stepInp_'+projId);
+    if (!el) return;
+    const name = el.value.trim();
+    if (!name || !window._fb) return;
+    window._fb.push('moshe/projects/'+projId+'/steps', { name, done: false });
+    el.value = '';
+  }
+
+  function toggleStep(projId, stepId) {
+    if (!window._fb) return;
+    const proj = window._projects.find(p=>p.id===projId);
+    if (!proj||!proj.steps||!proj.steps[stepId]) return;
+    window._fb.update('moshe/projects/'+projId+'/steps/'+stepId, {
+      done: !proj.steps[stepId].done
+    });
+  }
+
+  function delProj(id) {
+    if (!window._fb) return;
+    window._fb.remove('moshe/projects/'+id);
+    toast('🗑️ פרויקט נמחק');
+  }
+
+  // ── add pickers ──────────────────────────────────────
+  function pickAddPrio(el) {
+    addPrio = parseInt(el.dataset.p);
+    document.querySelectorAll('#addPrioRow .pchip').forEach(c => c.className='pchip');
+    el.classList.add('sp'+addPrio);
+  }
+
+  function pickAddCat(el) {
+    addCat = el.dataset.c;
+    document.querySelectorAll('#addCatRow .cchip').forEach(c=>c.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+
+  // ── task edit modal ───────────────────────────────────
+  function openTaskEdit(id) {
+    const t = window._tasks.find(x=>x.id===id);
+    if (!t) return;
+    editTaskId  = id;
+    editPrioVal = t.priority||3;
+    editCatVal  = t.cat||'spyder';
+    document.getElementById('editTaskName').value = t.name;
+    document.querySelectorAll('#editPrioRow .pchip').forEach(c=>{
+      const p=parseInt(c.dataset.p);
+      c.className='pchip'+(p===editPrioVal?' sp'+p:'');
+    });
+    document.querySelectorAll('#editCatRow .cchip').forEach(c=>{
+      c.classList.toggle('sel', c.dataset.c===editCatVal);
+    });
+    document.getElementById('taskModal').classList.add('open');
+  }
+
+  function setEditPrio(el) {
+    editPrioVal = parseInt(el.dataset.p);
+    document.querySelectorAll('#editPrioRow .pchip').forEach(c=>c.className='pchip');
+    el.classList.add('sp'+editPrioVal);
+  }
+
+  function setEditCat(el) {
+    editCatVal = el.dataset.c;
+    document.querySelectorAll('#editCatRow .cchip').forEach(c=>c.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+
+  function saveTaskEdit() {
+    if (!editTaskId||!window._fb) return;
+    const name = document.getElementById('editTaskName').value.trim();
+    if (!name) return;
+    window._fb.update('moshe/tasks/'+editTaskId, { name, priority: editPrioVal, cat: editCatVal });
+    closeModal('taskModal');
+    toast('✏️ עודכן!');
+  }
+
+  // ── project modal ────────────────────────────────────
+  function openNewProj() {
+    editProjId = null;
+    projCatVal = 'spyder';
+    document.getElementById('projModalTitle').textContent = '➕ פרויקט חדש';
+    document.getElementById('projNameInput').value = '';
+    document.getElementById('projDescInput').value = '';
+    document.querySelectorAll('#projCatRow .cchip').forEach(c=>c.classList.remove('sel'));
+    document.getElementById('projModal').classList.add('open');
+  }
+
+  function openEditProj(id) {
+    const p = window._projects.find(x=>x.id===id);
+    if (!p) return;
+    editProjId = id;
+    projCatVal = p.cat||'spyder';
+    document.getElementById('projModalTitle').textContent = '✏️ ערוך פרויקט';
+    document.getElementById('projNameInput').value = p.name;
+    document.getElementById('projDescInput').value = p.desc||'';
+    document.querySelectorAll('#projCatRow .cchip').forEach(c=>{
+      c.classList.toggle('sel', c.dataset.c===projCatVal);
+    });
+    document.getElementById('projModal').classList.add('open');
+  }
+
+  function setProjCat(el) {
+    projCatVal = el.dataset.c;
+    document.querySelectorAll('#projCatRow .cchip').forEach(c=>c.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+
+  function saveProjModal() {
+    if (!window._fb) return;
+    const name = document.getElementById('projNameInput').value.trim();
+    if (!name) return;
+    const desc = document.getElementById('projDescInput').value.trim();
+    if (editProjId) {
+      window._fb.update('moshe/projects/'+editProjId, { name, desc, cat: projCatVal });
+    } else {
+      window._fb.push('moshe/projects', { name, desc, cat: projCatVal, createdAt: Date.now() });
+    }
+    closeModal('projModal');
+    toast(editProjId ? '✏️ פרויקט עודכן' : '📁 פרויקט נוצר!');
+  }
+
+  // ── modal helpers ────────────────────────────────────
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  function maybeClose(e,id) { if(e.target===document.getElementById(id)) closeModal(id); }
+
+  function setTab(t,el) {
+    currentTab = t;
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    render();
+  }
+
+  function esc(s='') {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 2200);
+  }
+
+  window.render = render;
+  render();
+  // הפעל Firebase listeners אחרי ש-render מוכן
+  if (window._fbReady) window._fbReady();
+</script>
+</body>
+</html>

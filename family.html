@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>אודליה ומשה 🏠</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+
+  <!-- ═══════════════════════════════════════════════
+       🔥 FIREBASE CONFIG — החלף את הערכים האלה!
+       הוראות: ראה בתחתית הקובץ
+  ══════════════════════════════════════════════════ -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue, push, update, remove, serverTimestamp }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // ⬇️  הדבק כאן את ה-firebaseConfig שלך מ-Firebase Console
+    const firebaseConfig = {
+      apiKey:            "AIzaSyDCtJtgIP-bSko4oqvDnArohUdwp1_QZAo",
+      authDomain:        "my-task-list-7f8cb.firebaseapp.com",
+      databaseURL:       "https://my-task-list-7f8cb-default-rtdb.firebaseio.com",
+      projectId:         "my-task-list-7f8cb",
+      storageBucket:     "my-task-list-7f8cb.firebasestorage.app",
+      messagingSenderId: "893970489708",
+      appId:             "1:893970489708:web:72a1468afc8fe2482d5349"
+    };
+
+    // ─── init ───────────────────────────────────────
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+    const listRef = ref(db, 'sharedList');
+
+    // ─── expose to global scope ──────────────────────
+    window._fb = { db, listRef, ref, push, update, remove, serverTimestamp };
+
+    // ─── listen for real-time changes ───────────────
+    onValue(listRef, (snap) => {
+      const raw = snap.val() || {};
+      window._items = Object.entries(raw).map(([id, v]) => ({ id, ...v }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      if (typeof window.render === 'function') window.render();
+    }, (err) => {
+      showConfigError(err.message);
+    });
+
+    function showConfigError(msg) {
+      document.getElementById('configBanner').style.display = 'flex';
+      console.error('Firebase error:', msg);
+    }
+    window.showConfigError = showConfigError;
+  </script>
+
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;900&display=swap');
+
+    :root {
+      --bg:        #12121f;
+      --bg2:       #16162a;
+      --card:      #1e1e30;
+      --card2:     #252540;
+      --card3:     #222238;
+      --accent:    #6c63ff;
+      --accent2:   #00d4ff;
+      --accent3:   #00ff9d;
+      --accent4:   #ff6b6b;
+      --gold:      #ffd700;
+      --text:      #f0f0ff;
+      --text-muted:#8888aa;
+      --border:    rgba(108,99,255,0.25);
+      --border2:   rgba(0,212,255,0.12);
+      --glow:      0 0 20px rgba(108,99,255,0.3);
+      --glow2:     0 0 30px rgba(0,212,255,0.2);
+      --shadow3d:  0 20px 60px rgba(0,0,0,0.6), 0 8px 20px rgba(0,0,0,0.4);
+      --radius:    20px;
+      --radius-sm: 13px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      max-width: 430px;
+      margin: 0 auto;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* animated bg grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(108,99,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108,99,255,0.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -200px; left: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(ellipse, rgba(108,99,255,0.08) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+      animation: floatGlow 8s ease-in-out infinite;
+    }
+
+    @keyframes floatGlow {
+      0%,100% { transform: translate(0,0) scale(1); }
+      50%      { transform: translate(40px,30px) scale(1.1); }
+    }
+
+    /* ── CONFIG BANNER ─────────────────────────────── */
+    #configBanner {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(108,99,255,0.97);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      text-align: center;
+      color: white;
+    }
+    #configBanner h2 { font-size: 24px; font-weight: 900; margin-bottom: 12px; }
+    #configBanner p  { font-size: 15px; line-height: 1.7; opacity: 0.92; }
+    #configBanner code {
+      display: block;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      padding: 14px;
+      margin: 16px 0;
+      font-size: 13px;
+      text-align: right;
+      line-height: 1.8;
+      direction: ltr;
+      white-space: pre-wrap;
+    }
+
+    /* ── HEADER ────────────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(18,18,31,0.95);
+      backdrop-filter: blur(24px);
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .app-name {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      background: linear-gradient(135deg, #6c63ff, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 8px rgba(108,99,255,0.5));
+    }
+
+    .sync-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #333;
+      margin-right: 6px;
+      display: inline-block;
+      transition: all 0.4s;
+      vertical-align: middle;
+    }
+    .sync-dot.live {
+      background: var(--accent3);
+      box-shadow: 0 0 8px var(--accent3), 0 0 16px rgba(0,255,157,0.4);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 6px var(--accent3); }
+      50%      { box-shadow: 0 0 14px var(--accent3), 0 0 28px rgba(0,255,157,0.3); }
+    }
+
+    /* ── TABS ──────────────────────────────────────── */
+    .tabs { display: flex; gap: 5px; }
+    .tab {
+      flex: 1;
+      padding: 8px 0;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 50px;
+      color: #aaaacc;
+      font-family: 'Heebo', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, #7c6fff, #00c8f0);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 4px 18px rgba(108,99,255,0.5), 0 1px 0 rgba(255,255,255,0.2) inset;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+    /* ── STATS ─────────────────────────────────────── */
+    .stats-bar {
+      display: flex;
+      gap: 8px;
+      padding: 10px 18px 2px;
+      position: relative; z-index: 1;
+    }
+    .stat-pill {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50px;
+      padding: 5px 13px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #9999bb;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .stat-pill b { color: #e0e0ff; font-weight: 800; }
+
+    /* ── ADD FORM ───────────────────────────────────── */
+    .add-section { padding: 10px 18px 8px; position: relative; z-index: 1; }
+    .add-row { display: flex; gap: 8px; }
+
+    .add-input {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      color: #f0f0ff;
+      font-family: 'Heebo', sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.25s;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .add-input::placeholder { color: var(--text-muted); }
+    .add-input:focus {
+      border-color: var(--accent);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.3), 0 0 0 3px rgba(108,99,255,0.2), var(--glow);
+    }
+
+    .add-btn {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 26px;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(108,99,255,0.5), 0 2px 0 rgba(255,255,255,0.1) inset;
+      transition: transform 0.15s, box-shadow 0.15s;
+      flex-shrink: 0;
+    }
+    .add-btn:active { transform: scale(0.88) translateY(2px); box-shadow: 0 2px 8px rgba(108,99,255,0.3); }
+
+    .cat-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .cat-row::-webkit-scrollbar { display: none; }
+
+    .cat-chip {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 50px;
+      padding: 5px 13px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #9999bb;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.18s;
+    }
+    .cat-chip.sel {
+      background: rgba(124,111,255,0.2);
+      border-color: #9d95ff;
+      color: #c4bfff;
+      box-shadow: 0 0 12px rgba(108,99,255,0.25);
+    }
+
+    /* ── WHO ────────────────────────────────────────── */
+    .who-row { display: flex; gap: 6px; margin-top: 8px; }
+    .who-btn {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,0.05);
+      font-family: 'Heebo', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: #aaaacc;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .who-btn.sel {
+      border-color: #00d4ff;
+      background: rgba(0,212,255,0.12);
+      color: #66e8ff;
+      box-shadow: 0 0 14px rgba(0,212,255,0.2);
+    }
+
+    /* ── LIST ───────────────────────────────────────── */
+    .list-wrap { padding: 4px 18px 120px; position: relative; z-index: 1; }
+
+    .section-lbl {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #7777aa;
+      margin: 16px 0 8px;
+      padding-right: 4px;
+    }
+
+    /* 3D card effect */
+    .item-card {
+      background: linear-gradient(145deg, #28283e, #1e1e30);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-top: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius);
+      padding: 14px 14px 14px 18px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow:
+        0 10px 30px rgba(0,0,0,0.5),
+        0 2px 0 rgba(255,255,255,0.04) inset,
+        0 -1px 0 rgba(0,0,0,0.3) inset;
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: pop3d .3s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+      overflow: hidden;
+      transform: perspective(600px) rotateX(0deg);
+    }
+
+    .item-card:hover {
+      transform: perspective(600px) rotateX(1.5deg) translateY(-2px);
+      box-shadow:
+        0 18px 40px rgba(0,0,0,0.6),
+        0 2px 0 rgba(255,255,255,0.06) inset;
+    }
+
+    @keyframes pop3d {
+      from { opacity:0; transform: perspective(600px) rotateX(8deg) translateY(-10px) scale(0.95); }
+      to   { opacity:1; transform: perspective(600px) rotateX(0deg) translateY(0) scale(1); }
+    }
+
+    .item-card.done {
+      opacity: 0.6;
+      filter: saturate(0.5);
+    }
+
+    /* glowing left stripe */
+    .item-card::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px; bottom: 8px;
+      width: 3px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 10px var(--accent), 0 0 20px rgba(108,99,255,0.4);
+    }
+    .item-card.done::after {
+      background: var(--accent3);
+      box-shadow: 0 0 8px var(--accent3);
+    }
+    .item-card.urgent::after {
+      background: linear-gradient(180deg, var(--accent4), #ff4500);
+      box-shadow: 0 0 10px var(--accent4), 0 0 20px rgba(255,107,107,0.4);
+    }
+
+    /* subtle shimmer */
+    .item-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.02) 50%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .check-btn {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.04);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .check-btn.checked {
+      background: linear-gradient(135deg, var(--accent3), #00a86b);
+      border-color: var(--accent3);
+      color: #000;
+      box-shadow: 0 0 12px rgba(0,255,157,0.4);
+    }
+
+    .item-body { flex: 1; min-width: 0; }
+    .item-name {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.3;
+      color: #f0f0ff;
+      letter-spacing: 0.1px;
+    }
+    .item-card.done .item-name {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .item-sub {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 5px;
+      padding: 2px 7px;
+      letter-spacing: 0.3px;
+    }
+    .badge.cat  {
+      background: rgba(255,255,255,0.06);
+      color: var(--text-muted);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .badge.who  {
+      background: rgba(0,212,255,0.1);
+      color: var(--accent2);
+      border: 1px solid rgba(0,212,255,0.2);
+    }
+    .badge.urg  {
+      background: rgba(255,107,107,0.12);
+      color: var(--accent4);
+      border: 1px solid rgba(255,107,107,0.25);
+    }
+    .badge.done-lbl {
+      background: rgba(0,255,157,0.08);
+      color: var(--accent3);
+      border: 1px solid rgba(0,255,157,0.2);
+    }
+
+    .item-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+    .icon-btn {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.04);
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .icon-btn:active { transform: scale(0.85) translateY(1px); }
+    .icon-btn.urg-on {
+      background: rgba(255,107,107,0.12);
+      color: var(--accent4);
+      border-color: rgba(255,107,107,0.25);
+      box-shadow: 0 0 8px rgba(255,107,107,0.2);
+    }
+    .icon-btn.del-btn { color: var(--accent4); }
+    .icon-btn.del-btn:hover { background: rgba(255,107,107,0.12); }
+
+    /* ── EMPTY ──────────────────────────────────────── */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-ico { font-size: 52px; margin-bottom: 10px; filter: drop-shadow(0 0 16px rgba(108,99,255,0.4)); }
+    .empty-txt { font-size: 16px; font-weight: 500; }
+
+    /* ── CONNECTING ─────────────────────────────────── */
+    #connectingMsg {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    /* ── TOAST ──────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--card3);
+      border: 1px solid var(--border);
+      color: var(--accent2);
+      border-radius: 50px;
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s;
+      white-space: nowrap;
+      z-index: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5), var(--glow2);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── PRIORITY ───────────────────────────────────── */
+    .priority-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 5px;
+      padding: 2px 7px;
+      letter-spacing: 0.3px;
+    }
+    .priority-badge.p1 { background: rgba(255,70,70,0.15); color: #ff6b6b; border: 1px solid rgba(255,70,70,0.3); }
+    .priority-badge.p2 { background: rgba(255,180,0,0.12); color: #ffcc00; border: 1px solid rgba(255,180,0,0.25); }
+    .priority-badge.p3 { background: rgba(0,212,255,0.1);  color: #66e8ff; border: 1px solid rgba(0,212,255,0.2); }
+    .priority-badge.p4 { background: rgba(255,255,255,0.05); color: #6666aa; border: 1px solid rgba(255,255,255,0.08); }
+
+    .priority-picker {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .prio-chip {
+      flex: 1;
+      padding: 6px 4px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-family: 'Heebo', sans-serif;
+      font-weight: 800;
+      font-size: 11px;
+      color: #6666aa;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.18s;
+    }
+    .prio-chip.sel-p1 { background: rgba(255,70,70,0.15);   border-color: #ff6b6b; color: #ff6b6b; box-shadow: 0 0 10px rgba(255,70,70,0.2); }
+    .prio-chip.sel-p2 { background: rgba(255,180,0,0.12);   border-color: #ffcc00; color: #ffcc00; box-shadow: 0 0 10px rgba(255,180,0,0.2); }
+    .prio-chip.sel-p3 { background: rgba(0,212,255,0.1);    border-color: #66e8ff; color: #66e8ff; box-shadow: 0 0 10px rgba(0,212,255,0.15); }
+    .prio-chip.sel-p4 { background: rgba(255,255,255,0.06); border-color: #6666aa; color: #9999bb; }
+
+    .sort-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 18px 0;
+      position: relative; z-index: 1;
+    }
+    .sort-label { font-size: 11px; font-weight: 700; color: #6666aa; white-space: nowrap; }
+    .sort-btn {
+      padding: 4px 10px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-family: 'Heebo', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #7777aa;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .sort-btn.active {
+      background: rgba(124,111,255,0.15);
+      border-color: #7c6fff;
+      color: #c4bfff;
+    }
+
+
+    /* ── EDIT MODAL ─────────────────────────────────── */
+    .edit-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      z-index: 300;
+      display: flex;
+      align-items: flex-end;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .edit-overlay.open { opacity: 1; pointer-events: all; }
+
+    .edit-modal {
+      background: linear-gradient(160deg, #222238, #1e1e30);
+      border-radius: 28px 28px 0 0;
+      padding: 20px 20px 44px;
+      width: 100%;
+      border-top: 1px solid rgba(108,99,255,0.3);
+      border-left: 1px solid rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.06);
+      transform: translateY(40px);
+      transition: transform 0.3s cubic-bezier(0.34,1.2,0.64,1);
+      box-shadow: 0 -20px 60px rgba(0,0,0,0.7);
+    }
+    .edit-overlay.open .edit-modal { transform: translateY(0); }
+
+    .edit-title {
+      font-size: 17px; font-weight: 900;
+      background: linear-gradient(135deg, #7c6fff, #00c8f0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .edit-input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 13px;
+      padding: 13px 14px;
+      color: #f0f0ff;
+      font-family: 'Heebo', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      outline: none;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .edit-input:focus {
+      border-color: #7c6fff;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.3), 0 0 0 3px rgba(108,99,255,0.2);
+    }
+
+    .edit-cat-row {
+      display: flex; gap: 6px;
+      overflow-x: auto; padding-bottom: 4px;
+      scrollbar-width: none; margin-bottom: 12px;
+    }
+    .edit-cat-row::-webkit-scrollbar { display: none; }
+
+    .edit-who-row { display: flex; gap: 6px; margin-bottom: 14px; }
+
+    .edit-save-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #7c6fff, #00c8f0);
+      border: none;
+      border-radius: 13px;
+      color: white;
+      font-family: 'Heebo', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(108,99,255,0.4), 0 1px 0 rgba(255,255,255,0.15) inset;
+      transition: transform 0.15s;
+      margin-bottom: 8px;
+    }
+    .edit-save-btn:active { transform: scale(0.97) translateY(1px); }
+
+    .edit-cancel-btn {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 13px;
+      color: #8888aa;
+      font-family: 'Heebo', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    /* ── UNDO DONE BUTTON ───────────────────────────── */
+    .undo-btn {
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.25);
+      border-radius: 8px;
+      color: #66e8ff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s;
+      font-family: 'Heebo', sans-serif;
+    }
+    .undo-btn:active { transform: scale(0.9); }
+  </style>
+</head>
+<body>
+
+<!-- Config error banner -->
+<div id="configBanner">
+  <h2>⚙️ יש להגדיר Firebase</h2>
+  <p>פתח את קובץ ה-HTML בעורך טקסט והחלף את ה-firebaseConfig בתחתית.</p>
+  <code>apiKey: "YOUR_API_KEY"
+authDomain: "YOUR_PROJECT.firebaseapp.com"
+databaseURL: "https://YOUR_PROJECT-default-rtdb..."
+projectId:   "YOUR_PROJECT"</code>
+  <p>הוראות מלאות: ראה את הטקסט בתחתית הקובץ</p>
+</div>
+
+<header>
+  <div class="header-top">
+    <div class="app-name" style="font-size:17px">
+      <span class="sync-dot" id="syncDot"></span>
+      אודליה ומשה שושה 🏠
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('all',this)">הכל</button>
+    <button class="tab" onclick="setTab('shopping',this)">🛒</button>
+    <button class="tab" onclick="setTab('todo',this)">📋</button>
+    <button class="tab" onclick="setTab('done',this)">✅</button>
+  </div>
+</header>
+
+<div class="stats-bar" id="statsBar"></div>
+
+
+<div class="sort-bar" id="sortBar">
+  <span class="sort-label">מיון:</span>
+  <button class="sort-btn active" onclick="setSort('priority',this)">⭐ עדיפות</button>
+  <button class="sort-btn" onclick="setSort('date',this)">🕐 תאריך</button>
+  <button class="sort-btn" onclick="setSort('cat',this)">📂 קטגוריה</button>
+</div>
+
+<div class="add-section">
+  <div class="add-row">
+    <input class="add-input" id="inp" placeholder="הוסף פריט..." onkeydown="if(event.key==='Enter')addItem()" />
+    <button class="add-btn" onclick="addItem()">+</button>
+  </div>
+
+  <div class="cat-row" id="catRow">
+    <div class="cat-chip sel" data-c="shopping" onclick="pickCat(this)">🛒 קניות</div>
+    <div class="cat-chip" data-c="todo" onclick="pickCat(this)">📋 מטלה</div>
+    <div class="cat-chip" data-c="home" onclick="pickCat(this)">🏠 בית</div>
+    <div class="cat-chip" data-c="kids" onclick="pickCat(this)">👶 ילדים</div>
+    <div class="cat-chip" data-c="work" onclick="pickCat(this)">💼 עבודה</div>
+    <div class="cat-chip" data-c="other" onclick="pickCat(this)">✨ אחר</div>
+  </div>
+
+  <div class="who-row">
+    <button class="who-btn sel" id="whoMe"  onclick="pickWho('me')">👤 אני</button>
+    <button class="who-btn"     id="whoWife" onclick="pickWho('wife')">👤 אשתי</button>
+  
+  <div class="priority-picker" id="addPrioPicker">
+    <button class="prio-chip sel-p1" data-p="1" onclick="pickPrio(this,'add')">🔴 דחוף</button>
+    <button class="prio-chip" data-p="2" onclick="pickPrio(this,'add')">🟡 גבוה</button>
+    <button class="prio-chip" data-p="3" onclick="pickPrio(this,'add')">🔵 רגיל</button>
+    <button class="prio-chip" data-p="4" onclick="pickPrio(this,'add')">⚪ נמוך</button>
+  </div>
+</div>
+</div>
+
+<div class="list-wrap" id="listWrap">
+  <div id="connectingMsg">⏳ מתחבר ל-Firebase...</div>
+</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Edit modal -->
+<div class="edit-overlay" id="editOverlay" onclick="maybeCloseEdit(event)">
+  <div class="edit-modal">
+    <div class="edit-title">✏️ עריכת פריט</div>
+    <input class="edit-input" id="editNameInput" placeholder="שם הפריט..." />
+    <div class="edit-cat-row" id="editCatRow">
+      <div class="cat-chip" data-c="shopping" onclick="pickEditCat(this)">🛒 קניות</div>
+      <div class="cat-chip" data-c="todo" onclick="pickEditCat(this)">📋 מטלה</div>
+      <div class="cat-chip" data-c="home" onclick="pickEditCat(this)">🏠 בית</div>
+      <div class="cat-chip" data-c="kids" onclick="pickEditCat(this)">👶 ילדים</div>
+      <div class="cat-chip" data-c="work" onclick="pickEditCat(this)">💼 עבודה</div>
+      <div class="cat-chip" data-c="other" onclick="pickEditCat(this)">✨ אחר</div>
+    </div>
+    <div class="edit-who-row">
+      <button class="who-btn" id="editWhoMe"   onclick="pickEditWho('me')">👤 אני</button>
+      <button class="who-btn" id="editWhoWife" onclick="pickEditWho('wife')">👤 אשתי</button>
+    </div>
+    <div class="priority-picker" id="editPrioPicker" style="margin-bottom:14px">
+      <button class="prio-chip" data-p="1" onclick="pickPrio(this,'edit')">🔴 דחוף</button>
+      <button class="prio-chip" data-p="2" onclick="pickPrio(this,'edit')">🟡 גבוה</button>
+      <button class="prio-chip" data-p="3" onclick="pickPrio(this,'edit')">🔵 רגיל</button>
+      <button class="prio-chip" data-p="4" onclick="pickPrio(this,'edit')">⚪ נמוך</button>
+    </div>
+    <button class="edit-save-btn" onclick="saveEdit()">💾 שמור שינויים</button>
+    <button class="edit-cancel-btn" onclick="closeEdit()">ביטול</button>
+  </div>
+</div>
+
+
+<script>
+  // ── state ───────────────────────────────────────────
+  const CATS = {
+    shopping:'🛒 קניות', todo:'📋 מטלה', home:'🏠 בית',
+    kids:'👶 ילדים', work:'💼 עבודה', other:'✨ אחר'
+  };
+  const WHO_LABEL = { me:'אני', wife:'אשתי' };
+
+  window._items = [];
+  let currentTab = 'all';
+  let selCat = 'shopping';
+  let selWho = 'me';
+  let editId = null;
+  let editCat = 'shopping';
+  let editWho = 'me';
+  let editPrio = 3;
+
+  // ── UI helpers ──────────────────────────────────────
+  function pickCat(el) {
+    document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('sel'));
+    el.classList.add('sel');
+    selCat = el.dataset.c;
+  }
+
+  function pickWho(w) {
+    selWho = w;
+    document.getElementById('whoMe').classList.toggle('sel', w==='me');
+    document.getElementById('whoWife').classList.toggle('sel', w==='wife');
+  }
+
+  function setTab(t, el) {
+    currentTab = t;
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    render();
+  }
+
+  // ── Firebase actions ────────────────────────────────
+  function addItem() {
+    const inp = document.getElementById('inp');
+    const name = inp.value.trim();
+    if (!name) return;
+    if (!window._fb) { toast('⚠️ Firebase לא מוגדר עדיין'); return; }
+    const { listRef, push, serverTimestamp } = window._fb;
+    push(listRef, {
+      name, cat: selCat, who: selWho,
+      priority: selPrioAdd,
+      done: false, urgent: selPrioAdd===1,
+      createdAt: Date.now(),
+      doneAt: null
+    });
+    inp.value = '';
+    toast('✅ נוסף!');
+  }
+
+  function toggleDone(id) {
+    if (!window._fb) return;
+    const item = window._items.find(i=>i.id===id);
+    if (!item) return;
+    const { db, ref, update } = window._fb;
+    update(ref(db, 'sharedList/'+id), {
+      done: !item.done,
+      doneAt: !item.done ? new Date().toLocaleDateString('he-IL') : null
+    });
+  }
+
+  function toggleUrgent(id) {
+    if (!window._fb) return;
+    const item = window._items.find(i=>i.id===id);
+    if (!item) return;
+    const { db, ref, update } = window._fb;
+    update(ref(db, 'sharedList/'+id), { urgent: !item.urgent });
+  }
+
+  function deleteItem(id) {
+    if (!window._fb) return;
+    const { db, ref, remove } = window._fb;
+    remove(ref(db, 'sharedList/'+id));
+    toast('🗑️ הוסר');
+  }
+
+
+
+  // ── Priority & Sort ─────────────────────────────────
+  const PRIO = { 1:'🔴 דחוף', 2:'🟡 גבוה', 3:'🔵 רגיל', 4:'⚪ נמוך' };
+  let selPrioAdd = 1;
+  let selPrioEdit = 1;
+  let currentSort = 'priority';
+
+  function pickPrio(el, ctx) {
+    const picker = ctx==='add' ? '#addPrioPicker' : '#editPrioPicker';
+    document.querySelectorAll(picker + ' .prio-chip').forEach(c=>{
+      c.className = 'prio-chip';
+    });
+    const p = parseInt(el.dataset.p);
+    el.classList.add('sel-p'+p);
+    if (ctx==='add') selPrioAdd = p;
+    else selPrioEdit = p;
+  }
+
+  function setSort(s, el) {
+    currentSort = s;
+    document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+    render();
+  }
+
+  function sortItems(arr) {
+    if (currentSort === 'priority') {
+      return [...arr].sort((a,b) => (a.priority||3) - (b.priority||3));
+    } else if (currentSort === 'date') {
+      return [...arr].sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+    } else if (currentSort === 'cat') {
+      return [...arr].sort((a,b) => (a.cat||'').localeCompare(b.cat||''));
+    }
+    return arr;
+  }
+
+  function prioBadge(p) {
+    const n = parseInt(p)||3;
+    return `<span class="priority-badge p${n}">${PRIO[n]||PRIO[3]}</span>`;
+  }
+
+  // ── Edit modal ──────────────────────────────────────
+  function openEdit(id) {
+    const item = window._items.find(i=>i.id===id);
+    if (!item) return;
+    editId = id;
+    editCat = item.cat || 'shopping';
+    editWho = item.who || 'me';
+    editPrio = parseInt(item.priority)||3;
+    selPrioEdit = editPrio;
+    document.getElementById('editNameInput').value = item.name;
+    // set cat chips
+    document.querySelectorAll('#editCatRow .cat-chip').forEach(c=>{
+      c.classList.toggle('sel', c.dataset.c === editCat);
+    });
+    // set who
+    document.getElementById('editWhoMe').classList.toggle('sel', editWho==='me');
+    document.getElementById('editWhoWife').classList.toggle('sel', editWho==='wife');
+    // set priority chips
+    document.querySelectorAll('#editPrioPicker .prio-chip').forEach(c=>{
+      const p = parseInt(c.dataset.p);
+      c.className = 'prio-chip' + (p===editPrio?' sel-p'+p:'');
+    });
+    document.getElementById('editOverlay').classList.add('open');
+    setTimeout(()=>document.getElementById('editNameInput').focus(), 300);
+  }
+
+  function pickEditCat(el) {
+    document.querySelectorAll('#editCatRow .cat-chip').forEach(c=>c.classList.remove('sel'));
+    el.classList.add('sel');
+    editCat = el.dataset.c;
+  }
+
+  function pickEditWho(w) {
+    editWho = w;
+    document.getElementById('editWhoMe').classList.toggle('sel', w==='me');
+    document.getElementById('editWhoWife').classList.toggle('sel', w==='wife');
+  }
+
+  function saveEdit() {
+    if (!editId || !window._fb) return;
+    const name = document.getElementById('editNameInput').value.trim();
+    if (!name) return;
+    const { db, ref, update } = window._fb;
+    update(ref(db, 'sharedList/'+editId), { name, cat: editCat, who: editWho, priority: selPrioEdit, urgent: selPrioEdit===1 });
+    closeEdit();
+    toast('✏️ עודכן!');
+  }
+
+  function closeEdit() {
+    document.getElementById('editOverlay').classList.remove('open');
+    editId = null;
+  }
+
+  function maybeCloseEdit(e) {
+    if (e.target===document.getElementById('editOverlay')) closeEdit();
+  }
+
+  // ── render ──────────────────────────────────────────
+  function render() {
+    // sync dot
+    document.getElementById('syncDot').className =
+      'sync-dot' + (window._fb ? ' live' : '');
+
+    const items = window._items || [];
+    const open  = items.filter(i=>!i.done);
+    const done  = items.filter(i=>i.done);
+    const urg   = open.filter(i=>i.urgent);
+
+    // stats
+    document.getElementById('statsBar').innerHTML = `
+      <div class="stat-pill">⏳ פתוח: <b>${open.length}</b></div>
+      <div class="stat-pill">✅ בוצע: <b>${done.length}</b></div>
+      ${urg.length ? `<div class="stat-pill">🔴 דחוף: <b>${urg.length}</b></div>` : ''}
+    `;
+
+    // filter + sort
+    let filtered;
+    if (currentTab==='done')          filtered = sortItems(done);
+    else if (currentTab==='shopping') filtered = sortItems(open.filter(i=>i.cat==='shopping'));
+    else if (currentTab==='todo')     filtered = sortItems(open.filter(i=>i.cat!=='shopping'));
+    else                              filtered = sortItems(open);
+
+    const wrap = document.getElementById('listWrap');
+
+    if (filtered.length === 0) {
+      wrap.innerHTML = `<div class="empty">
+        <div class="empty-ico">${currentTab==='done'?'🎉':'📝'}</div>
+        <div class="empty-txt">${currentTab==='done'?'עדיין לא בוצע כלום':'הרשימה ריקה!'}</div>
+      </div>`;
+      return;
+    }
+
+    let html = '';
+    if (currentTab !== 'done') {
+      filtered.forEach(i => html += card(i));
+    } else {
+      html += `<div class="section-lbl">✅ בוצע (${filtered.length})</div>`;
+      filtered.forEach(i => html += card(i));
+    }
+
+    wrap.innerHTML = html;
+  }
+
+  function card(item) {
+    return `
+    <div class="item-card ${item.done?'done':''} ${item.urgent&&!item.done?'urgent':''}">
+      <button class="check-btn ${item.done?'checked':''}" onclick="toggleDone('${item.id}')">
+        ${item.done?'✓':''}
+      </button>
+      <div class="item-body">
+        <div class="item-name">${esc(item.name)}</div>
+        <div class="item-sub">
+          <span class="badge cat">${CATS[item.cat]||item.cat}</span>
+          <span class="badge who">${WHO_LABEL[item.who]||item.who||''}</span>
+          ${!item.done ? prioBadge(item.priority||3) : ''}
+          ${item.done?`<span class="badge done-lbl">✅ בוצע ${item.doneAt||''}</span>`:''}
+        </div>
+        ${item.done?`<div style="margin-top:6px"><button class="undo-btn" onclick="toggleDone('${item.id}')">↩ החזר לפתוח</button></div>`:''}
+      </div>
+      <div class="item-actions">
+        ${!item.done?`
+          <button class="icon-btn" onclick="openEdit('${item.id}')" title="ערוך" style="color:#9d95ff">✏️</button>
+          <button class="icon-btn ${item.urgent?'urg-on':''}" onclick="toggleUrgent('${item.id}')">⚡</button>
+        `:''}
+        <button class="icon-btn del-btn" onclick="deleteItem('${item.id}')">🗑</button>
+      </div>
+    </div>`;
+  }
+
+  function esc(s='') {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── toast ─────────────────────────────────────────────
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(()=>el.classList.remove('show'), 2200);
+  }
+
+  // initial render while connecting
+  render();
+</script>
+
+<!--
+════════════════════════════════════════════════════
+  🔥 הוראות הגדרת Firebase — 5 דקות בלבד!
+════════════════════════════════════════════════════
+
+שלב 1: צור פרויקט Firebase
+  ► פתח: https://console.firebase.google.com
+  ► לחץ "Add project" → תן שם → המשך עד סוף
+
+שלב 2: הפעל Realtime Database
+  ► בתפריט הצד: Build → Realtime Database
+  ► "Create Database" → בחר אזור → "Start in test mode"
+  ► תראה URL בצורה: https://YOUR_PROJECT-default-rtdb.firebaseio.com
+
+שלב 3: קבל את firebaseConfig
+  ► Project Settings (⚙️ למעלה) → General → Your apps
+  ► לחץ "</>" (Web app) → Register → תראה את ה-config
+
+שלב 4: עדכן בקובץ
+  ► פתח את הקובץ הזה בעורך טקסט (Notepad / VS Code)
+  ► מצא את השורה: const firebaseConfig = {
+  ► החלף את הערכים עם הערכים האמיתיים שלך
+
+שלב 5: שתף עם אשתך
+  ► שמור את הקובץ ב-Google Drive / Dropbox
+  ► שתפו את הקישור
+  ► כל אחד פותח את הקובץ בדפדפן — הרשימה מסונכרנת!
+
+  💡 טיפ: ניתן גם להעלות ל-GitHub Pages / Netlify
+     לקבל כתובת URL קבועה שאפשר לשמור בפלאפון כ-PWA
+
+════════════════════════════════════════════════════
+-->
+</body>
+</html>
