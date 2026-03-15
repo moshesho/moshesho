@@ -664,6 +664,12 @@ header{
   .task-progress-pct{font-size:11px;font-weight:800;color:var(--text3);min-width:32px;text-align:left}
   .task-progress-pct.done{color:var(--green)}
 
+
+  /* ── PROGRESS PIE BADGE ── */
+  .pct-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:3px 8px 3px 5px;font-size:11px;font-weight:800}
+  .pct-badge.done-badge{border-color:rgba(16,185,129,0.3);color:var(--green)}
+  .pct-badge svg{flex-shrink:0}
+
 </style>
 </head>
 <body>
@@ -854,13 +860,13 @@ header{
 <script>
   // ── USERS ──────────────────────────────────────────
   const USERS = {
-    moshe:  { name:'משה שושה',     role:'admin',  initials:'מש', pin:'5284' },
-    assaf:  { name:'אסף בן מאיר',  role:'admin',  initials:'אב', pin:'2168' },
-    elad:   { name:'אלעד קומיסר',  role:'member', initials:'אק', pin:'8623' },
-    alik:   { name:'אליק אברמזון', role:'member', initials:'אא', pin:'9195' },
-    rif:    { name:'ריף פרץ',      role:'member', initials:'רפ', pin:'5090' },
-    tal:    { name:'טל כהן',       role:'member', initials:'טכ', pin:'4810' },
-    omer:   { name:'עומר תורג\'מן',   role:'lab',    initials:'עת', pin:'1082' },
+    moshe:  { name:'משה שושה',     role:'admin',  initials:'מש', pin:'5284',  phone:'972525588555' },
+    assaf:  { name:'אסף בן מאיר',  role:'admin',  initials:'אב', pin:'2168',  phone:'972507857205' },
+    elad:   { name:'אלעד קומיסר',  role:'member', initials:'אק', pin:'8623',  phone:'972528721303' },
+    alik:   { name:'אליק אברמזון', role:'member', initials:'אא', pin:'9195',  phone:'972523201618' },
+    rif:    { name:'ריף פרץ',      role:'member', initials:'רפ', pin:'5090',  phone:'972533326272' },
+    tal:    { name:'טל כהן',       role:'member', initials:'טכ', pin:'4810',  phone:'972524713172' },
+    omer:   { name:'עומר תורג\'מן',   role:'lab',    initials:'עת', pin:'1082',  phone:'972545876986' },
   };
   const PRIO_LABEL = {1:'🔴 דחוף',2:'🟡 גבוה',3:'🔵 רגיל',4:'⚪ נמוך'};
   const STATUS_LABEL = {open:'🔵 פתוח',progress:'🟡 בביצוע',blocked:'⏳ ממתין',done:'✅ בוצע'};
@@ -1035,6 +1041,77 @@ header{
   });
 
 
+
+
+  // ── WHATSAPP NOTIFICATIONS ──────────────────────────
+  function sendWhatsAppNotif(uids, taskName, taskNotes) {
+    const url = 'https://moshesho.github.io/moshesho/team.html';
+    uids.forEach(uid => {
+      const u = USERS[uid];
+      if (!u || !u.phone || uid === currentUser) return;
+      const firstName = u.name.split(' ')[0];
+      const msg = encodeURIComponent(
+        'שלום ' + firstName + ' 👋\n' +
+        'נוספה לך משימה חדשה במערכת SPYDER Team Management:\n\n' +
+        '📋 ' + taskName + '\n' +
+        (taskNotes ? '📝 ' + taskNotes.substring(0,80) + '\n\n' : '\n') +
+        '🔗 כניסה למערכת:\n' + url
+      );
+      const phone = u.phone.replace(/[^0-9]/g,'');
+      window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+    });
+  }
+
+  function openWhatsAppPanel(uids, taskName, taskNotes) {
+    const url = 'https://moshesho.github.io/moshesho/team.html';
+    const assigneesWithPhone = uids.filter(uid => uid !== currentUser && USERS[uid]?.phone);
+    const assigneesNoPhone   = uids.filter(uid => uid !== currentUser && !USERS[uid]?.phone);
+
+    if (!assigneesWithPhone.length && !assigneesNoPhone.length) return;
+
+    let html = `<div style="direction:rtl;font-family:'Heebo',sans-serif;padding:4px">`;
+    html += `<div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:12px">📲 שלח התראת WhatsApp</div>`;
+
+    if (assigneesWithPhone.length) {
+      assigneesWithPhone.forEach(uid => {
+        const u = USERS[uid];
+        const firstName = u.name.split(' ')[0];
+        const msg = encodeURIComponent(
+          'שלום ' + firstName + ' 👋\n' +
+          'נוספה לך משימה חדשה במערכת SPYDER Team Management:\n\n' +
+          '📋 ' + taskName + '\n' +
+          (taskNotes ? '📝 ' + taskNotes.substring(0,80) + '\n\n' : '\n') +
+          '🔗 כניסה למערכת:\n' + url
+        );
+        const phone = u.phone.replace(/[^0-9]/g,'');
+        html += `<a href="https://wa.me/${phone}?text=${msg}" target="_blank"
+          style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);border-radius:10px;padding:10px 14px;margin-bottom:8px;text-decoration:none;color:#fff">
+          <span style="font-size:20px">💬</span>
+          <div>
+            <div style="font-size:13px;font-weight:700">${u.name}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.5)">${u.phone}</div>
+          </div>
+          <span style="margin-right:auto;font-size:11px;color:#25d366;font-weight:700">פתח WhatsApp ←</span>
+        </a>`;
+      });
+    }
+
+    if (assigneesNoPhone.length) {
+      html += `<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px">⚠️ חסר מספר טלפון: ${assigneesNoPhone.map(uid=>USERS[uid].name.split(' ')[0]).join(', ')}</div>`;
+    }
+
+    html += `</div>`;
+
+    // show in a toast-style modal
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9998;display:flex;align-items:flex-end;justify-content:center;padding:20px';
+    overlay.innerHTML = `<div style="background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px;max-width:420px;width:100%">
+      ${html}
+      <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;margin-top:12px;padding:10px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-family:'Heebo',sans-serif;cursor:pointer">סגור</button>
+    </div>`;
+    overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
+    document.body.appendChild(overlay);
+  }
 
   // ── NOTIFICATIONS ──────────────────────────────────
   let notifUnsub = null;
@@ -1980,11 +2057,14 @@ header{
     }
     pendingSteps = [];
     const names = mAssignees.map(u=>USERS[u].name.split(' ')[0]).join(', ');
+    const mAssigneesSnapshot = [...mAssignees];
     mAssignees.forEach(uid => pushNotif(uid, name));
     mAssignees = [];
     document.getElementById('quickName').value='';
     if (document.getElementById('qNotes')) document.getElementById('qNotes').value='';
     toast('✅ משימה נוספה ל-' + (names || 'הצוות'));
+    const assigneesForWA = [...mAssigneesSnapshot];
+    if (USERS[currentUser]?.role === 'admin') setTimeout(() => openWhatsAppPanel(assigneesForWA, name, notes), 300);
     const tasksBtn = Array.from(document.querySelectorAll('.tab')).find(b=>b.textContent.includes('משימות'));
     setTab('tasks', tasksBtn);
   }
@@ -2156,20 +2236,25 @@ header{
         <span class="badge ${['','prio1','prio2','prio3','prio4'][t.priority||3]}">${PRIO_LABEL[t.priority||3]}</span>
         <span class="badge ${statusMap[t.status||'open']}">${STATUS_LABEL[t.status||'open']}</span>
         ${deadlineBadge}
+        ${(() => {
+          const steps = t.steps ? Object.values(t.steps) : [];
+          if (!steps.length) return '';
+          const done = steps.filter(s=>s.done).length;
+          const pct = Math.round(done/steps.length*100);
+          const isDone = pct===100;
+          const r=8, circ=2*Math.PI*r;
+          const dash=circ*(pct/100), gap=circ-dash;
+          const color = isDone ? '#10b981' : pct>60 ? '#3b82f6' : pct>30 ? '#f59e0b' : '#6b7280';
+          const svg = `<svg width="20" height="20" viewBox="0 0 20 20">
+            <circle cx="10" cy="10" r="${r}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3"/>
+            <circle cx="10" cy="10" r="${r}" fill="none" stroke="${color}" stroke-width="3"
+              stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+              stroke-linecap="round"
+              transform="rotate(-90 10 10)"/>
+          </svg>`;
+          return `<span class="pct-badge${isDone?' done-badge':''}">${svg}${isDone?'✅ ':''} ${pct}%</span>`;
+        })()}
       </div>
-      ${(() => {
-        const steps = t.steps ? Object.values(t.steps) : [];
-        if (!steps.length) return '';
-        const done = steps.filter(s=>s.done).length;
-        const pct = Math.round(done/steps.length*100);
-        const isDone = pct===100;
-        return `<div class="task-progress-wrap">
-          <div class="task-progress-bar"><div class="task-progress-fill${isDone?' done':''}" style="width:${pct}%"></div></div>
-          <div class="task-progress-pct${isDone?' done':''}">
-            ${isDone ? '✅ 100%' : pct+'%'}
-          </div>
-        </div>`;
-      })()}
       ${t.notes ? `<div class="task-notes">${esc(t.notes)}</div>` : ''}
       ${canEdit && t.status!=='done' ? `
       <div class="status-sel">
