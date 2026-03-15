@@ -1092,7 +1092,7 @@ header{
         });
       }
 
-      html += `<button onclick="saveBackupNow()" style="width:100%;margin-top:12px;padding:11px;border-radius:10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10b981;font-family:'Heebo',sans-serif;font-weight:700;cursor:pointer;font-size:13px">💾 שמור גיבוי עכשיו</button>`;
+      html += `<button id="saveBackupBtn" onclick="saveBackupNow()" style="width:100%;margin-top:12px;padding:11px;border-radius:10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10b981;font-family:'Heebo',sans-serif;font-weight:700;cursor:pointer;font-size:13px">💾 שמור גיבוי עכשיו</button>`;
       html += `</div>`;
 
       showFloatPanel(html);
@@ -1101,6 +1101,8 @@ header{
 
   function saveBackupNow() {
     if (!tasks.length) { toast('⚠️ אין משימות לגיבוי'); return; }
+    const btn = document.getElementById('saveBackupBtn');
+    if (btn) { btn.textContent = '⏳ שומר גיבוי...'; btn.disabled = true; btn.style.opacity = '0.7'; }
     const today = new Date().toISOString().split('T')[0];
     const backupData = {};
     tasks.forEach(t => { backupData[t.id] = {...t}; delete backupData[t.id].id; });
@@ -1109,9 +1111,18 @@ header{
       savedAt: Date.now(),
       taskCount: tasks.length
     }).then(() => {
-      toast('💾 גיבוי נשמר בהצלחה!');
-      closeFloatPanel();
-      setTimeout(openBackupModal, 400);
+      // show saving status inside panel before closing
+      const btn = document.getElementById('saveBackupBtn');
+      if (btn) {
+        btn.textContent = '✅ נשמר בהצלחה!';
+        btn.style.background = 'rgba(16,185,129,0.2)';
+        btn.style.borderColor = 'rgba(16,185,129,0.5)';
+        btn.disabled = true;
+      }
+      setTimeout(() => {
+        closeFloatPanel();
+        toast('💾 גיבוי נשמר בהצלחה!');
+      }, 1200);
     }).catch(err => {
       toast('⚠️ שגיאה: ' + err.message);
     });
