@@ -1199,26 +1199,13 @@ header{
     document.querySelectorAll('.pin-dot').forEach((d,i) => {
       d.classList.toggle('filled', i < pinBuffer.length);
     });
-    // show matching user name as hint while typing
-    const matches = Object.entries(USERS).filter(([,u]) => u.pin.startsWith(pinBuffer));
-    const nameEl = document.getElementById('pinUserName');
-    const avatarEl = document.getElementById('pinUserAvatar');
+    // only reset display when clearing — don't reveal name while typing
     if (pinBuffer.length === 0) {
+      const nameEl = document.getElementById('pinUserName');
+      const avatarEl = document.getElementById('pinUserAvatar');
       nameEl.textContent = 'מי אתה?';
       avatarEl.textContent = '🛡️';
       avatarEl.style.background = 'linear-gradient(135deg,var(--blue),var(--cyan))';
-    } else if (matches.length === 1) {
-      const [uid, u] = matches[0];
-      nameEl.textContent = u.name;
-      avatarEl.textContent = u.initials;
-      avatarEl.style.background = u.role==='admin'
-        ? 'linear-gradient(135deg,#7c3aed,#a855f7)'
-        : 'linear-gradient(135deg,var(--blue),var(--cyan))';
-    } else if (matches.length > 1) {
-      nameEl.textContent = matches.length + ' אפשרויות...';
-      avatarEl.textContent = '?';
-    } else {
-      nameEl.textContent = '';
     }
   }
 
