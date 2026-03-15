@@ -2108,7 +2108,9 @@ header{
       else                deadlineBadge = `<span class="deadline-badge ok">📅 ${t.deadline}</span>`;
     }
     const isAdmin = USERS[currentUser]?.role==='admin';
-    const canEdit = isAdmin || t.assignee===currentUser;
+    const isAssigned = t.assignee===currentUser || (t.assignees && t.assignees.includes(currentUser));
+    const canEdit = isAdmin || isAssigned;
+    const canDelete = isAdmin || isAssigned;
 
     const statusMap = {open:'status-open',progress:'status-progress',blocked:'status-blocked',done:'status-done'};
 
@@ -2118,7 +2120,7 @@ header{
         <div class="tc-name">${esc(t.name)}</div>
         <div class="tc-actions">
           ${canEdit ? `<button class="iBtn edit" onclick="openEdit('${t.id}')">✏️</button>` : ''}
-          ${(isAdmin || (currentUser === 'omer' && (t.assignee === 'omer' || (t.assignees && t.assignees.includes('omer'))))) ? `<button class="iBtn del" onclick="delTask('${t.id}')">🗑</button>` : ''}
+          ${canDelete ? `<button class="iBtn del" onclick="delTask('${t.id}')">🗑</button>` : ''}
         </div>
       </div>
       <div class="tc-meta">
