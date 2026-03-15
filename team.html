@@ -1092,7 +1092,19 @@ header{
         });
       }
 
-      html += `<button id="saveBackupBtn" onclick="saveBackupNow()" style="width:100%;margin-top:12px;padding:11px;border-radius:10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10b981;font-family:'Heebo',sans-serif;font-weight:700;cursor:pointer;font-size:13px">💾 שמור גיבוי עכשיו</button>`;
+      html += `
+        <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:14px;padding-top:14px">
+          <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:1px;margin-bottom:10px">☁️ גיבוי Firebase</div>
+          <button id="saveBackupBtn" onclick="saveBackupNow()" style="width:100%;padding:11px;border-radius:10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#10b981;font-family:'Heebo',sans-serif;font-weight:700;cursor:pointer;font-size:13px">💾 שמור גיבוי עכשיו</button>
+        </div>
+        <div style="border-top:1px solid rgba(255,255,255,0.07);margin-top:12px;padding-top:12px">
+          <div style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:1px;margin-bottom:10px">💻 גיבוי מקומי למחשב</div>
+          <div style="display:flex;gap:8px">
+            <button onclick="downloadLocalBackup()" style="flex:1;padding:11px;border-radius:10px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--blue);font-family:'Heebo',sans-serif;font-weight:700;cursor:pointer;font-size:13px">⬇️ הורד קובץ JSON</button>
+            <button onclick="triggerLocalRestore()" style="flex:1;padding:11px;border-radius:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#f59e0b;font-family:'Heebo',sans-serif;font-weight:700;cursor:pointer;font-size:13px">⬆️ שחזר מקובץ</button>
+          </div>
+        </div>
+      `;
       html += `</div>`;
 
       showFloatPanel(html);
@@ -1167,6 +1179,65 @@ header{
     db.ref('team/backups/'+today).once('value', snap => {
       if (!snap.exists()) saveBackup();
     });
+  }
+
+
+  // ── LOCAL BACKUP ────────────────────────────────────
+  function downloadLocalBackup() {
+    if (!tasks.length) { toast('⚠️ אין משימות לגיבוי'); return; }
+    const now = new Date();
+    const dateStr = now.getDate()+'_'+(now.getMonth()+1)+'_'+now.getFullYear()+'_'+now.getHours()+'_'+String(now.getMinutes()).padStart(2,'0');
+    const backup = {
+      version: 1,
+      exportedAt: now.toISOString(),
+      taskCount: tasks.length,
+      tasks: {}
+    };
+    tasks.forEach(t => {
+      backup.tasks[t.id] = {...t};
+      delete backup.tasks[t.id].id;
+    });
+    const json = JSON.stringify(backup, null, 2);
+    const blob = new Blob([json], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'SPYDER_backup_' + dateStr + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('💾 קובץ גיבוי הורד!');
+  }
+
+  function triggerLocalRestore() {
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.json';
+    inp.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const backup = JSON.parse(ev.target.result);
+          if (!backup.tasks || backup.version !== 1) {
+            toast('⚠️ קובץ לא תקין'); return;
+          }
+          const dateStr = backup.exportedAt ? new Date(backup.exportedAt).toLocaleString('he-IL') : 'לא ידוע';
+          if (!confirm('לשחזר ' + (backup.taskCount||0) + ' משימות מגיבוי מתאריך:\n' + dateStr + '?\n\nכל המשימות הנוכחיות יוחלפו!')) return;
+          
+          // show loading
+          toast('⏳ משחזר...');
+          db.ref('team/tasks').set(backup.tasks).then(() => {
+            toast('✅ שוחזר בהצלחה! ' + (backup.taskCount||0) + ' משימות');
+            closeFloatPanel();
+          }).catch(err => toast('⚠️ שגיאה: ' + err.message));
+        } catch(e) {
+          toast('⚠️ שגיאה בקריאת הקובץ');
+        }
+      };
+      reader.readAsText(file);
+    };
+    inp.click();
   }
 
   // ── NOTIFICATIONS ──────────────────────────────────
