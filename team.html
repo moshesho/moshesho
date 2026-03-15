@@ -1061,6 +1061,13 @@ header{
     });
   }
 
+
+  function openWAForTask(taskId) {
+    const t = tasks.find(x=>x.id===taskId);
+    if (!t) return;
+    const uids = (t.assignees && t.assignees.length) ? t.assignees : [t.assignee];
+    openWhatsAppPanel(uids.filter(u=>u), t.name, t.notes||null);
+  }
   function openWhatsAppPanel(uids, taskName, taskNotes) {
     const url = 'https://moshesho.github.io/moshesho/team.html';
     const assigneesWithPhone = uids.filter(uid => uid !== currentUser && USERS[uid]?.phone);
@@ -2220,6 +2227,7 @@ header{
         <div class="tc-name">${esc(t.name)}</div>
         <div class="tc-actions">
           ${canEdit ? `<button class="iBtn edit" onclick="openEdit('${t.id}')">✏️</button>` : ''}
+          ${isAdmin ? `<button class="iBtn" style="color:#25d366;font-size:14px" title="שלח WhatsApp לאחראים" onclick="openWAForTask('${t.id}')">📲</button>` : ''}
           ${canDelete ? `<button class="iBtn del" onclick="delTask('${t.id}')">🗑</button>` : ''}
         </div>
       </div>
