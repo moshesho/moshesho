@@ -669,14 +669,21 @@ header{
     <div class="login-sub">בחר את שמך להמשך</div>
   </div>
   <div class="login-right">
-    <div id="currentUserHeader" style="display:none;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:10px 14px;margin-bottom:16px;text-align:center">
-      <div id="currentUserRole" style="font-size:10px;font-weight:800;letter-spacing:2px;color:var(--blue);text-transform:uppercase;margin-bottom:2px"></div>
-      <div id="currentUserName" style="font-size:15px;font-weight:900;color:#fff"></div>
+    <!-- Section 1: current user (moshe or assaf) -->
+    <div id="mySection" style="margin-bottom:14px">
+      <div id="myRoleLabel" class="login-label" style="margin-bottom:8px"></div>
+      <div id="myGrid" class="user-grid"></div>
     </div>
-    <div class="login-label">👑 <span id="adminSectionLabel">מנהלים</span></div>
-    <div class="user-grid" id="adminGrid" style="margin-bottom:16px"></div>
-    <div class="login-label">👥 צוות</div>
-    <div class="user-grid" id="memberGrid"></div>
+    <!-- Section 2: the other admin -->
+    <div id="otherAdminSection" style="margin-bottom:14px">
+      <div id="otherAdminLabel" class="login-label" style="margin-bottom:8px"></div>
+      <div id="otherAdminGrid" class="user-grid"></div>
+    </div>
+    <!-- Section 3: team members -->
+    <div id="memberSection">
+      <div class="login-label" style="margin-bottom:8px">👥 צוות</div>
+      <div class="user-grid" id="memberGrid"></div>
+    </div>
     <button onclick="showPinScreen()" style="margin-top:16px;width:100%;padding:10px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text2);font-family:'Heebo',sans-serif;font-size:13px;cursor:pointer;">🔐 כניסה עם PIN</button>
   </div>
 </div>
@@ -1263,21 +1270,21 @@ header{
 
   function showUserSelect() {
     setTimeout(() => {
-      // update admin section label
-      const lbl = document.getElementById('adminSectionLabel');
-      if (lbl) lbl.textContent = loggedInAs === 'assaf' ? 'ראש צוות' : 'מנהלים';
+      const roleLabels = {
+        moshe: 'מוביל תשתיות טכנולוגיות 🛡️',
+        assaf: '👑 ראש צוות'
+      };
+      const otherAdmin = loggedInAs === 'moshe' ? 'assaf' : 'moshe';
+      const otherLabel = loggedInAs === 'moshe' ? '👑 ראש צוות' : 'מוביל תשתיות טכנולוגיות 🛡️';
 
-      // show current user header
-      const header = document.getElementById('currentUserHeader');
-      const roleEl = document.getElementById('currentUserRole');
-      const nameEl = document.getElementById('currentUserName');
-      if (header && loggedInAs && USERS[loggedInAs]) {
-        const u = USERS[loggedInAs];
-        header.style.display = 'block';
-        roleEl.textContent = loggedInAs === 'moshe' ? 'מוביל תשתיות טכנולוגיות' : loggedInAs === 'assaf' ? 'ראש צוות' : 'צוות';
-        nameEl.textContent = u.name;
-      } else if (header) {
-        header.style.display = 'none';
+      // Section 1 — me
+      document.getElementById('myRoleLabel').textContent = roleLabels[loggedInAs] || '👑 מנהל';
+
+      // Section 2 — other admin (hide moshe from assaf's view if needed)
+      const showOther = !(loggedInAs === 'assaf' && otherAdmin === 'moshe');
+      document.getElementById('otherAdminSection').style.display = showOther ? 'block' : 'none';
+      if (showOther) {
+        document.getElementById('otherAdminLabel').textContent = otherLabel;
       }
     }, 10);
     renderUserSelectButtons();
@@ -1297,27 +1304,41 @@ header{
   }
 
   function renderUserSelectButtons() {
-    const adminGrid  = document.getElementById('adminGrid');
-    const memberGrid = document.getElementById('memberGrid');
-    if (!adminGrid || !memberGrid) return;
-    let adminHtml = '', memberHtml = '';
+    const myGrid       = document.getElementById('myGrid');
+    const otherGrid    = document.getElementById('otherAdminGrid');
+    const memberGrid   = document.getElementById('memberGrid');
+    if (!myGrid || !otherGrid || !memberGrid) return;
+
+    // clear all
+    myGrid.innerHTML = '';
+    otherGrid.innerHTML = '';
+    memberGrid.innerHTML = '';
+
+    function makeBtn(uid, onclick) {
+      const taskCnt = tasks.filter(t=>t.assignee===uid && t.status!=='done').length;
+      const btn = document.createElement('button');
+      btn.className = 'user-btn' + (USERS[uid].role==='admin' ? ' admin-btn' : '');
+      btn.innerHTML = USERS[uid].name
+        + (taskCnt > 0
+          ? '<span class="user-btn-count has-tasks">● '+taskCnt+' משימות פתוחות</span>'
+          : '<span class="user-btn-count">אין משימות פתוחות</span>');
+      btn.onclick = onclick;
+      return btn;
+    }
+
     Object.entries(USERS).forEach(([uid, u]) => {
-      // אסף לא רואה את משה
-      if (loggedInAs !== 'moshe' && uid === 'moshe') return;
-      const open = tasks.filter(t => t.assignee === uid && t.status !== 'done').length;
-      const countLabel = open > 0
-        ? '<span class="user-btn-count has-tasks">● ' + open + ' משימות פתוחות</span>'
-        : '<span class="user-btn-count">אין משימות פתוחות</span>';
-      const cls = u.role === 'admin' ? 'user-btn admin-btn' : 'user-btn';
-      const btn = '<button class="' + cls + '" onclick="login(\'' + uid + '\',\'' + u.role + '\')">'
-        + u.name + countLabel + '</button>';
-      if (u.role === 'admin') adminHtml += btn;
-      else memberHtml += btn;
+      if (uid === loggedInAs) {
+        myGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
+        myGrid.style.gridTemplateColumns = '1fr';
+      } else if (u.role === 'admin') {
+        // hide moshe from assaf
+        if (loggedInAs === 'assaf' && uid === 'moshe') return;
+        otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
+        otherGrid.style.gridTemplateColumns = '1fr';
+      } else {
+        memberGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
+      }
     });
-    // אם כרטיס אחד בלבד — מרכז
-    adminGrid.style.gridTemplateColumns = adminHtml.split('<button').length - 1 === 1 ? '1fr' : '1fr 1fr';
-    adminGrid.innerHTML  = adminHtml;
-    memberGrid.innerHTML = memberHtml;
   }
 
   // ── STEPS STATE ──────────────────────────────────
