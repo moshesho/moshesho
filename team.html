@@ -1100,9 +1100,21 @@ header{
   }
 
   function saveBackupNow() {
-    saveBackup();
-    toast('💾 גיבוי נשמר!');
-    setTimeout(openBackupModal, 500);
+    if (!tasks.length) { toast('⚠️ אין משימות לגיבוי'); return; }
+    const today = new Date().toISOString().split('T')[0];
+    const backupData = {};
+    tasks.forEach(t => { backupData[t.id] = {...t}; delete backupData[t.id].id; });
+    db.ref('team/backups/' + today).set({
+      tasks: backupData,
+      savedAt: Date.now(),
+      taskCount: tasks.length
+    }).then(() => {
+      toast('💾 גיבוי נשמר בהצלחה!');
+      closeFloatPanel();
+      setTimeout(openBackupModal, 400);
+    }).catch(err => {
+      toast('⚠️ שגיאה: ' + err.message);
+    });
   }
 
   function confirmRestore(date) {
