@@ -1508,6 +1508,7 @@ header{
   function renderDash(wrap) {
     const u = USERS[currentUser];
     const myTasks = u.role === 'admin' ? tasks : tasks.filter(t=>isAssignedTo(t, currentUser));
+    const myPersonalTasks = tasks.filter(t=>isAssignedTo(t, currentUser)); // tasks assigned to ME specifically
     const open     = myTasks.filter(t=>t.status==='open').length;
     const progress = myTasks.filter(t=>t.status==='progress').length;
     const blocked  = myTasks.filter(t=>t.status==='blocked').length;
@@ -1614,14 +1615,14 @@ header{
       html += '</div>';
 
       // overdue for this member
-      const overdueM = myTasks.filter(t=>t.deadline && t.deadline < today && t.status!=='done');
+      const overdueM = myPersonalTasks.filter(t=>t.deadline && t.deadline < today && t.status!=='done');
       if (overdueM.length) {
         html += `<div class="sec-lbl" style="color:#fca5a5">⚠️ באיחור (${overdueM.length})</div>`;
         overdueM.forEach(t => html += taskCard(t, false));
       }
 
       // personal card
-      const active = myTasks.filter(t=>t.status!=='done');
+      const active = myPersonalTasks.filter(t=>t.status!=='done');
       html += `
       <div class="my-header">
         <div class="my-avatar">${u.initials}</div>
