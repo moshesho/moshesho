@@ -2122,7 +2122,14 @@ header{
         </div>
       </div>
       <div class="tc-meta">
-        ${showAssignee&&t.assignee ? `<span class="badge assignee">👤 ${USERS[t.assignee]?.name||t.assignee}</span>` : ''}
+        ${showAssignee && t.assignee ? (() => {
+          const all = (t.assignees && t.assignees.length > 0) ? t.assignees : [t.assignee];
+          const isAdminUser = USERS[currentUser]?.role === 'admin';
+          return all
+            .filter(uid => uid && (USERS[uid]?.role !== 'lab' || isAdminUser || uid === currentUser))
+            .map(uid => `<span class="badge assignee">👤 ${USERS[uid]?.name.split(' ')[0]||uid}</span>`)
+            .join('');
+        })() : ''}
         <span class="badge ${['','prio1','prio2','prio3','prio4'][t.priority||3]}">${PRIO_LABEL[t.priority||3]}</span>
         <span class="badge ${statusMap[t.status||'open']}">${STATUS_LABEL[t.status||'open']}</span>
         ${deadlineBadge}
