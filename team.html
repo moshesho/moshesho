@@ -1042,83 +1042,6 @@ header{
 
 
 
-  // ── WHATSAPP NOTIFICATIONS ──────────────────────────
-  function sendWhatsAppNotif(uids, taskName, taskNotes) {
-    const url = 'https://moshesho.github.io/moshesho/team.html';
-    uids.forEach(uid => {
-      const u = USERS[uid];
-      if (!u || !u.phone || uid === currentUser) return;
-      const firstName = u.name.split(' ')[0];
-      const msg = encodeURIComponent(
-        'שלום ' + firstName + ' 👋\n' +
-        'נוספה לך משימה חדשה במערכת SPYDER Team Management:\n\n' +
-        '📋 ' + taskName + '\n' +
-        (taskNotes ? '📝 ' + taskNotes.substring(0,80) + '\n\n' : '\n') +
-        '🔗 כניסה למערכת:\n' + url
-      );
-      const phone = u.phone.replace(/[^0-9]/g,'');
-      window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
-    });
-  }
-
-
-  function openWAForTask(taskId) {
-    const t = tasks.find(x=>x.id===taskId);
-    if (!t) return;
-    const uids = (t.assignees && t.assignees.length) ? t.assignees : [t.assignee];
-    openWhatsAppPanel(uids.filter(u=>u), t.name, t.notes||null);
-  }
-  function openWhatsAppPanel(uids, taskName, taskNotes) {
-    const url = 'https://moshesho.github.io/moshesho/team.html';
-    const assigneesWithPhone = uids.filter(uid => uid !== currentUser && USERS[uid]?.phone);
-    const assigneesNoPhone   = uids.filter(uid => uid !== currentUser && !USERS[uid]?.phone);
-
-    if (!assigneesWithPhone.length && !assigneesNoPhone.length) return;
-
-    let html = `<div style="direction:rtl;font-family:'Heebo',sans-serif;padding:4px">`;
-    html += `<div style="font-size:14px;font-weight:800;color:#fff;margin-bottom:12px">📲 שלח התראת WhatsApp</div>`;
-
-    if (assigneesWithPhone.length) {
-      assigneesWithPhone.forEach(uid => {
-        const u = USERS[uid];
-        const firstName = u.name.split(' ')[0];
-        const msg = encodeURIComponent(
-          'שלום ' + firstName + ' 👋\n' +
-          'נוספה לך משימה חדשה במערכת SPYDER Team Management:\n\n' +
-          '📋 ' + taskName + '\n' +
-          (taskNotes ? '📝 ' + taskNotes.substring(0,80) + '\n\n' : '\n') +
-          '🔗 כניסה למערכת:\n' + url
-        );
-        const phone = u.phone.replace(/[^0-9]/g,'');
-        html += `<a href="https://wa.me/${phone}?text=${msg}" target="_blank"
-          style="display:flex;align-items:center;gap:10px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);border-radius:10px;padding:10px 14px;margin-bottom:8px;text-decoration:none;color:#fff">
-          <span style="font-size:20px">💬</span>
-          <div>
-            <div style="font-size:13px;font-weight:700">${u.name}</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.5)">${u.phone}</div>
-          </div>
-          <span style="margin-right:auto;font-size:11px;color:#25d366;font-weight:700">פתח WhatsApp ←</span>
-        </a>`;
-      });
-    }
-
-    if (assigneesNoPhone.length) {
-      html += `<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px">⚠️ חסר מספר טלפון: ${assigneesNoPhone.map(uid=>USERS[uid].name.split(' ')[0]).join(', ')}</div>`;
-    }
-
-    html += `</div>`;
-
-    // show in a toast-style modal
-    const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9998;display:flex;align-items:flex-end;justify-content:center;padding:20px';
-    overlay.innerHTML = `<div style="background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:20px;max-width:420px;width:100%">
-      ${html}
-      <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;margin-top:12px;padding:10px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-family:'Heebo',sans-serif;cursor:pointer">סגור</button>
-    </div>`;
-    overlay.onclick = e => { if(e.target===overlay) overlay.remove(); };
-    document.body.appendChild(overlay);
-  }
-
   // ── NOTIFICATIONS ──────────────────────────────────
   let notifUnsub = null;
 
@@ -2063,14 +1986,11 @@ header{
     }
     pendingSteps = [];
     const names = mAssignees.map(u=>USERS[u].name.split(' ')[0]).join(', ');
-    const mAssigneesSnapshot = [...mAssignees];
     mAssignees.forEach(uid => pushNotif(uid, name));
     mAssignees = [];
     document.getElementById('quickName').value='';
     if (document.getElementById('qNotes')) document.getElementById('qNotes').value='';
     toast('✅ משימה נוספה ל-' + (names || 'הצוות'));
-    const assigneesForWA = [...mAssigneesSnapshot];
-    if (USERS[currentUser]?.role === 'admin') setTimeout(() => openWhatsAppPanel(assigneesForWA, name, notes), 300);
     const tasksBtn = Array.from(document.querySelectorAll('.tab')).find(b=>b.textContent.includes('משימות'));
     setTab('tasks', tasksBtn);
   }
@@ -2227,7 +2147,6 @@ header{
         <div class="tc-name">${esc(t.name)}</div>
         <div class="tc-actions">
           ${canEdit ? `<button class="iBtn edit" onclick="openEdit('${t.id}')">✏️</button>` : ''}
-          ${isAdmin ? `<button class="iBtn" style="color:#25d366;font-size:14px" title="שלח WhatsApp לאחראים" onclick="openWAForTask('${t.id}')">📲</button>` : ''}
           ${canDelete ? `<button class="iBtn del" onclick="delTask('${t.id}')">🗑</button>` : ''}
         </div>
       </div>
