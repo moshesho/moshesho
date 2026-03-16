@@ -68,7 +68,7 @@ body::after{content:'';position:fixed;inset:0;
     padding:40px 20px;
     overflow-y:auto;
   }
-  .login-left{text-align:center;margin-bottom:20px}
+  .login-left{text-align:center;margin-bottom:20px;position:relative;}
   .login-logo{font-size:56px}
   .login-title{font-size:28px}
   .login-right{
@@ -168,7 +168,7 @@ body::after{content:'';position:fixed;inset:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:30px 24px;
 }
-.login-logo{font-size:48px;margin-bottom:16px;filter:drop-shadow(0 0 24px rgba(59,130,246,0.5));animation:float 3s ease-in-out infinite}
+.login-logo{font-size:48px;margin-bottom:16px;filter:drop-shadow(0 0 24px rgba(0,170,255,0.6));animation:float 3s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .login-title{font-size:22px;font-weight:900;margin-bottom:4px;
   background:linear-gradient(135deg,var(--blue),var(--cyan));
@@ -818,6 +818,51 @@ header{
   .my-stat-num{font-family:var(--font-mono)!important;font-size:28px!important;}
   .my-stat-lbl{font-family:var(--font-display)!important;letter-spacing:1px!important;text-transform:uppercase!important;}
 
+
+  /* ── LOGIN OUTER ENHANCEMENTS ── */
+  .login-wrap{position:relative;}
+  .login-wrap::before,.login-wrap::after{
+    content:'';position:fixed;width:200px;height:200px;pointer-events:none;z-index:0;
+  }
+  .login-wrap::before{
+    top:0;left:0;
+    background:radial-gradient(circle at 0 0,rgba(0,170,255,0.12),transparent 70%);
+  }
+  .login-wrap::after{
+    bottom:0;right:0;
+    background:radial-gradient(circle at 100% 100%,rgba(162,89,255,0.1),transparent 70%);
+  }
+  /* Corner brackets on login-right */
+  .login-right::after{
+    content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--blue),transparent);
+    opacity:.4;
+  }
+  /* Title glow pulse */
+  @keyframes title-pulse{
+    0%,100%{filter:drop-shadow(0 0 16px rgba(0,229,255,0.4));}
+    50%{filter:drop-shadow(0 0 28px rgba(0,229,255,0.7));}
+  }
+  .login-title{animation:title-pulse 3s ease-in-out infinite;}
+
+  /* Hexagon pattern overlay */
+  .login-left::before{
+    content:'SPYDER';
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    font-size:80px;font-weight:900;font-family:var(--font-display);
+    color:rgba(0,170,255,0.03);letter-spacing:8px;
+    pointer-events:none;white-space:nowrap;z-index:-1;
+  }
+
+  /* Subtitle styling */
+  .login-sub{
+    font-family:var(--font-display)!important;
+    letter-spacing:2px!important;
+    text-transform:uppercase!important;
+    font-size:11px!important;
+    color:rgba(0,170,255,0.5)!important;
+  }
+
 </style>
 </head>
 <body>
@@ -826,9 +871,22 @@ header{
 <!-- ── USER SELECT SCREEN ── -->
 <div id="userSelectScreen" style="display:none">
   <div class="login-left">
-    <div class="login-logo">🛡️</div>
+    <div class="login-logo">
+      <svg width="64" height="72" viewBox="0 0 64 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sg1" x1="0" y1="0" x2="64" y2="72" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#00e5ff"/>
+            <stop offset="100%" stop-color="#0066ff"/>
+          </linearGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path d="M32 2L4 14v20c0 16 12 30 28 36 16-6 28-20 28-36V14L32 2z" fill="rgba(0,170,255,0.08)" stroke="url(#sg1)" stroke-width="1.5" filter="url(#glow)"/>
+        <path d="M32 10L10 20v14c0 11 8 21 22 26 14-5 22-15 22-26V20L32 10z" fill="rgba(0,229,255,0.06)" stroke="rgba(0,229,255,0.4)" stroke-width="1"/>
+        <path d="M22 36l7 7 14-14" stroke="url(#sg1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+        <circle cx="32" cy="34" r="10" fill="none" stroke="rgba(0,170,255,0.15)" stroke-width="1" stroke-dasharray="2 3"/>
+      </svg>
+    </div>
     <div class="login-title">SPYDER Team Management Center</div>
-    <div style="font-size:11px;color:var(--text3);margin-top:4px;margin-bottom:2px">נכתב ע"י משה שושה | מוביל תשתיות טכנולוגיות</div>
     <div class="login-sub">בחר את שמך להמשך</div>
   </div>
   <div class="login-right">
@@ -876,9 +934,22 @@ header{
 <!-- ── PIN SCREEN ── -->
 <div id="loginScreen">
   <div class="login-left">
-    <div class="login-logo">🛡️</div>
+    <div class="login-logo">
+      <svg width="64" height="72" viewBox="0 0 64 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sg1" x1="0" y1="0" x2="64" y2="72" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#00e5ff"/>
+            <stop offset="100%" stop-color="#0066ff"/>
+          </linearGradient>
+          <filter id="glow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path d="M32 2L4 14v20c0 16 12 30 28 36 16-6 28-20 28-36V14L32 2z" fill="rgba(0,170,255,0.08)" stroke="url(#sg1)" stroke-width="1.5" filter="url(#glow)"/>
+        <path d="M32 10L10 20v14c0 11 8 21 22 26 14-5 22-15 22-26V20L32 10z" fill="rgba(0,229,255,0.06)" stroke="rgba(0,229,255,0.4)" stroke-width="1"/>
+        <path d="M22 36l7 7 14-14" stroke="url(#sg1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+        <circle cx="32" cy="34" r="10" fill="none" stroke="rgba(0,170,255,0.15)" stroke-width="1" stroke-dasharray="2 3"/>
+      </svg>
+    </div>
     <div class="login-title">SPYDER Team Management Center</div>
-    <div style="font-size:11px;color:var(--text3);margin-top:4px;margin-bottom:2px">נכתב ע"י משה שושה | מוביל תשתיות טכנולוגיות</div>
     <div class="login-sub">הכנס קוד PIN לכניסה</div>
   </div>
   <div class="login-right" id="loginRight">
