@@ -1127,6 +1127,96 @@ header{
     position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.35;
   }
 
+
+  /* ── BOLD EVERYTHING ── */
+
+  /* Thicker borders on all cards */
+  .task-card { border-width:1.5px !important; }
+  .task-card:hover { border-color:rgba(0,170,255,0.35) !important; border-width:1.5px !important; }
+
+  /* Thicker neon side bar on tasks */
+  .task-card::before { width:4px !important; border-radius:3px !important; }
+  .task-card.s-open::before   { box-shadow:0 0 16px var(--cyan),0 0 6px var(--cyan) !important; }
+  .task-card.s-progress::before { box-shadow:0 0 16px var(--yellow),0 0 6px var(--yellow) !important; }
+  .task-card.s-blocked::before  { box-shadow:0 0 16px var(--red),0 0 6px var(--red) !important; }
+  .task-card.s-done::before     { box-shadow:0 0 16px var(--green),0 0 6px var(--green) !important; }
+
+  /* Bolder task name */
+  .tc-name { font-weight:800 !important; font-size:15px !important; color:#e8f4ff !important; }
+
+  /* Bolder badges */
+  .badge { font-size:11px !important; font-weight:800 !important; padding:3px 10px !important; border-width:1.5px !important; }
+  .badge.assignee { border-color:rgba(0,170,255,0.3) !important; color:#7dd3fc !important; }
+
+  /* Bolder sec-lbl */
+  .sec-lbl { font-size:11px !important; font-weight:900 !important; letter-spacing:4px !important; color:var(--cyan) !important; }
+
+  /* Bolder dash numbers */
+  .dash-num { font-size:36px !important; font-weight:900 !important; }
+  .dash-card.blue .dash-num  { text-shadow:0 0 16px var(--blue) !important; }
+  .dash-card.green .dash-num { text-shadow:0 0 16px var(--green) !important; }
+  .dash-card.yellow .dash-num{ text-shadow:0 0 16px var(--yellow) !important; }
+  .dash-card.red .dash-num   { text-shadow:0 0 16px var(--red) !important; }
+
+  /* Bolder dash cards */
+  .dash-card { border-width:1.5px !important; border-color:rgba(0,170,255,0.15) !important; }
+
+  /* Bolder tab */
+  .tab { font-size:12px !important; font-weight:800 !important; border-width:1.5px !important; }
+  .tab.active { font-size:12px !important; font-weight:900 !important; letter-spacing:1px !important; }
+
+  /* Bolder header name */
+  .hdr-name { font-size:16px !important; font-weight:900 !important; letter-spacing:2px !important; text-shadow:0 0 14px rgba(0,229,255,0.5) !important; }
+
+  /* Bolder load rows */
+  .load-name { font-size:13px !important; font-weight:800 !important; }
+  .load-count { font-size:12px !important; font-weight:900 !important; color:var(--cyan) !important; }
+  .load-bar-wrap { height:7px !important; border-radius:4px !important; }
+  .load-row { border-width:1.5px !important; }
+  .load-avatar { font-size:14px !important; font-weight:900 !important; width:40px !important; height:40px !important; box-shadow:0 0 16px rgba(0,170,255,0.5),inset 0 1px 0 rgba(255,255,255,0.25) !important; }
+
+  /* Bolder expand btn */
+  .expand-task-btn { font-size:12px !important; font-weight:800 !important; color:var(--cyan) !important; }
+
+  /* Bolder step list */
+  .task-steps li { border-bottom-width:1px !important; padding:9px 4px !important; font-size:13px !important; font-weight:600 !important; }
+  .ts-chk { width:20px !important; height:20px !important; border-width:2px !important; font-size:12px !important; }
+
+  /* Bolder modal labels */
+  .m-lbl { font-size:11px !important; font-weight:900 !important; letter-spacing:3px !important; }
+  .m-title { font-size:18px !important; font-weight:900 !important; }
+
+  /* Bolder notif dot */
+  .notif-dot { width:9px !important; height:9px !important; box-shadow:0 0 10px var(--red),0 0 4px var(--red) !important; }
+
+  /* Bolder progress pie */
+  .pct-badge { font-size:12px !important; font-weight:900 !important; padding:4px 10px !important; }
+
+  /* Bolder task progress bar */
+  .task-progress-bar { height:7px !important; border-radius:4px !important; }
+  .task-progress-fill { box-shadow:0 0 10px rgba(0,229,255,0.5) !important; }
+  .task-progress-pct { font-size:12px !important; font-weight:900 !important; }
+
+  /* Bolder login title */
+  #loginScreen .login-title,
+  #userSelectScreen .login-title {
+    font-size:24px !important;
+    letter-spacing:5px !important;
+    font-weight:900 !important;
+  }
+
+  /* Bolder PIN keys */
+  #loginScreen .pin-key {
+    font-size:22px !important;
+    font-weight:900 !important;
+    border-width:1.5px !important;
+  }
+
+  /* Bolder user buttons */
+  .user-btn { font-size:14px !important; font-weight:800 !important; border-width:1.5px !important; }
+  .user-btn-count { font-size:11px !important; font-weight:700 !important; }
+  .login-label { font-size:11px !important; font-weight:900 !important; letter-spacing:4px !important; }
+
 </style>
 </head>
 <body>
