@@ -1548,7 +1548,8 @@ header{
     setTimeout(() => {
       const roleLabels = {
         moshe: 'מוביל תשתיות טכנולוגיות 🛡️',
-        assaf: '👑 ראש צוות'
+        assaf: '👑 ראש צוות',
+        hazi:  '🔱 ממ"ר יחידה עסקית'
       };
       const otherAdmin = loggedInAs === 'moshe' ? 'assaf' : 'moshe';
       const otherLabel = loggedInAs === 'moshe' ? '👑 ראש צוות' : 'מוביל תשתיות טכנולוגיות 🛡️';
@@ -1556,13 +1557,14 @@ header{
       // Section 1 — me
       document.getElementById('myRoleLabel').textContent = roleLabels[loggedInAs] || '👑 מנהל';
 
-      // Section 2 — other admin (hide moshe from assaf's view if needed)
-      const showOther = !(loggedInAs === 'assaf' && otherAdmin === 'moshe');
+      // Section 2 — other admin (hide for hazi, hide moshe from assaf)
+      const viewer = loggedInAs || currentUser;
+      const showOther = viewer !== 'hazi' && !(viewer === 'assaf' && otherAdmin === 'moshe');
       document.getElementById('otherAdminSection').style.display = showOther ? 'flex' : 'none';
       document.getElementById('otherAdminSection').style.flexDirection = 'column';
       // lab section only for admins
       const labSec = document.getElementById('labSection');
-      if (labSec) { labSec.style.display = ['moshe','assaf','hazi'].includes(loggedInAs) ? 'flex' : 'none'; labSec.style.flexDirection='column'; }
+      if (labSec) { const v = loggedInAs||currentUser; labSec.style.display = ['moshe','assaf'].includes(v) ? 'flex' : 'none'; labSec.style.flexDirection='column'; }
       // manager section always visible
       // managerSection shown/hidden by renderUserSelectButtons
       if (showOther) {
