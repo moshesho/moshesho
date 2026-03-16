@@ -1532,12 +1532,14 @@ header{
   function logout() {
     const role = loggedInAs ? (USERS[loggedInAs] ? USERS[loggedInAs].role : '') : '';
     const wasAdmin = (role === 'admin' || role === 'manager');
+    const keepLoggedInAs = wasAdmin; // keep loggedInAs for user select screen
     currentUser = null;
     currentTab = 'dash';
     mAssignees = [];
     document.getElementById('app').style.display = 'none';
     if (wasAdmin) {
-      showUserSelect(); // מנהל → רשימת צוות, ללא PIN
+      // keep loggedInAs so showUserSelect knows who is viewing
+      showUserSelect();
     } else {
       loggedInAs = null;
       showPinScreen();  // צוות → חייב PIN
@@ -1558,13 +1560,13 @@ header{
       document.getElementById('myRoleLabel').textContent = roleLabels[loggedInAs] || '👑 מנהל';
 
       // Section 2 — other admin (hide for hazi, hide moshe from assaf)
-      const viewer = loggedInAs || currentUser;
+      const viewer = loggedInAs;
       const showOther = viewer !== 'hazi' && !(viewer === 'assaf' && otherAdmin === 'moshe');
       document.getElementById('otherAdminSection').style.display = showOther ? 'flex' : 'none';
       document.getElementById('otherAdminSection').style.flexDirection = 'column';
       // lab section only for admins
       const labSec = document.getElementById('labSection');
-      if (labSec) { const v = loggedInAs||currentUser; labSec.style.display = ['moshe','assaf'].includes(v) ? 'flex' : 'none'; labSec.style.flexDirection='column'; }
+      if (labSec) { labSec.style.display = ['moshe','assaf'].includes(loggedInAs) ? 'flex' : 'none'; labSec.style.flexDirection='column'; }
       // manager section always visible
       // managerSection shown/hidden by renderUserSelectButtons
       if (showOther) {
@@ -1616,13 +1618,17 @@ header{
       return btn;
     }
 
+    const viewer = loggedInAs;
+
     Object.entries(USERS).forEach(([uid, u]) => {
       if (uid === loggedInAs) {
         myGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
         myGrid.style.gridTemplateColumns = '1fr';
       } else if (u.role === 'admin') {
+        // hide all admins from hazi
+        if (viewer === 'hazi') return;
         // hide moshe from assaf
-        if (loggedInAs === 'assaf' && uid === 'moshe') return;
+        if (viewer === 'assaf' && uid === 'moshe') return;
         otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
         otherGrid.style.gridTemplateColumns = '1fr';
       } else if (u.role === 'manager') {
@@ -1638,8 +1644,8 @@ header{
         }
         if (mgSec) mgSec.style.display = 'block';
       } else if (u.role === 'lab') {
-        // omer — only visible to moshe and assaf
-        if (loggedInAs === 'moshe' || loggedInAs === 'assaf') {
+        // omer — only visible to moshe and assaf (not hazi)
+        if (viewer === 'moshe' || viewer === 'assaf') {
           if (labGrid) {
             labGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
             labGrid.style.gridTemplateColumns = '1fr';
