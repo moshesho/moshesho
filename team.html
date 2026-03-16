@@ -1568,15 +1568,29 @@ header{
         if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
         if (mgSec) mgSec.style.display = 'block';
       } else if (who === 'hazi') {
-        // hazi sees same as moshe but without managerSection
-        // mySection=חזי, otherAdmin=משה, lab=אסף+עומר, members=צוות
+        // hazi: mySection=חזי, otherAdmin=משה, then assaf+omer side by side, members=צוות
+        // Step1: show moshe section
         otherAdminSec.style.display = 'flex'; otherAdminSec.style.flexDirection = 'column';
         document.getElementById('otherAdminLabel').textContent = '🛡️ מוביל תשתיות טכנולוגיות';
+        // Step2: show lab section for omer, side by side with a new assaf section
         if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
-        // restore lab label
         const labLbl = document.querySelector('#labSection .login-label');
         if (labLbl) labLbl.textContent = '🔬 מנהל מעבדה';
         if (mgSec) mgSec.style.display = 'none';
+        // Use a wrapper to show assaf next to omer — add assaf section dynamically
+        // Actually reuse the existing flex row wrapper for lab+otherAdmin sections
+        // Inject assaf section before lab section
+        const existingAssafSec = document.getElementById('haziAssafSection');
+        if (!existingAssafSec) {
+          const assafSec = document.createElement('div');
+          assafSec.id = 'haziAssafSection';
+          assafSec.style.cssText = 'flex:1';
+          assafSec.innerHTML = '<div class="login-label" style="margin-bottom:6px">👑 ראש צוות IT</div><div class="user-grid" id="haziAssafGrid" style="grid-template-columns:1fr"></div>';
+          labSec.parentNode.insertBefore(assafSec, labSec);
+        } else {
+          existingAssafSec.style.display = 'flex';
+          existingAssafSec.style.flexDirection = 'column';
+        }
       } else if (who === 'assaf') {
         // assaf doesn't see moshe
         otherAdminSec.style.display = 'none';
@@ -1619,6 +1633,8 @@ header{
     if (mgGrid2) { mgGrid2.innerHTML = ''; }
     const mgSec2 = document.getElementById('managerSection');
     if (mgSec2) mgSec2.style.display = 'none';
+    const haziAssafGrid = document.getElementById('haziAssafGrid');
+    if (haziAssafGrid) haziAssafGrid.innerHTML = '';
 
     function makeBtn(uid, onclick) {
       const taskCnt = tasks.filter(t=>isAssignedTo(t,uid) && t.status!=='done').length;
@@ -1669,7 +1685,7 @@ header{
         if (viewer === 'moshe' || viewer === 'assaf' || viewer === 'hazi') {
           if (labGrid) {
             labGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
-            labGrid.style.gridTemplateColumns = (viewer === 'hazi') ? '1fr 1fr' : '1fr';
+            labGrid.style.gridTemplateColumns = '1fr';
           }
         }
       } else {
