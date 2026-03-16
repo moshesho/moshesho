@@ -1563,7 +1563,7 @@ header{
       if (labSec) labSec.style.display = ['moshe','assaf','hazi'].includes(loggedInAs) ? 'block' : 'none';
       // manager section always visible
       const mgSec = document.getElementById('managerSection');
-      if (mgSec && loggedInAs === 'hazi') mgSec.style.display = 'none'; // hide self
+      if (mgSec) mgSec.style.display = 'none'; // hide by default, only shown for moshe
       if (showOther) {
         document.getElementById('otherAdminLabel').textContent = otherLabel;
       }
@@ -1596,6 +1596,10 @@ header{
     memberGrid.innerHTML = '';
     const labGrid = document.getElementById('labGrid');
     if (labGrid) labGrid.innerHTML = '';
+    const mgGrid2 = document.getElementById('managerGrid');
+    if (mgGrid2) { mgGrid2.innerHTML = ''; }
+    const mgSec2 = document.getElementById('managerSection');
+    if (mgSec2) mgSec2.style.display = 'none';
 
     function makeBtn(uid, onclick) {
       const taskCnt = tasks.filter(t=>isAssignedTo(t,uid) && t.status!=='done').length;
