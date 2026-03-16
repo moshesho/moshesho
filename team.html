@@ -159,7 +159,7 @@ body::before{content:'';position:fixed;inset:0;
   background:linear-gradient(135deg,var(--blue),var(--cyan));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .login-sub{font-size:13px;color:var(--text2);margin-bottom:32px}
-.login-label{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:10px;width:100%;max-width:340px}
+.login-label{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:6px;width:100%;max-width:340px}
 .user-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:340px;margin-bottom:10px}
 .user-btn-count{
   font-size:10px;font-weight:600;
@@ -170,7 +170,7 @@ body::before{content:'';position:fixed;inset:0;
   color:#f59e0b;font-weight:700;
 }
 .user-btn{
-  padding:14px 10px;border-radius:var(--radius-sm);
+  padding:8px 10px;border-radius:var(--radius-sm);
   border:1px solid rgba(255,255,255,0.08);
   background:linear-gradient(145deg,var(--card2),var(--card));
   color:var(--text);font-family:'Heebo',sans-serif;font-weight:700;font-size:13px;
@@ -694,27 +694,27 @@ header{
   </div>
   <div class="login-right">
     <!-- Section 1: current user (moshe or assaf) -->
-    <div id="mySection" style="margin-bottom:14px">
+    <div id="mySection" style="margin-bottom:8px">
       <div id="myRoleLabel" class="login-label" style="margin-bottom:8px"></div>
       <div id="myGrid" class="user-grid"></div>
     </div>
     <!-- Section 1.5: senior manager (hazi) — visible to all -->
-    <div id="managerSection" style="margin-bottom:14px;display:none">
+    <div id="managerSection" style="margin-bottom:8px;display:none">
       <div class="login-label" style="margin-bottom:8px">🔱 ממ"ר יחידה עסקית</div>
       <div class="user-grid" id="managerGrid"></div>
     </div>
     <!-- Section 2: lab manager (admins only) -->
-    <div id="labSection" style="margin-bottom:14px">
+    <div id="labSection" style="margin-bottom:8px">
       <div class="login-label" style="margin-bottom:8px">🔬 מנהל מעבדה</div>
       <div class="user-grid" id="labGrid"></div>
     </div>
     <!-- Section 3: the other admin -->
-    <div id="otherAdminSection" style="margin-bottom:14px">
+    <div id="otherAdminSection" style="margin-bottom:8px">
       <div id="otherAdminLabel" class="login-label" style="margin-bottom:8px"></div>
       <div id="otherAdminGrid" class="user-grid"></div>
     </div>
     <!-- Section 4: team members -->
-    <div id="memberSection">
+    <div id="memberSection" style="margin-bottom:4px">
       <div class="login-label" style="margin-bottom:8px">👥 צוות</div>
       <div class="user-grid" id="memberGrid"></div>
     </div>
