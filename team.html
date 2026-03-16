@@ -716,7 +716,7 @@ header{
     </div>
     <!-- Section 4: team members -->
     <div id="memberSection" style="margin-bottom:4px">
-      <div class="login-label" style="margin-bottom:8px">👥 צוות</div>
+      <div class="login-label" style="margin-bottom:8px">👥 צוות IT</div>
       <div class="user-grid" id="memberGrid"></div>
     </div>
     <button onclick="showPinScreen()" style="margin-top:16px;width:100%;padding:10px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text2);font-family:'Heebo',sans-serif;font-size:13px;cursor:pointer;">🔐 כניסה עם PIN</button>
@@ -1564,7 +1564,7 @@ header{
       if (who === 'moshe') {
         // moshe sees full hierarchy
         otherAdminSec.style.display = 'flex'; otherAdminSec.style.flexDirection = 'column';
-        document.getElementById('otherAdminLabel').textContent = '👑 ראש צוות';
+        document.getElementById('otherAdminLabel').textContent = '👑 ראש צוות IT';
         if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
         if (mgSec) mgSec.style.display = 'block';
       } else if (who === 'hazi') {
@@ -1572,7 +1572,7 @@ header{
         otherAdminSec.style.display = 'flex'; otherAdminSec.style.flexDirection = 'column';
         document.getElementById('otherAdminLabel').textContent = '🛡️ מוביל תשתיות טכנולוגיות';
         if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
-        document.querySelector('#labSection .login-label').textContent = '👑 ראש צוות';
+        document.querySelector('#labSection .login-label').textContent = '👑 ראש צוות IT';
         if (mgSec) mgSec.style.display = 'none';
       } else if (who === 'assaf') {
         // assaf doesn't see moshe
