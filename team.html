@@ -1650,7 +1650,13 @@ header{
 
     function addTo(gridId, uid) {
       const g = document.getElementById(gridId);
-      if (g) { g.appendChild(makeBtn(uid, () => login(uid, USERS[uid].role))); g.style.gridTemplateColumns='1fr'; }
+      if (!g) return;
+      g.appendChild(makeBtn(uid, () => login(uid, USERS[uid].role)));
+      if (gridId === 'memberGrid') {
+        g.style.gridTemplateColumns = '1fr 1fr';
+      } else {
+        g.style.gridTemplateColumns = '1fr';
+      }
     }
 
     if (who === 'moshe') {
