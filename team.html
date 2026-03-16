@@ -1550,7 +1550,8 @@ header{
     mAssignees = [];
     document.getElementById('app').style.display = 'none';
     if (wasAdmin) {
-      // keep loggedInAs so showUserSelect knows who is viewing
+      // hazi → show moshe's screen
+      if (loggedInAs === 'hazi') loggedInAs = 'moshe';
       showUserSelect();
     } else {
       loggedInAs = null;
