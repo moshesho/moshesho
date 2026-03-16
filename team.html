@@ -1547,35 +1547,43 @@ header{
   }
 
   function showUserSelect() {
-    setTimeout(() => {
-      const roleLabels = {
-        moshe: 'מוביל תשתיות טכנולוגיות 🛡️',
-        assaf: '👑 ראש צוות',
-        hazi:  '🔱 ממ"ר יחידה עסקית'
-      };
-      const otherAdmin = loggedInAs === 'moshe' ? 'assaf' : 'moshe';
-      const otherLabel = loggedInAs === 'moshe' ? '👑 ראש צוות' : 'מוביל תשתיות טכנולוגיות 🛡️';
-
-      // Section 1 — me
-      document.getElementById('myRoleLabel').textContent = roleLabels[loggedInAs] || '👑 מנהל';
-
-      // Section 2 — other admin (hide for hazi, hide moshe from assaf)
-      const viewer = loggedInAs;
-      const showOther = viewer !== 'hazi' && !(viewer === 'assaf' && otherAdmin === 'moshe');
-      document.getElementById('otherAdminSection').style.display = showOther ? 'flex' : 'none';
-      document.getElementById('otherAdminSection').style.flexDirection = 'column';
-      // lab section only for admins
-      const labSec = document.getElementById('labSection');
-      if (labSec) { labSec.style.display = ['moshe','assaf'].includes(loggedInAs) ? 'flex' : 'none'; labSec.style.flexDirection='column'; }
-      // manager section always visible
-      // managerSection shown/hidden by renderUserSelectButtons
-      if (showOther) {
-        document.getElementById('otherAdminLabel').textContent = otherLabel;
-      }
-      renderUserSelectButtons();
-    }, 10);
     document.getElementById('userSelectScreen').style.display = 'flex';
     document.getElementById('loginScreen').style.display = 'none';
+    setTimeout(() => {
+      const who = loggedInAs; // who pressed "מסך ראשי"
+
+      // Set my role label
+      const roleLabels = { moshe:'מוביל תשתיות טכנולוגיות 🛡️', assaf:'👑 ראש צוות', hazi:'🔱 ממ"ר יחידה עסקית' };
+      document.getElementById('myRoleLabel').textContent = roleLabels[who] || '👑 מנהל';
+
+      // otherAdminSection: show only for moshe/assaf (not hazi)
+      const otherAdminSec = document.getElementById('otherAdminSection');
+      if (who === 'moshe') {
+        otherAdminSec.style.display = 'flex'; otherAdminSec.style.flexDirection = 'column';
+        document.getElementById('otherAdminLabel').textContent = '👑 ראש צוות';
+      } else if (who === 'assaf') {
+        // assaf doesn't see moshe
+        otherAdminSec.style.display = 'none';
+      } else {
+        otherAdminSec.style.display = 'none';
+      }
+
+      // labSection: only moshe and assaf
+      const labSec = document.getElementById('labSection');
+      if (labSec) {
+        if (who === 'moshe' || who === 'assaf') {
+          labSec.style.display = 'flex'; labSec.style.flexDirection = 'column';
+        } else {
+          labSec.style.display = 'none';
+        }
+      }
+
+      // managerSection: only moshe
+      const mgSec = document.getElementById('managerSection');
+      if (mgSec) mgSec.style.display = (who === 'moshe') ? 'block' : 'none';
+
+      renderUserSelectButtons();
+    }, 10);
   }
 
   function showPinScreen() {
@@ -1634,7 +1642,6 @@ header{
       } else if (u.role === 'manager') {
         if (uid === loggedInAs) return;
         // only moshe can see hazi in the list
-        const viewer = loggedInAs || currentUser;
         if (viewer !== 'moshe') return;
         const mgGrid = document.getElementById('managerGrid');
         const mgSec = document.getElementById('managerSection');
@@ -1642,7 +1649,7 @@ header{
           mgGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
           mgGrid.style.gridTemplateColumns = '1fr';
         }
-        if (mgSec) mgSec.style.display = 'block';
+        if (mgSec && viewer === 'moshe') mgSec.style.display = 'block';
       } else if (u.role === 'lab') {
         // omer — only visible to moshe and assaf (not hazi)
         if (viewer === 'moshe' || viewer === 'assaf') {
