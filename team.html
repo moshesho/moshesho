@@ -1557,31 +1557,26 @@ header{
       const roleLabels = { moshe:'מוביל תשתיות טכנולוגיות 🛡️', assaf:'👑 ראש צוות', hazi:'🔱 ממ"ר יחידה עסקית' };
       document.getElementById('myRoleLabel').textContent = roleLabels[who] || '👑 מנהל';
 
-      // otherAdminSection: show only for moshe/assaf (not hazi)
       const otherAdminSec = document.getElementById('otherAdminSection');
-      if (who === 'moshe') {
+      const labSec = document.getElementById('labSection');
+      const mgSec = document.getElementById('managerSection');
+
+      if (who === 'moshe' || who === 'hazi') {
+        // show full hierarchy
         otherAdminSec.style.display = 'flex'; otherAdminSec.style.flexDirection = 'column';
         document.getElementById('otherAdminLabel').textContent = '👑 ראש צוות';
+        if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
+        if (mgSec) mgSec.style.display = (who === 'moshe') ? 'block' : 'none';
       } else if (who === 'assaf') {
         // assaf doesn't see moshe
         otherAdminSec.style.display = 'none';
+        if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
+        if (mgSec) mgSec.style.display = 'none';
       } else {
         otherAdminSec.style.display = 'none';
+        if (labSec) labSec.style.display = 'none';
+        if (mgSec) mgSec.style.display = 'none';
       }
-
-      // labSection: only moshe and assaf
-      const labSec = document.getElementById('labSection');
-      if (labSec) {
-        if (who === 'moshe' || who === 'assaf') {
-          labSec.style.display = 'flex'; labSec.style.flexDirection = 'column';
-        } else {
-          labSec.style.display = 'none';
-        }
-      }
-
-      // managerSection: only moshe
-      const mgSec = document.getElementById('managerSection');
-      if (mgSec) mgSec.style.display = (who === 'moshe') ? 'block' : 'none';
 
       renderUserSelectButtons();
     }, 10);
@@ -1634,9 +1629,7 @@ header{
         myGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
         myGrid.style.gridTemplateColumns = '1fr';
       } else if (u.role === 'admin') {
-        // hide all admins from hazi
-        if (viewer === 'hazi') return;
-        // hide moshe from assaf
+        // hide moshe from assaf only
         if (viewer === 'assaf' && uid === 'moshe') return;
         otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
         otherGrid.style.gridTemplateColumns = '1fr';
@@ -1652,8 +1645,8 @@ header{
         }
         if (mgSec && viewer === 'moshe') mgSec.style.display = 'block';
       } else if (u.role === 'lab') {
-        // omer — only visible to moshe and assaf (not hazi)
-        if (viewer === 'moshe' || viewer === 'assaf') {
+        // omer — visible to moshe, assaf, and hazi
+        if (viewer === 'moshe' || viewer === 'assaf' || viewer === 'hazi') {
           if (labGrid) {
             labGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
             labGrid.style.gridTemplateColumns = '1fr';
