@@ -703,8 +703,8 @@ header{
       <div id="myRoleLabel" class="login-label" style="margin-bottom:8px"></div>
       <div id="myGrid" class="user-grid"></div>
     </div>
-    <!-- Section 2+3: lab manager + other admin in same row -->
-    <div style="display:flex;gap:8px;margin-bottom:8px">
+    <!-- Section 2+3: lab manager + other admin in same row (moshe/assaf view) -->
+    <div id="mosheRow" style="display:flex;gap:8px;margin-bottom:8px">
       <div id="labSection" style="flex:1">
         <div class="login-label" style="margin-bottom:6px">🔬 מנהל מעבדה</div>
         <div class="user-grid" id="labGrid"></div>
@@ -712,6 +712,17 @@ header{
       <div id="otherAdminSection" style="flex:1">
         <div id="otherAdminLabel" class="login-label" style="margin-bottom:6px"></div>
         <div id="otherAdminGrid" class="user-grid"></div>
+      </div>
+    </div>
+    <!-- Section for hazi: ראש צוות IT + מנהל מעבדה side by side -->
+    <div id="haziRow" style="display:none;gap:8px;margin-bottom:8px">
+      <div style="flex:1">
+        <div class="login-label" style="margin-bottom:6px">👑 ראש צוות IT</div>
+        <div class="user-grid" id="haziAssafGrid"></div>
+      </div>
+      <div style="flex:1">
+        <div class="login-label" style="margin-bottom:6px">🔬 מנהל מעבדה</div>
+        <div class="user-grid" id="haziOmerGrid"></div>
       </div>
     </div>
     <!-- Section 4: team members -->
@@ -1561,8 +1572,11 @@ header{
       const labSec = document.getElementById('labSection');
       const mgSec = document.getElementById('managerSection');
 
+      const mosheRow = document.getElementById('mosheRow');
+      const haziRow = document.getElementById('haziRow');
       if (who === 'moshe') {
-        // moshe sees full hierarchy
+        if (mosheRow) mosheRow.style.display = 'flex';
+        if (haziRow) haziRow.style.display = 'none';
         otherAdminSec.style.display = 'flex'; otherAdminSec.style.flexDirection = 'column';
         document.getElementById('otherAdminLabel').textContent = '👑 ראש צוות IT';
         if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
@@ -1584,11 +1598,14 @@ header{
         if (labLbl2) labLbl2.textContent = '👑 ראש צוות IT';
         document.getElementById('otherAdminLabel').textContent = '🔬 מנהל מעבדה';
       } else if (who === 'assaf') {
-        // assaf doesn't see moshe
+        if (mosheRow) mosheRow.style.display = 'flex';
+        if (haziRow) haziRow.style.display = 'none';
         otherAdminSec.style.display = 'none';
         if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
         if (mgSec) mgSec.style.display = 'none';
       } else {
+        if (mosheRow) mosheRow.style.display = 'none';
+        if (haziRow) haziRow.style.display = 'none';
         otherAdminSec.style.display = 'none';
         if (labSec) labSec.style.display = 'none';
         if (mgSec) mgSec.style.display = 'none';
@@ -1625,6 +1642,8 @@ header{
     if (mgGrid2) { mgGrid2.innerHTML = ''; }
     const mgSec2 = document.getElementById('managerSection');
     if (mgSec2) mgSec2.style.display = 'none';
+    const haziAG = document.getElementById('haziAssafGrid'); if (haziAG) haziAG.innerHTML='';
+    const haziOG = document.getElementById('haziOmerGrid'); if (haziOG) haziOG.innerHTML='';
 
 
     function makeBtn(uid, onclick) {
@@ -1676,9 +1695,8 @@ header{
         if (viewer === 'moshe' || viewer === 'assaf') {
           if (labGrid) { labGrid.appendChild(makeBtn(uid, () => login(uid, u.role))); labGrid.style.gridTemplateColumns = '1fr'; }
         } else if (viewer === 'hazi') {
-          // for hazi: omer goes to otherGrid (מנהל מעבדה)
-          otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
-          otherGrid.style.gridTemplateColumns = '1fr';
+          const haziOmerGrid = document.getElementById('haziOmerGrid');
+          if (haziOmerGrid) { haziOmerGrid.innerHTML=''; haziOmerGrid.appendChild(makeBtn(uid, () => login(uid, u.role))); }
         }
       } else {
         memberGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
