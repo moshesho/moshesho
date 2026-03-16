@@ -990,6 +990,143 @@ header{
     margin:8px auto 0;opacity:.6;
   }
 
+
+  /* ── TECH LOGIN REDESIGN ── */
+
+  /* Dark solid login bg */
+  #loginScreen, #userSelectScreen {
+    background:#020508;
+    position:relative;
+    overflow:hidden;
+  }
+
+  /* Circuit board grid lines */
+  #loginScreen::before, #userSelectScreen::before {
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(0,255,100,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,100,0.04) 1px, transparent 1px);
+    background-size:32px 32px;
+  }
+
+  /* Corner glow effects */
+  #loginScreen::after, #userSelectScreen::after {
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse 50% 40% at 0% 0%, rgba(0,255,100,0.06), transparent 60%),
+      radial-gradient(ellipse 40% 30% at 100% 100%, rgba(0,200,255,0.05), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 50% 50%, rgba(0,0,0,0.4), transparent 80%);
+  }
+
+  /* Title - sharp green/white tech */
+  #loginScreen .login-title,
+  #userSelectScreen .login-title {
+    background:linear-gradient(135deg,#ffffff 0%,#aaffcc 40%,#00ff88) !important;
+    -webkit-background-clip:text !important;
+    -webkit-text-fill-color:transparent !important;
+    background-clip:text !important;
+    filter:drop-shadow(0 0 16px rgba(0,255,120,0.5)) !important;
+    animation:tech-pulse 4s ease-in-out infinite !important;
+    letter-spacing:4px !important;
+  }
+
+  @keyframes tech-pulse {
+    0%,100%{filter:drop-shadow(0 0 12px rgba(0,255,120,0.4));}
+    50%{filter:drop-shadow(0 0 24px rgba(0,255,120,0.7));}
+  }
+
+  /* Credit line */
+  #loginScreen [style*="מוביל תשתיות"],
+  #userSelectScreen [style*="מוביל תשתיות"] {
+    background:linear-gradient(90deg,#00ff88,#00ccff) !important;
+    -webkit-background-clip:text !important;
+    -webkit-text-fill-color:transparent !important;
+    filter:drop-shadow(0 0 6px rgba(0,255,120,0.4)) !important;
+  }
+
+  /* Login right box - dark glass with green border */
+  #loginScreen .login-right,
+  #userSelectScreen .login-right {
+    background:rgba(2,8,6,0.92) !important;
+    border:1px solid rgba(0,255,120,0.2) !important;
+    box-shadow:
+      0 0 0 1px rgba(0,255,120,0.05),
+      0 20px 60px rgba(0,0,0,0.9),
+      0 0 40px rgba(0,255,120,0.08),
+      inset 0 1px 0 rgba(0,255,120,0.06) !important;
+  }
+
+  /* Scanning line on login-right */
+  #loginScreen .login-right::before,
+  #userSelectScreen .login-right::before {
+    background:linear-gradient(90deg,transparent,rgba(0,255,120,0.4),transparent) !important;
+  }
+  #loginScreen .login-right::after,
+  #userSelectScreen .login-right::after {
+    background:linear-gradient(90deg,transparent,rgba(0,255,120,0.15),transparent) !important;
+  }
+
+  /* PIN keys - dark with green accent */
+  #loginScreen .pin-key {
+    background:linear-gradient(145deg,rgba(0,20,12,0.95),rgba(2,8,6,0.98)) !important;
+    border:1px solid rgba(0,255,120,0.15) !important;
+    color:#aaffcc !important;
+    text-shadow:0 0 8px rgba(0,255,120,0.4) !important;
+    box-shadow:0 4px 12px rgba(0,0,0,0.6),inset 0 1px 0 rgba(0,255,120,0.08) !important;
+  }
+  #loginScreen .pin-key:hover {
+    border-color:rgba(0,255,120,0.5) !important;
+    background:linear-gradient(145deg,rgba(0,40,20,0.9),rgba(0,20,12,0.95)) !important;
+    box-shadow:0 0 16px rgba(0,255,120,0.25),inset 0 1px 0 rgba(0,255,120,0.15) !important;
+    color:#ffffff !important;
+  }
+
+  /* PIN dots - green */
+  #loginScreen .pin-dot {
+    border-color:rgba(0,255,120,0.2) !important;
+  }
+  #loginScreen .pin-dot.filled {
+    background:#00ff88 !important;
+    border-color:#00ff88 !important;
+    box-shadow:0 0 14px #00ff88,0 0 5px #00ff88 !important;
+  }
+
+  /* Login labels green */
+  #userSelectScreen .login-label {
+    color:#00cc66 !important;
+    text-shadow:0 0 6px rgba(0,255,120,0.3) !important;
+  }
+
+  /* Login sub text */
+  #loginScreen .login-sub,
+  #userSelectScreen .login-sub {
+    color:rgba(0,200,100,0.5) !important;
+    font-family:var(--font-mono) !important;
+    letter-spacing:2px !important;
+  }
+
+  /* PIN enter button */
+  #userSelectScreen button[onclick*="showPinScreen"] {
+    border-color:rgba(0,255,120,0.15) !important;
+    color:rgba(0,200,100,0.6) !important;
+  }
+  #userSelectScreen button[onclick*="showPinScreen"]:hover {
+    border-color:rgba(0,255,120,0.4) !important;
+    color:#00ff88 !important;
+    box-shadow:0 0 12px rgba(0,255,120,0.15) !important;
+  }
+
+  /* User btn hover in login */
+  #userSelectScreen .user-btn:hover {
+    border-color:rgba(0,255,120,0.3) !important;
+    box-shadow:0 0 12px rgba(0,255,120,0.12) !important;
+  }
+
+  /* Matrix rain canvas */
+  #matrixCanvas {
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.35;
+  }
+
 </style>
 </head>
 <body>
@@ -999,35 +1136,26 @@ header{
 <div id="userSelectScreen" style="display:none">
   <div class="login-left">
     <div class="login-logo">
-      <svg width="72" height="80" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="72" height="80" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="goldShield" x1="0" y1="0" x2="72" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#fff7aa"/>
-            <stop offset="40%" stop-color="#ffd700"/>
-            <stop offset="100%" stop-color="#ff6b00"/>
+          <linearGradient id="techShield" x1="0" y1="0" x2="72" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#afffcc"/>
+            <stop offset="50%" stop-color="#00ff88"/>
+            <stop offset="100%" stop-color="#00cc44"/>
           </linearGradient>
-          <linearGradient id="goldShield2" x1="72" y1="0" x2="0" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#ffd700" stop-opacity="0.3"/>
-            <stop offset="100%" stop-color="#ff6b00" stop-opacity="0.05"/>
-          </linearGradient>
-          <filter id="goldGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          <filter id="goldGlow2"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="techGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="techGlow2"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
-        <!-- outer shield -->
-        <path d="M36 3L5 16v22c0 18 14 34 31 40 17-6 31-22 31-40V16L36 3z" 
-          fill="url(#goldShield2)" stroke="url(#goldShield)" stroke-width="1.5" filter="url(#goldGlow)"/>
-        <!-- inner shield -->
-        <path d="M36 12L12 23v16c0 12 9 23 24 28 15-5 24-16 24-28V23L36 12z" 
-          fill="rgba(255,180,0,0.05)" stroke="rgba(255,200,0,0.35)" stroke-width="1"/>
-        <!-- checkmark -->
-        <path d="M24 40l9 9 16-16" 
-          stroke="url(#goldShield)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#goldGlow2)"/>
-        <!-- decorative circle -->
-        <circle cx="36" cy="39" r="12" fill="none" stroke="rgba(255,180,0,0.12)" stroke-width="1" stroke-dasharray="2 4"/>
-        <!-- corner sparks -->
-        <circle cx="36" cy="3" r="2" fill="#ffd700" opacity=".8" filter="url(#goldGlow2)"/>
-        <circle cx="5" cy="16" r="1.5" fill="#ff9500" opacity=".6"/>
-        <circle cx="67" cy="16" r="1.5" fill="#ff9500" opacity=".6"/>
+        <path d="M36 3L5 16v22c0 18 14 34 31 40 17-6 31-22 31-40V16L36 3z"
+          fill="rgba(0,255,120,0.04)" stroke="url(#techShield)" stroke-width="1.5" filter="url(#techGlow)"/>
+        <path d="M36 12L12 23v16c0 12 9 23 24 28 15-5 24-16 24-28V23L36 12z"
+          fill="rgba(0,255,120,0.03)" stroke="rgba(0,255,120,0.25)" stroke-width="1"/>
+        <path d="M24 40l9 9 16-16"
+          stroke="url(#techShield)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#techGlow2)"/>
+        <circle cx="36" cy="39" r="12" fill="none" stroke="rgba(0,255,120,0.1)" stroke-width="1" stroke-dasharray="2 4"/>
+        <circle cx="36" cy="3" r="2" fill="#00ff88" opacity=".9" filter="url(#techGlow2)"/>
+        <circle cx="5" cy="16" r="1.5" fill="#00cc66" opacity=".7"/>
+        <circle cx="67" cy="16" r="1.5" fill="#00cc66" opacity=".7"/>
       </svg>
     </div>
     <div class="login-title">SPYDER Team Management Center</div>
@@ -1080,35 +1208,26 @@ header{
 <div id="loginScreen">
   <div class="login-left">
     <div class="login-logo">
-      <svg width="72" height="80" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="72" height="80" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="goldShield" x1="0" y1="0" x2="72" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#fff7aa"/>
-            <stop offset="40%" stop-color="#ffd700"/>
-            <stop offset="100%" stop-color="#ff6b00"/>
+          <linearGradient id="techShield" x1="0" y1="0" x2="72" y2="80" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#afffcc"/>
+            <stop offset="50%" stop-color="#00ff88"/>
+            <stop offset="100%" stop-color="#00cc44"/>
           </linearGradient>
-          <linearGradient id="goldShield2" x1="72" y1="0" x2="0" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#ffd700" stop-opacity="0.3"/>
-            <stop offset="100%" stop-color="#ff6b00" stop-opacity="0.05"/>
-          </linearGradient>
-          <filter id="goldGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          <filter id="goldGlow2"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="techGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="techGlow2"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
-        <!-- outer shield -->
-        <path d="M36 3L5 16v22c0 18 14 34 31 40 17-6 31-22 31-40V16L36 3z" 
-          fill="url(#goldShield2)" stroke="url(#goldShield)" stroke-width="1.5" filter="url(#goldGlow)"/>
-        <!-- inner shield -->
-        <path d="M36 12L12 23v16c0 12 9 23 24 28 15-5 24-16 24-28V23L36 12z" 
-          fill="rgba(255,180,0,0.05)" stroke="rgba(255,200,0,0.35)" stroke-width="1"/>
-        <!-- checkmark -->
-        <path d="M24 40l9 9 16-16" 
-          stroke="url(#goldShield)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#goldGlow2)"/>
-        <!-- decorative circle -->
-        <circle cx="36" cy="39" r="12" fill="none" stroke="rgba(255,180,0,0.12)" stroke-width="1" stroke-dasharray="2 4"/>
-        <!-- corner sparks -->
-        <circle cx="36" cy="3" r="2" fill="#ffd700" opacity=".8" filter="url(#goldGlow2)"/>
-        <circle cx="5" cy="16" r="1.5" fill="#ff9500" opacity=".6"/>
-        <circle cx="67" cy="16" r="1.5" fill="#ff9500" opacity=".6"/>
+        <path d="M36 3L5 16v22c0 18 14 34 31 40 17-6 31-22 31-40V16L36 3z"
+          fill="rgba(0,255,120,0.04)" stroke="url(#techShield)" stroke-width="1.5" filter="url(#techGlow)"/>
+        <path d="M36 12L12 23v16c0 12 9 23 24 28 15-5 24-16 24-28V23L36 12z"
+          fill="rgba(0,255,120,0.03)" stroke="rgba(0,255,120,0.25)" stroke-width="1"/>
+        <path d="M24 40l9 9 16-16"
+          stroke="url(#techShield)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#techGlow2)"/>
+        <circle cx="36" cy="39" r="12" fill="none" stroke="rgba(0,255,120,0.1)" stroke-width="1" stroke-dasharray="2 4"/>
+        <circle cx="36" cy="3" r="2" fill="#00ff88" opacity=".9" filter="url(#techGlow2)"/>
+        <circle cx="5" cy="16" r="1.5" fill="#00cc66" opacity=".7"/>
+        <circle cx="67" cy="16" r="1.5" fill="#00cc66" opacity=".7"/>
       </svg>
     </div>
     <div class="login-title">SPYDER Team Management Center</div>
@@ -1178,63 +1297,51 @@ header{
 </div>
 
 
-<!-- PARTICLE CANVAS -->
-<canvas id="particleCanvas"></canvas>
+
+
+<!-- MATRIX RAIN -->
+<canvas id="matrixCanvas"></canvas>
 <script>
 (function(){
-  const canvas = document.getElementById('particleCanvas');
-  const ctx = canvas.getContext('2d');
-  let W, H, particles = [];
+  const c = document.getElementById('matrixCanvas');
+  const ctx = c.getContext('2d');
+  let W, H, cols, drops;
+  const chars = 'SPYDER01アイウエオカキクケコサシスセソタチツテトナニヌネノ';
+  const fontSize = 13;
 
-  function resize(){
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
+  function init(){
+    W = c.width = window.innerWidth;
+    H = c.height = window.innerHeight;
+    cols = Math.floor(W/fontSize);
+    drops = Array(cols).fill(1).map(()=>Math.random()*-H/fontSize);
   }
-  resize();
-  window.addEventListener('resize', resize);
+  init();
+  window.addEventListener('resize', init);
 
-  // Only show on login screens
   function isLoginVisible(){
     const ls = document.getElementById('loginScreen');
     const us = document.getElementById('userSelectScreen');
-    return (ls && ls.style.display !== 'none' && ls.style.display !== '') ||
-           (us && us.style.display !== 'none' && us.style.display === 'flex');
+    return (ls && ls.style.display !== 'none') ||
+           (us && us.style.display === 'flex');
   }
 
-  class Particle {
-    constructor(){this.reset();}
-    reset(){
-      this.x = Math.random()*W;
-      this.y = Math.random()*H;
-      this.size = Math.random()*1.5+0.3;
-      this.speed = Math.random()*0.3+0.05;
-      this.opacity = Math.random()*0.25+0.05;
-      this.color = Math.random()>0.6
-        ? `rgba(255,${Math.floor(Math.random()*100+150)},0,`
-        : `rgba(255,${Math.floor(Math.random()*50+200)},${Math.floor(Math.random()*50)},`;
-    }
-    update(){
-      this.y -= this.speed;
-      this.x += Math.sin(this.y*0.01)*0.3;
-      if(this.y < -5) this.reset(), this.y=H+5;
-    }
-    draw(){
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
-      ctx.fillStyle = this.color + this.opacity + ')';
-      ctx.fill();
-    }
-  }
-
-  for(let i=0;i<120;i++) particles.push(new Particle());
-
-  function animate(){
-    requestAnimationFrame(animate);
+  function draw(){
+    requestAnimationFrame(draw);
     if(!isLoginVisible()){ctx.clearRect(0,0,W,H);return;}
-    ctx.clearRect(0,0,W,H);
-    particles.forEach(p=>{p.update();p.draw();});
+    ctx.fillStyle = 'rgba(2,8,6,0.05)';
+    ctx.fillRect(0,0,W,H);
+    ctx.font = fontSize+'px "Share Tech Mono",monospace';
+    for(let i=0;i<cols;i++){
+      const ch = chars[Math.floor(Math.random()*chars.length)];
+      const y = drops[i]*fontSize;
+      // bright head
+      ctx.fillStyle = drops[i]*fontSize < H*0.3 ? '#afffcc' : '#00ff66';
+      ctx.fillText(ch, i*fontSize, y);
+      if(y > H && Math.random()>0.975) drops[i] = 0;
+      drops[i] += Math.random()*0.4+0.1;
+    }
   }
-  animate();
+  draw();
 })();
 </script>
 
