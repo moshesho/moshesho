@@ -1145,7 +1145,8 @@ header{
 
   /* Matrix rain canvas */
   #matrixCanvas {
-    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.35;
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.55;
+    display:block !important;
   }
 
 
@@ -1417,8 +1418,8 @@ header{
   const c = document.getElementById('matrixCanvas');
   const ctx = c.getContext('2d');
   let W, H, cols, drops;
-  const chars = 'SPYDER01アイウエオカキクケコサシスセソタチツテトナニヌネノ';
-  const fontSize = 13;
+  const chars = '0123456789';
+  const fontSize = 14;
 
   function init(){
     W = c.width = window.innerWidth;
@@ -1432,7 +1433,10 @@ header{
   function isLoginVisible(){
     const ls = document.getElementById('loginScreen');
     const us = document.getElementById('userSelectScreen');
-    return (ls && ls.style.display !== 'none') ||
+    const app = document.getElementById('app');
+    // if app is hidden, login is visible
+    if (app && (app.style.display === 'none' || app.style.display === '')) return true;
+    return (ls && ls.style.display !== 'none' && ls.style.display !== '') ||
            (us && us.style.display === 'flex');
   }
 
@@ -1446,10 +1450,10 @@ header{
       const ch = chars[Math.floor(Math.random()*chars.length)];
       const y = drops[i]*fontSize;
       // bright head
-      ctx.fillStyle = drops[i]*fontSize < H*0.3 ? '#afffcc' : '#00ff66';
+      ctx.fillStyle = drops[i]*fontSize < H*0.15 ? '#ffffff' : drops[i]*fontSize < H*0.4 ? '#afffcc' : '#00cc55';
       ctx.fillText(ch, i*fontSize, y);
       if(y > H && Math.random()>0.975) drops[i] = 0;
-      drops[i] += Math.random()*0.4+0.1;
+      drops[i] += Math.random()*0.3+0.08;
     }
   }
   draw();
