@@ -1239,6 +1239,113 @@ header{
   .user-btn-count { font-size:11px !important; font-weight:700 !important; }
   .login-label { font-size:11px !important; font-weight:900 !important; letter-spacing:4px !important; }
 
+
+  /* ── TOP SECTION EFFECT ── */
+
+  /* Horizontal scan line sweeping across login-left */
+  .login-left {
+    position:relative;
+    overflow:visible;
+  }
+
+  /* Glowing arc above logo */
+  .login-logo::before {
+    content:'';
+    position:absolute;
+    top:-30px; left:50%; transform:translateX(-50%);
+    width:120px; height:60px;
+    background:radial-gradient(ellipse at 50% 100%, rgba(0,255,120,0.25), transparent 70%);
+    pointer-events:none;
+    animation:arc-pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes arc-pulse {
+    0%,100%{ opacity:0.5; transform:translateX(-50%) scaleX(1); }
+    50%{ opacity:1; transform:translateX(-50%) scaleX(1.2); }
+  }
+
+  /* Horizontal lines left and right of title */
+  .login-title::before,
+  .login-title::after {
+    content:'';
+    position:absolute;
+    top:50%; height:1px; width:30px;
+    background:linear-gradient(90deg, transparent, rgba(0,255,120,0.6));
+    transform:translateY(-50%);
+  }
+  .login-title { position:relative; }
+  .login-title::before { right:calc(100% + 8px); }
+  .login-title::after  { left:calc(100% + 8px); background:linear-gradient(270deg, transparent, rgba(0,255,120,0.6)); }
+
+  /* Corner brackets top-left and top-right of login-right */
+  .login-right {
+    position:relative;
+  }
+  .login-right::before,
+  .login-right::after {
+    content:'';
+    position:absolute;
+    width:20px; height:20px;
+    pointer-events:none;
+  }
+  .login-right::before {
+    top:-1px; right:-1px;
+    border-top:2px solid rgba(0,255,120,0.7);
+    border-right:2px solid rgba(0,255,120,0.7);
+    border-radius:0 12px 0 0;
+    animation:corner-pulse 3s ease-in-out infinite;
+  }
+  .login-right::after {
+    bottom:0; left:0; height:1px; width:100%;
+    background:linear-gradient(90deg,transparent,rgba(0,255,120,0.3),transparent);
+    animation:scanline 4s linear infinite;
+  }
+  @keyframes corner-pulse {
+    0%,100%{ opacity:0.5; }
+    50%{ opacity:1; box-shadow:0 0 8px rgba(0,255,120,0.4); }
+  }
+
+  /* Top-left corner bracket */
+  .login-right .corner-tl {
+    position:absolute;top:-1px;left:-1px;
+    width:20px;height:20px;
+    border-top:2px solid rgba(0,255,120,0.7);
+    border-left:2px solid rgba(0,255,120,0.7);
+    border-radius:12px 0 0 0;
+    animation:corner-pulse 3s ease-in-out infinite 1.5s;
+    pointer-events:none;
+  }
+
+  /* Typewriter dots under title */
+  .login-sub::after {
+    content:'...';
+    animation:typing 1.5s steps(3) infinite;
+    display:inline-block;
+    width:20px;
+    overflow:hidden;
+    vertical-align:bottom;
+  }
+  @keyframes typing {
+    0%{ width:0; }
+    100%{ width:20px; }
+  }
+
+  /* Data stream numbers above logo */
+  .data-stream {
+    font-family:var(--font-mono);
+    font-size:10px;
+    color:rgba(0,255,120,0.35);
+    letter-spacing:3px;
+    margin-bottom:8px;
+    animation:data-flicker 3s ease-in-out infinite;
+    text-shadow:0 0 6px rgba(0,255,120,0.3);
+  }
+  @keyframes data-flicker {
+    0%,100%{ opacity:0.4; }
+    30%{ opacity:0.8; }
+    60%{ opacity:0.3; }
+    80%{ opacity:0.9; }
+  }
+
 </style>
 </head>
 <body>
@@ -1247,6 +1354,7 @@ header{
 <!-- ── USER SELECT SCREEN ── -->
 <div id="userSelectScreen" style="display:none">
   <div class="login-left">
+    <div class="data-stream">SYS::INIT &nbsp; AUTH::READY &nbsp; SPYDER::V2</div>
     <div class="login-logo">
             <svg width="72" height="80" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -1274,7 +1382,7 @@ header{
     <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:'Rajdhani',sans-serif;background:linear-gradient(90deg,var(--cyan),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;text-shadow:none;filter:drop-shadow(0 0 8px rgba(0,229,255,0.4))">נכתב ע"י משה שושה &nbsp;|&nbsp; מוביל תשתיות טכנולוגיות</div>
     <div class="login-sub">בחר את שמך להמשך</div>
   </div>
-  <div class="login-right">
+  <div class="login-right"><div class="corner-tl"></div>
     <!-- Section 1: current user (moshe or assaf) -->
     <!-- Section 1.5: senior manager (hazi) — visible to moshe only -->
     <div id="managerSection" style="margin-bottom:8px;display:none">
@@ -1319,6 +1427,7 @@ header{
 <!-- ── PIN SCREEN ── -->
 <div id="loginScreen">
   <div class="login-left">
+    <div class="data-stream">SYS::INIT &nbsp; AUTH::READY &nbsp; SPYDER::V2</div>
     <div class="login-logo">
             <svg width="72" height="80" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
