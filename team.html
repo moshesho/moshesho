@@ -1564,13 +1564,12 @@ header{
       const labSec = document.getElementById('labSection');
       if (labSec) { labSec.style.display = ['moshe','assaf','hazi'].includes(loggedInAs) ? 'flex' : 'none'; labSec.style.flexDirection='column'; }
       // manager section always visible
-      const mgSec = document.getElementById('managerSection');
-      if (mgSec) mgSec.style.display = 'none'; // hide by default, only shown for moshe
+      // managerSection shown/hidden by renderUserSelectButtons
       if (showOther) {
         document.getElementById('otherAdminLabel').textContent = otherLabel;
       }
+      renderUserSelectButtons();
     }, 10);
-    renderUserSelectButtons();
     document.getElementById('userSelectScreen').style.display = 'flex';
     document.getElementById('loginScreen').style.display = 'none';
   }
