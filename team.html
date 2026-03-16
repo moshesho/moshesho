@@ -1673,7 +1673,8 @@ header{
             otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
             otherGrid.style.gridTemplateColumns = '1fr';
           } else if (uid === 'assaf') {
-            if (labGrid) { labGrid.appendChild(makeBtn(uid, () => login(uid, u.role))); }
+            const haziAssafGrid = document.getElementById('haziAssafGrid');
+            if (haziAssafGrid) haziAssafGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
           }
           return;
         }
