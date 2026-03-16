@@ -1568,11 +1568,14 @@ header{
         if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
         if (mgSec) mgSec.style.display = 'block';
       } else if (who === 'hazi') {
-        // hazi: moshe in otherAdminSection, assaf in labSection
+        // hazi sees same as moshe but without managerSection
+        // mySection=חזי, otherAdmin=משה, lab=אסף+עומר, members=צוות
         otherAdminSec.style.display = 'flex'; otherAdminSec.style.flexDirection = 'column';
         document.getElementById('otherAdminLabel').textContent = '🛡️ מוביל תשתיות טכנולוגיות';
         if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
-        document.querySelector('#labSection .login-label').textContent = '👑 ראש צוות IT';
+        // restore lab label
+        const labLbl = document.querySelector('#labSection .login-label');
+        if (labLbl) labLbl.textContent = '🔬 מנהל מעבדה';
         if (mgSec) mgSec.style.display = 'none';
       } else if (who === 'assaf') {
         // assaf doesn't see moshe
@@ -1638,13 +1641,13 @@ header{
       } else if (u.role === 'admin') {
         // hide moshe from assaf
         if (viewer === 'assaf' && uid === 'moshe') return;
-        // for hazi: moshe → otherGrid, assaf → labGrid
+        // for hazi: moshe→otherGrid, assaf→labGrid (same row as omer)
         if (viewer === 'hazi') {
           if (uid === 'moshe') {
             otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
             otherGrid.style.gridTemplateColumns = '1fr';
           } else if (uid === 'assaf') {
-            if (labGrid) { labGrid.appendChild(makeBtn(uid, () => login(uid, u.role))); labGrid.style.gridTemplateColumns = '1fr'; }
+            if (labGrid) { labGrid.appendChild(makeBtn(uid, () => login(uid, u.role))); }
           }
           return;
         }
@@ -1666,7 +1669,7 @@ header{
         if (viewer === 'moshe' || viewer === 'assaf' || viewer === 'hazi') {
           if (labGrid) {
             labGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
-            labGrid.style.gridTemplateColumns = '1fr';
+            labGrid.style.gridTemplateColumns = (viewer === 'hazi') ? '1fr 1fr' : '1fr';
           }
         }
       } else {
