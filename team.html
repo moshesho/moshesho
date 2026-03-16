@@ -1560,7 +1560,7 @@ header{
       document.getElementById('otherAdminSection').style.display = showOther ? 'block' : 'none';
       // lab section only for admins
       const labSec = document.getElementById('labSection');
-      if (labSec) labSec.style.display = (loggedInAs === 'moshe' || loggedInAs === 'assaf') ? 'block' : 'none';
+      if (labSec) labSec.style.display = ['moshe','assaf','hazi'].includes(loggedInAs) ? 'block' : 'none';
       // manager section always visible
       const mgSec = document.getElementById('managerSection');
       if (mgSec && loggedInAs === 'hazi') mgSec.style.display = 'none'; // hide self
@@ -1620,6 +1620,8 @@ header{
         otherGrid.style.gridTemplateColumns = '1fr';
       } else if (u.role === 'manager') {
         if (uid === loggedInAs) return;
+        // only moshe can see hazi in the list
+        if (loggedInAs !== 'moshe') return;
         const mgGrid = document.getElementById('managerGrid');
         const mgSec = document.getElementById('managerSection');
         if (mgGrid) {
@@ -1830,7 +1832,7 @@ header{
       html += `<div class="sec-lbl">📊 עומס צוות</div><div class="team-load">`;
       ['elad','alik','rif','tal','moshe','assaf','omer'].forEach(uid => {
         if (loggedInAs === 'assaf' && uid === 'moshe') return;
-        if (USERS[uid]?.role === 'lab' && USERS[currentUser]?.role !== 'admin') return;
+        if (USERS[uid]?.role === 'lab' && !['admin','manager'].includes(USERS[currentUser]?.role)) return;
         const ut = tasks.filter(t=>isAssignedTo(t,uid) && t.status!=='done');
         const maxLoad = Math.max(8, ...['elad','alik','rif','tal','moshe','assaf','omer'].map(u2=>tasks.filter(t=>isAssignedTo(t,u2)&&t.status!=='done').length));
         const pct = Math.min(ut.length/maxLoad*100,100);
@@ -1973,7 +1975,7 @@ header{
             const allAssignees = t.assignees && t.assignees.length > 1 ? t.assignees : [t.assignee];
             const visibleAssignees = allAssignees.filter(uid => {
               if (!uid) return false;
-              if (USERS[uid]?.role === 'lab') return isAdmin || uid === currentUser;
+              if (USERS[uid]?.role === 'lab') return isAdmin || isManager || uid === currentUser;
               return true;
             });
             return visibleAssignees.map(uid => {
@@ -2196,7 +2198,7 @@ header{
     </div>
     <div class="m-lbl">שייך ל <span style="font-size:10px;color:var(--text3);font-weight:400">(ניתן לבחור כמה)</span></div>
     <div class="meta-row" id="qAssigneeRow">
-      ${Object.entries(USERS).filter(([uid,u]) => u.role !== 'lab' || USERS[currentUser]?.role === 'admin').map(([uid,u])=>`
+      ${Object.entries(USERS).filter(([uid,u]) => u.role !== 'lab' || ['admin','manager'].includes(USERS[currentUser]?.role)).map(([uid,u])=>`
         <button class="mchip ${mAssignees.includes(uid)?'sel':''}" data-u="${uid}" onclick="toggleQA(this)">${u.name.split(' ')[0]}</button>
       `).join('')}
     </div>
@@ -2409,7 +2411,7 @@ header{
           const all = (t.assignees && t.assignees.length > 0) ? t.assignees : [t.assignee];
           const isAdminUser = USERS[currentUser]?.role === 'admin';
           return all
-            .filter(uid => uid && (USERS[uid]?.role !== 'lab' || isAdminUser || uid === currentUser))
+            .filter(uid => uid && (USERS[uid]?.role !== 'lab' || isAdminUser || USERS[currentUser]?.role==='manager' || uid === currentUser))
             .map(uid => `<span class="badge assignee">👤 ${USERS[uid]?.name.split(' ')[0]||uid}</span>`)
             .join('');
         })() : ''}
@@ -2506,7 +2508,7 @@ header{
       c.classList.toggle('sel', isSel);
       // omer: show if assigned OR if admin; hide if not assigned and not admin
       if (uid === 'omer') {
-        const showOmer = USERS[currentUser]?.role === 'admin' || isSel;
+        const showOmer = ['admin','manager'].includes(USERS[currentUser]?.role) || isSel;
         c.style.display = showOmer ? 'inline-flex' : 'none';
         // non-admins can see omer is assigned but can't change it
         // admins can always change assignees
