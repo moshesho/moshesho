@@ -1531,7 +1531,7 @@ header{
 
   function logout() {
     const role = loggedInAs ? (USERS[loggedInAs] ? USERS[loggedInAs].role : '') : '';
-    const wasAdmin = (role === 'admin');
+    const wasAdmin = (role === 'admin' || role === 'manager');
     currentUser = null;
     currentTab = 'dash';
     mAssignees = [];
@@ -1626,7 +1626,8 @@ header{
       } else if (u.role === 'manager') {
         if (uid === loggedInAs) return;
         // only moshe can see hazi in the list
-        if (loggedInAs !== 'moshe') return;
+        const viewer = loggedInAs || currentUser;
+        if (viewer !== 'moshe') return;
         const mgGrid = document.getElementById('managerGrid');
         const mgSec = document.getElementById('managerSection');
         if (mgGrid) {
