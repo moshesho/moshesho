@@ -1490,6 +1490,7 @@ header{
 
   function login(uid, role) {
     currentUser = uid;
+    loggedInAs = uid; // always track who is logged in
     const u = USERS[uid];
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('userSelectScreen').style.display = 'none';
