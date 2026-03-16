@@ -1558,10 +1558,11 @@ header{
 
       // Section 2 — other admin (hide moshe from assaf's view if needed)
       const showOther = !(loggedInAs === 'assaf' && otherAdmin === 'moshe');
-      document.getElementById('otherAdminSection').style.display = showOther ? 'block' : 'none';
+      document.getElementById('otherAdminSection').style.display = showOther ? 'flex' : 'none';
+      document.getElementById('otherAdminSection').style.flexDirection = 'column';
       // lab section only for admins
       const labSec = document.getElementById('labSection');
-      if (labSec) labSec.style.display = ['moshe','assaf','hazi'].includes(loggedInAs) ? 'block' : 'none';
+      if (labSec) { labSec.style.display = ['moshe','assaf','hazi'].includes(loggedInAs) ? 'flex' : 'none'; labSec.style.flexDirection='column'; }
       // manager section always visible
       const mgSec = document.getElementById('managerSection');
       if (mgSec) mgSec.style.display = 'none'; // hide by default, only shown for moshe
