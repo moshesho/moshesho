@@ -698,6 +698,11 @@ header{
       <div id="myRoleLabel" class="login-label" style="margin-bottom:8px"></div>
       <div id="myGrid" class="user-grid"></div>
     </div>
+    <!-- Section 1.5: senior manager (hazi) — visible to all -->
+    <div id="managerSection" style="margin-bottom:14px;display:none">
+      <div class="login-label" style="margin-bottom:8px">🔱 ממ"ר יחידה עסקית</div>
+      <div class="user-grid" id="managerGrid"></div>
+    </div>
     <!-- Section 2: lab manager (admins only) -->
     <div id="labSection" style="margin-bottom:14px">
       <div class="login-label" style="margin-bottom:8px">🔬 מנהל מעבדה</div>
@@ -876,6 +881,7 @@ header{
     rif:    { name:'ריף פרץ',      role:'member', initials:'רפ', pin:'5090',  phone:'972533326272' },
     tal:    { name:'טל כהן',       role:'member', initials:'טכ', pin:'4810',  phone:'972524713172' },
     omer:   { name:'עומר תורג\'מן',   role:'lab',    initials:'עת', pin:'1082',  phone:'972545876986' },
+    hazi:   { name:'חזי בן-ארי',      role:'manager', initials:'חב', pin:'7324',  phone:'' },
   };
   const PRIO_LABEL = {1:'🔴 דחוף',2:'🟡 גבוה',3:'🔵 רגיל',4:'⚪ נמוך'};
   const STATUS_LABEL = {open:'🔵 פתוח',progress:'🟡 בביצוע',blocked:'⏳ ממתין',done:'✅ בוצע'};
@@ -1500,6 +1506,11 @@ header{
         <button class="tab" onclick="setTab('tasks',this)">✅ משימות</button>
         <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>
         ${isTrashUser ? `<button class="tab" id="trashTab" onclick="setTab('trash',this)">🗑️ סל${trash.length?' ('+trash.length+')':''}</button>` : ''}`;
+    } else if (u.role === 'manager') {
+      document.getElementById('tabsRow').innerHTML = `
+        <button class="tab active" onclick="setTab('dash',this)">📊 דשבורד</button>
+        <button class="tab" onclick="setTab('tasks',this)">✅ משימות</button>
+        <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>`;
     } else {
       document.getElementById('tabsRow').innerHTML = `
         <button class="tab active" onclick="setTab('dash',this)">📊 דשבורד</button>
@@ -1550,6 +1561,9 @@ header{
       // lab section only for admins
       const labSec = document.getElementById('labSection');
       if (labSec) labSec.style.display = (loggedInAs === 'moshe' || loggedInAs === 'assaf') ? 'block' : 'none';
+      // manager section always visible
+      const mgSec = document.getElementById('managerSection');
+      if (mgSec && loggedInAs === 'hazi') mgSec.style.display = 'none'; // hide self
       if (showOther) {
         document.getElementById('otherAdminLabel').textContent = otherLabel;
       }
@@ -1604,6 +1618,15 @@ header{
         if (loggedInAs === 'assaf' && uid === 'moshe') return;
         otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
         otherGrid.style.gridTemplateColumns = '1fr';
+      } else if (u.role === 'manager') {
+        if (uid === loggedInAs) return;
+        const mgGrid = document.getElementById('managerGrid');
+        const mgSec = document.getElementById('managerSection');
+        if (mgGrid) {
+          mgGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
+          mgGrid.style.gridTemplateColumns = '1fr';
+        }
+        if (mgSec) mgSec.style.display = 'block';
       } else if (u.role === 'lab') {
         // omer — only visible to moshe and assaf
         if (loggedInAs === 'moshe' || loggedInAs === 'assaf') {
@@ -1757,8 +1780,8 @@ header{
   // ── DASHBOARD ──────────────────────────────────────
   function renderDash(wrap) {
     const u = USERS[currentUser];
-    const myTasks = u.role === 'admin' ? tasks : tasks.filter(t=>isAssignedTo(t, currentUser));
-    const myPersonalTasks = tasks.filter(t=>isAssignedTo(t, currentUser)); // tasks assigned to ME specifically
+    const myTasks = (u.role === 'admin' || u.role === 'manager') ? tasks : tasks.filter(t=>isAssignedTo(t, currentUser));
+    const myPersonalTasks = (u.role==='manager') ? tasks.filter(t=>isAssignedTo(t, currentUser)) : tasks.filter(t=>isAssignedTo(t, currentUser));
     const open     = myTasks.filter(t=>t.status==='open').length;
     const progress = myTasks.filter(t=>t.status==='progress').length;
     const blocked  = myTasks.filter(t=>t.status==='blocked').length;
@@ -2090,12 +2113,12 @@ header{
   // ── TASKS LIST ─────────────────────────────────────
   function renderTasks(wrap) {
     const u = USERS[currentUser];
-    const myTasks = u.role==='admin' ? tasks : tasks.filter(t=>isAssignedTo(t, currentUser));
+    const myTasks = (u.role==='admin' || u.role==='manager') ? tasks : tasks.filter(t=>isAssignedTo(t, currentUser));
     const isAdmin = u.role==='admin';
 
     let html = '';
-    if (isAdmin) {
-      // filter by person for admin
+    if (isAdmin || USERS[currentUser]?.role==='manager') {
+      // filter by person for admin/manager
       html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px">
         <button class="mchip ${taskPersonFilter==='all'?'sel':''}" style="grid-column:span 3" onclick="setTPF('all')">📋 כולם (${tasks.filter(t=>t.status!=='done').length})</button>
         ${['elad','alik','rif','tal','moshe','assaf','omer'].map(uid=>{
@@ -2105,7 +2128,7 @@ header{
       </div>`;
     }
 
-    const filtered = isAdmin
+    const filtered = (isAdmin || USERS[currentUser]?.role==='manager')
       ? (taskPersonFilter==='all' ? tasks : tasks.filter(t=>isAssignedTo(t,taskPersonFilter)))
       : myTasks;
 
@@ -2366,7 +2389,8 @@ header{
       else                deadlineBadge = `<span class="deadline-badge ok">📅 ${t.deadline}</span>`;
     }
     const isAdmin = USERS[currentUser]?.role==='admin';
-    const canEdit = isAdmin || isAssignedTo(t, currentUser);
+    const isManager = USERS[currentUser]?.role==='manager';
+    const canEdit = isAdmin || isManager || isAssignedTo(t, currentUser);
     const canDelete = isAdmin || isAssignedTo(t, currentUser);
 
     const statusMap = {open:'status-open',progress:'status-progress',blocked:'status-blocked',done:'status-done'};
