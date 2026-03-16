@@ -1574,23 +1574,15 @@ header{
         document.getElementById('otherAdminLabel').textContent = '🛡️ מוביל תשתיות טכנולוגיות';
         // Step2: show lab section for omer, side by side with a new assaf section
         if (labSec) { labSec.style.display = 'flex'; labSec.style.flexDirection = 'column'; }
-        const labLbl = document.querySelector('#labSection .login-label');
-        if (labLbl) labLbl.textContent = '🔬 מנהל מעבדה';
+        // labels set below
         if (mgSec) mgSec.style.display = 'none';
         // Use a wrapper to show assaf next to omer — add assaf section dynamically
         // Actually reuse the existing flex row wrapper for lab+otherAdmin sections
         // Inject assaf section before lab section
-        const existingAssafSec = document.getElementById('haziAssafSection');
-        if (!existingAssafSec) {
-          const assafSec = document.createElement('div');
-          assafSec.id = 'haziAssafSection';
-          assafSec.style.cssText = 'flex:1';
-          assafSec.innerHTML = '<div class="login-label" style="margin-bottom:6px">👑 ראש צוות IT</div><div class="user-grid" id="haziAssafGrid" style="grid-template-columns:1fr"></div>';
-          labSec.parentNode.insertBefore(assafSec, labSec);
-        } else {
-          existingAssafSec.style.display = 'flex';
-          existingAssafSec.style.flexDirection = 'column';
-        }
+        // for hazi: labSection = ראש צוות IT (assaf), otherAdminSection = מנהל מעבדה (omer)
+        const labLbl2 = document.querySelector('#labSection .login-label');
+        if (labLbl2) labLbl2.textContent = '👑 ראש צוות IT';
+        document.getElementById('otherAdminLabel').textContent = '🔬 מנהל מעבדה';
       } else if (who === 'assaf') {
         // assaf doesn't see moshe
         otherAdminSec.style.display = 'none';
@@ -1633,8 +1625,7 @@ header{
     if (mgGrid2) { mgGrid2.innerHTML = ''; }
     const mgSec2 = document.getElementById('managerSection');
     if (mgSec2) mgSec2.style.display = 'none';
-    const haziAssafGrid = document.getElementById('haziAssafGrid');
-    if (haziAssafGrid) haziAssafGrid.innerHTML = '';
+
 
     function makeBtn(uid, onclick) {
       const taskCnt = tasks.filter(t=>isAssignedTo(t,uid) && t.status!=='done').length;
@@ -1682,11 +1673,12 @@ header{
         if (mgSec && viewer === 'moshe') mgSec.style.display = 'block';
       } else if (u.role === 'lab') {
         // omer — visible to moshe, assaf, and hazi
-        if (viewer === 'moshe' || viewer === 'assaf' || viewer === 'hazi') {
-          if (labGrid) {
-            labGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
-            labGrid.style.gridTemplateColumns = '1fr';
-          }
+        if (viewer === 'moshe' || viewer === 'assaf') {
+          if (labGrid) { labGrid.appendChild(makeBtn(uid, () => login(uid, u.role))); labGrid.style.gridTemplateColumns = '1fr'; }
+        } else if (viewer === 'hazi') {
+          // for hazi: omer goes to otherGrid (מנהל מעבדה)
+          otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
+          otherGrid.style.gridTemplateColumns = '1fr';
         }
       } else {
         memberGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
