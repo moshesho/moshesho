@@ -875,10 +875,9 @@ header{
   /* Override bg for login screens only */
   #loginScreen, #userSelectScreen {
     background:
-      radial-gradient(ellipse 100% 80% at 50% 0%,rgba(255,120,0,0.12),transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 100%,rgba(255,60,0,0.08),transparent 50%),
-      radial-gradient(ellipse 50% 30% at 10% 60%,rgba(255,180,0,0.06),transparent 50%),
-      var(--bg);
+      radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,120,0,0.06),transparent 60%),
+      radial-gradient(ellipse 40% 30% at 90% 90%,rgba(255,60,0,0.04),transparent 50%),
+      #04070f;
     position:relative;
     overflow:hidden;
   }
@@ -1209,7 +1208,7 @@ header{
       this.y = Math.random()*H;
       this.size = Math.random()*1.5+0.3;
       this.speed = Math.random()*0.3+0.05;
-      this.opacity = Math.random()*0.6+0.1;
+      this.opacity = Math.random()*0.25+0.05;
       this.color = Math.random()>0.6
         ? `rgba(255,${Math.floor(Math.random()*100+150)},0,`
         : `rgba(255,${Math.floor(Math.random()*50+200)},${Math.floor(Math.random()*50)},`;
