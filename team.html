@@ -1627,24 +1627,14 @@ header{
   }
 
   function renderUserSelectButtons() {
-    const myGrid       = document.getElementById('myGrid');
-    const otherGrid    = document.getElementById('otherAdminGrid');
-    const memberGrid   = document.getElementById('memberGrid');
-    if (!myGrid || !otherGrid || !memberGrid) return;
+    const who = loggedInAs;
 
-    // clear all
-    myGrid.innerHTML = '';
-    otherGrid.innerHTML = '';
-    memberGrid.innerHTML = '';
-    const labGrid = document.getElementById('labGrid');
-    if (labGrid) labGrid.innerHTML = '';
-    const mgGrid2 = document.getElementById('managerGrid');
-    if (mgGrid2) { mgGrid2.innerHTML = ''; }
-    const mgSec2 = document.getElementById('managerSection');
-    if (mgSec2) mgSec2.style.display = 'none';
-    const haziAG = document.getElementById('haziAssafGrid'); if (haziAG) haziAG.innerHTML='';
-    const haziOG = document.getElementById('haziOmerGrid'); if (haziOG) haziOG.innerHTML='';
-
+    // clear all grids
+    ['myGrid','otherAdminGrid','labGrid','managerGrid','haziAssafGrid','haziOmerGrid','memberGrid'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '';
+    });
+    document.getElementById('managerSection').style.display = 'none';
 
     function makeBtn(uid, onclick) {
       const taskCnt = tasks.filter(t=>isAssignedTo(t,uid) && t.status!=='done').length;
@@ -1658,54 +1648,44 @@ header{
       return btn;
     }
 
-    const viewer = loggedInAs;
+    function addTo(gridId, uid) {
+      const g = document.getElementById(gridId);
+      if (g) { g.appendChild(makeBtn(uid, () => login(uid, USERS[uid].role))); g.style.gridTemplateColumns='1fr'; }
+    }
 
-    Object.entries(USERS).forEach(([uid, u]) => {
-      if (uid === loggedInAs) {
-        myGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
-        myGrid.style.gridTemplateColumns = '1fr';
-      } else if (u.role === 'admin') {
-        // hide moshe from assaf
-        if (viewer === 'assaf' && uid === 'moshe') return;
-        // for hazi: moshe→otherGrid, assaf→labGrid (same row as omer)
-        if (viewer === 'hazi') {
-          if (uid === 'moshe') {
-            otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
-            otherGrid.style.gridTemplateColumns = '1fr';
-          } else if (uid === 'assaf') {
-            const haziAssafGrid = document.getElementById('haziAssafGrid');
-            if (haziAssafGrid) haziAssafGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
-          }
-          return;
-        }
-        otherGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
-        otherGrid.style.gridTemplateColumns = '1fr';
-      } else if (u.role === 'manager') {
-        if (uid === loggedInAs) return;
-        // only moshe can see hazi in the list
-        if (viewer !== 'moshe') return;
-        const mgGrid = document.getElementById('managerGrid');
-        const mgSec = document.getElementById('managerSection');
-        if (mgGrid) {
-          mgGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
-          mgGrid.style.gridTemplateColumns = '1fr';
-        }
-        if (mgSec && viewer === 'moshe') mgSec.style.display = 'block';
-      } else if (u.role === 'lab') {
-        // omer — visible to moshe, assaf, and hazi
-        if (viewer === 'moshe' || viewer === 'assaf') {
-          if (labGrid) { labGrid.appendChild(makeBtn(uid, () => login(uid, u.role))); labGrid.style.gridTemplateColumns = '1fr'; }
-        } else if (viewer === 'hazi') {
-          const haziOmerGrid = document.getElementById('haziOmerGrid');
-          if (haziOmerGrid) { haziOmerGrid.innerHTML=''; haziOmerGrid.appendChild(makeBtn(uid, () => login(uid, u.role))); }
-        }
-      } else {
-        memberGrid.appendChild(makeBtn(uid, () => login(uid, u.role)));
-      }
-    });
+    if (who === 'moshe') {
+      // moshe: myGrid=משה, managerGrid=חזי, otherAdminGrid=אסף, labGrid=עומר, memberGrid=צוות
+      addTo('myGrid', 'moshe');
+      addTo('managerGrid', 'hazi');
+      document.getElementById('managerSection').style.display = 'block';
+      addTo('otherAdminGrid', 'assaf');
+      addTo('labGrid', 'omer');
+      ['elad','alik','rif','tal'].forEach(uid => addTo('memberGrid', uid));
+
+    } else if (who === 'hazi') {
+      // hazi: myGrid=חזי, otherAdminGrid=משה, haziAssafGrid=אסף, haziOmerGrid=עומר, memberGrid=צוות
+      addTo('myGrid', 'hazi');
+      addTo('otherAdminGrid', 'moshe');
+      addTo('haziAssafGrid', 'assaf');
+      addTo('haziOmerGrid', 'omer');
+      ['elad','alik','rif','tal'].forEach(uid => addTo('memberGrid', uid));
+
+    } else if (who === 'assaf') {
+      // assaf: myGrid=אסף, labGrid=עומר, memberGrid=צוות (no moshe)
+      addTo('myGrid', 'assaf');
+      addTo('labGrid', 'omer');
+      ['elad','alik','rif','tal'].forEach(uid => addTo('memberGrid', uid));
+
+    } else {
+      // member: myGrid=self, memberGrid=all others (member role)
+      addTo('myGrid', who);
+      Object.entries(USERS).forEach(([uid,u]) => {
+        if (uid !== who && u.role === 'member') addTo('memberGrid', uid);
+      });
+    }
   }
 
-  // ── STEPS STATE ──────────────────────────────────
+    // ── STEPS STATE ──────────────────────────────────
   const expandedSteps = new Set();
   const expandedTasks = new Set();
   const expandedStepMenus = new Set(); // "taskId|stepId"
