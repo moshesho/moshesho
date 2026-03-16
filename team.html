@@ -459,18 +459,38 @@ header{
     }
     .pin-dot.filled{background:var(--blue);border-color:var(--blue);box-shadow:0 0 8px rgba(59,130,246,.5)}
     .pin-pad{
-      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
-      max-width:220px;margin:0 auto;
+      display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+      max-width:240px;margin:0 auto;
     }
     .pin-key{
-      aspect-ratio:1;border-radius:50%;font-size:20px;font-weight:700;
-      background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
-      color:var(--text);cursor:pointer;font-family:var(--font-main);
+      aspect-ratio:1;border-radius:12px;font-size:22px;font-weight:900;
+      background:linear-gradient(145deg,rgba(0,30,18,0.95),rgba(2,10,8,0.98));
+      border:1.5px solid rgba(0,255,120,0.18);
+      color:#afffcc;cursor:pointer;font-family:var(--font-mono);
       transition:all .15s;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 16px rgba(0,0,0,0.6),inset 0 1px 0 rgba(0,255,120,0.08);
+      position:relative;overflow:hidden;
     }
-    .pin-key:hover{background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.3)}
-    .pin-key:active{transform:scale(.9)}
-    .pin-back{font-size:16px;background:rgba(255,255,255,0.03)}
+    .pin-key::before{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(0,255,120,0.06) 0%,transparent 60%);
+      pointer-events:none;
+    }
+    .pin-num{
+      position:relative;z-index:1;
+      text-shadow:0 0 10px rgba(0,255,120,0.5);
+      font-size:24px;
+    }
+    .pin-key:hover{
+      background:linear-gradient(145deg,rgba(0,60,30,0.95),rgba(0,30,15,0.98));
+      border-color:rgba(0,255,120,0.5);
+      box-shadow:0 0 20px rgba(0,255,120,0.2),0 4px 16px rgba(0,0,0,0.5),inset 0 1px 0 rgba(0,255,120,0.15);
+      transform:translateY(-2px);
+      color:#ffffff;
+    }
+    .pin-key:active{transform:scale(.93);box-shadow:0 0 12px rgba(0,255,120,0.4);}
+    .pin-back{font-size:18px;background:linear-gradient(145deg,rgba(20,10,0,0.95),rgba(10,5,0,0.98));border-color:rgba(255,100,0,0.2);color:rgba(255,150,0,0.7);}
+    .pin-back:hover{border-color:rgba(255,150,0,0.5) !important;color:#ff9500 !important;box-shadow:0 0 16px rgba(255,120,0,0.2) !important;}
     .pin-cancel{font-size:14px;background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.2);color:#f87171}
     @keyframes pinShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
     .pin-shake{animation:pinShake .3s ease}
@@ -1332,18 +1352,18 @@ header{
       <div id="pinDots" style="display:flex;gap:12px;justify-content:center;margin-bottom:20px">
         <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
       </div>
-      <div class="pin-pad">
-        <button class="pin-key" onclick="pinPress('1')">1</button>
-        <button class="pin-key" onclick="pinPress('2')">2</button>
-        <button class="pin-key" onclick="pinPress('3')">3</button>
-        <button class="pin-key" onclick="pinPress('4')">4</button>
-        <button class="pin-key" onclick="pinPress('5')">5</button>
-        <button class="pin-key" onclick="pinPress('6')">6</button>
-        <button class="pin-key" onclick="pinPress('7')">7</button>
-        <button class="pin-key" onclick="pinPress('8')">8</button>
-        <button class="pin-key" onclick="pinPress('9')">9</button>
+      <div class="pin-pad" dir="ltr">
+        <button class="pin-key" onclick="pinPress('1')"><span class="pin-num">1</span></button>
+        <button class="pin-key" onclick="pinPress('2')"><span class="pin-num">2</span></button>
+        <button class="pin-key" onclick="pinPress('3')"><span class="pin-num">3</span></button>
+        <button class="pin-key" onclick="pinPress('4')"><span class="pin-num">4</span></button>
+        <button class="pin-key" onclick="pinPress('5')"><span class="pin-num">5</span></button>
+        <button class="pin-key" onclick="pinPress('6')"><span class="pin-num">6</span></button>
+        <button class="pin-key" onclick="pinPress('7')"><span class="pin-num">7</span></button>
+        <button class="pin-key" onclick="pinPress('8')"><span class="pin-num">8</span></button>
+        <button class="pin-key" onclick="pinPress('9')"><span class="pin-num">9</span></button>
         <button class="pin-key pin-back" onclick="pinBack()">⌫</button>
-        <button class="pin-key" onclick="pinPress('0')">0</button>
+        <button class="pin-key" onclick="pinPress('0')"><span class="pin-num">0</span></button>
         <button class="pin-key pin-back" onclick="pinBack()">⌫</button>
       </div>
       <div id="pinError" style="color:#f87171;font-size:12px;margin-top:10px;min-height:18px"></div>
