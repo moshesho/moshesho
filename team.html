@@ -703,15 +703,16 @@ header{
       <div class="login-label" style="margin-bottom:8px">🔱 ממ"ר יחידה עסקית</div>
       <div class="user-grid" id="managerGrid"></div>
     </div>
-    <!-- Section 2: lab manager (admins only) -->
-    <div id="labSection" style="margin-bottom:8px">
-      <div class="login-label" style="margin-bottom:8px">🔬 מנהל מעבדה</div>
-      <div class="user-grid" id="labGrid"></div>
-    </div>
-    <!-- Section 3: the other admin -->
-    <div id="otherAdminSection" style="margin-bottom:8px">
-      <div id="otherAdminLabel" class="login-label" style="margin-bottom:8px"></div>
-      <div id="otherAdminGrid" class="user-grid"></div>
+    <!-- Section 2+3: lab manager + other admin in same row -->
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <div id="labSection" style="flex:1">
+        <div class="login-label" style="margin-bottom:6px">🔬 מנהל מעבדה</div>
+        <div class="user-grid" id="labGrid"></div>
+      </div>
+      <div id="otherAdminSection" style="flex:1">
+        <div id="otherAdminLabel" class="login-label" style="margin-bottom:6px"></div>
+        <div id="otherAdminGrid" class="user-grid"></div>
+      </div>
     </div>
     <!-- Section 4: team members -->
     <div id="memberSection" style="margin-bottom:4px">
