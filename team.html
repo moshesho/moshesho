@@ -694,14 +694,14 @@ header{
   </div>
   <div class="login-right">
     <!-- Section 1: current user (moshe or assaf) -->
-    <div id="mySection" style="margin-bottom:8px">
-      <div id="myRoleLabel" class="login-label" style="margin-bottom:8px"></div>
-      <div id="myGrid" class="user-grid"></div>
-    </div>
-    <!-- Section 1.5: senior manager (hazi) — visible to all -->
+    <!-- Section 1.5: senior manager (hazi) — visible to moshe only -->
     <div id="managerSection" style="margin-bottom:8px;display:none">
       <div class="login-label" style="margin-bottom:8px">🔱 ממ"ר יחידה עסקית</div>
       <div class="user-grid" id="managerGrid"></div>
+    </div>
+    <div id="mySection" style="margin-bottom:8px">
+      <div id="myRoleLabel" class="login-label" style="margin-bottom:8px"></div>
+      <div id="myGrid" class="user-grid"></div>
     </div>
     <!-- Section 2+3: lab manager + other admin in same row -->
     <div style="display:flex;gap:8px;margin-bottom:8px">
