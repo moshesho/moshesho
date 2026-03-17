@@ -1902,10 +1902,10 @@ header{
       <button class="mchip" data-proj="LMCP" onclick="setProjChip(this,'LMCP')">LMCP</button>
       <button class="mchip" data-proj="אחר" onclick="setProjChip(this,'אחר')">אחר ✏️</button>
     </div>
-    <input class="m-input" id="mProjectName" placeholder="שם פרויקט מותאם אישית..." style="display:none;margin-top:6px"/>
+    <input class="m-input" id="mProjectName" placeholder="או הקלד שם פרויקט חופשי..." style="margin-top:6px;height:38px;"/>
 
     <div class="m-lbl">תיאור משימה / סטטוס</div>
-    <textarea class="m-input" id="mTaskNotes" placeholder="תיאור משימה..." rows="2" style="height:70px;resize:none;width:100%;box-sizing:border-box"></textarea>
+    <textarea class="m-input" id="mTaskNotes" placeholder="תיאור משימה..." rows="1" style="height:42px;resize:none;width:100%;box-sizing:border-box"></textarea>
 
     <div class="m-lbl">שייך ל <span style="font-size:10px;color:var(--text3);font-weight:400">(ניתן לבחור כמה)</span></div>
     <div class="meta-row" id="mAssigneeRow">
@@ -3461,15 +3461,15 @@ header{
   function setProjChip(el, val) {
     document.querySelectorAll('#mProjectRow .mchip').forEach(b=>b.classList.remove('sel'));
     el.classList.add('sel');
-    const customInp = document.getElementById('mProjectName');
-    if (val === 'אחר') {
-      customInp.style.display = '';
-      customInp.focus();
-      mProjectVal = customInp.value;
+    mProjectVal = val;
+    const inp = document.getElementById('mProjectName');
+    if (val && val !== 'אחר') {
+      inp.value = val;
+    } else if (val === 'אחר') {
+      inp.value = '';
+      inp.focus();
     } else {
-      customInp.style.display = 'none';
-      mProjectVal = val;
-      document.getElementById('mProjectName').value = val;
+      inp.value = '';
     }
   }
 
@@ -3886,15 +3886,13 @@ header{
     const customInp = document.getElementById('mProjectName');
     if (projChip) {
       projChip.classList.add('sel');
-      customInp.style.display='none';
       customInp.value = mProjectVal;
     } else if (mProjectVal) {
       document.querySelector('#mProjectRow .mchip[data-proj="אחר"]').classList.add('sel');
-      customInp.style.display='';
       customInp.value = mProjectVal;
     } else {
       document.querySelector('#mProjectRow .mchip[data-proj=""]').classList.add('sel');
-      customInp.style.display='none';
+      customInp.value = '';
     }
     document.getElementById('mTaskNotes').value = t.notes||'';
     document.getElementById('mDeadline').value  = t.deadline||'';
@@ -3927,7 +3925,6 @@ header{
     mProjectVal='';
     document.querySelectorAll('#mProjectRow .mchip').forEach(b=>b.classList.remove('sel'));
     document.querySelector('#mProjectRow .mchip[data-proj=""]').classList.add('sel');
-    document.getElementById('mProjectName').style.display='none';
     document.getElementById('mProjectName').value='';
     document.getElementById('mTaskNotes').value='';
     document.getElementById('mDeadline').value='';
@@ -3960,7 +3957,7 @@ header{
     if (!mAssigneesList.length) return toast('⚠️ בחר לפחות אחראי אחד');
     const base = {
       name, priority:mPrio, status:mStatus,
-      project:(document.getElementById('mProjectName').value.trim())||mProjectVal||null,
+      project:document.getElementById('mProjectName').value.trim()||null,
       notes:document.getElementById('mTaskNotes').value.trim()||null,
       deadline:document.getElementById('mDeadline').value||null
     };
