@@ -3769,7 +3769,7 @@ header{
     return `
     <div class="task-card s-${t.status||'open'}">
       <div class="tc-top">
-        ${t.project ? `<div style="font-size:10px;color:var(--cyan);font-weight:700;margin-bottom:3px;letter-spacing:1px">📁 ${esc(t.project)}</div>` : ''}
+        ${t.project ? '<div style="font-size:10px;color:#00e5ff;font-weight:700;margin-bottom:3px">📁 '+esc(t.project)+'</div>' : ''}
         <div class="tc-name">${esc(t.name)}</div>
         <div class="tc-actions">
           ${canEdit ? `<button class="iBtn edit" onclick="openEdit('${t.id}')">✏️</button>` : ''}
