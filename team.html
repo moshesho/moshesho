@@ -68,9 +68,9 @@ body::after{content:'';position:fixed;inset:0;
     padding:40px 20px;
     overflow-y:auto;
   }
-  .login-left{text-align:center;margin-bottom:20px;position:relative;}
+  .login-left{text-align:center;margin-bottom:10px;position:relative;}
   .login-logo{font-size:56px}
-  .login-title{font-size:28px}
+  .login-title{font-size:18px}
   .login-right{
     width:100%;
     max-width:480px;
@@ -114,8 +114,8 @@ body::after{content:'';position:fixed;inset:0;
   .hdr-name{font-size:15px;text-align:center}
   .hdr-right{flex-wrap:wrap;gap:8px;justify-content:center;width:100%}
 
-  .tabs{flex-direction:column;gap:6px;margin-top:6px;overflow-x:visible;overflow-y:auto}
-  .tab{border-radius:10px;padding:11px 14px;text-align:right;font-size:13px;flex:0 0 auto}
+  .tabs{flex-direction:column;gap:6px;margin-top:6px}
+  .tab{border-radius:10px;padding:11px 14px;text-align:right;font-size:13px}
   .tab.active{box-shadow:0 4px 18px rgba(59,130,246,0.35)}
 
   /* content: centered with max-width */
@@ -168,12 +168,12 @@ body::after{content:'';position:fixed;inset:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:30px 24px;
 }
-.login-logo{font-size:48px;margin-bottom:16px;filter:drop-shadow(0 0 24px rgba(0,170,255,0.6));animation:float 3s ease-in-out infinite}
+.login-logo{font-size:48px;margin-bottom:8px;filter:drop-shadow(0 0 24px rgba(0,150,255,0.7));animation:float 3s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .login-title{font-size:22px;font-weight:900;margin-bottom:4px;
   background:linear-gradient(135deg,var(--blue),var(--cyan));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.login-sub{font-size:13px;color:var(--text2);margin-bottom:32px}
+.login-sub{font-size:11px;color:var(--text2);margin-bottom:12px}
 .login-label{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--blue);margin-bottom:6px;width:100%;max-width:340px;font-family:var(--font-display);text-shadow:0 0 6px rgba(0,170,255,0.3);}
 .user-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:340px;margin-bottom:10px}
 .user-btn-count{
@@ -230,10 +230,9 @@ header{
 .sync-dot.live{background:var(--green);box-shadow:0 0 10px var(--green),0 0 4px var(--green);animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{box-shadow:0 0 6px var(--green)}50%{box-shadow:0 0 14px var(--green)}}
 
-.tabs{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;padding:7px 11px;background:rgba(0,170,255,0.03);border:1px solid rgba(0,170,255,0.08);font-family:var(--font-display);letter-spacing:.5px;
-  border-radius:50px;color:var(--text3);font-family:var(--font-main);font-weight:700;font-size:11px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tabs{display:flex;gap:5px}
+.tab{flex:1;padding:7px 0;background:rgba(0,170,255,0.03);border:1px solid rgba(0,170,255,0.08);font-family:var(--font-display);letter-spacing:.5px;
+  border-radius:50px;color:var(--text3);font-family:var(--font-main);font-weight:700;font-size:11px;cursor:pointer;transition:all .2s}
 .tab.active{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(0,170,255,0.4),0 0 20px rgba(0,229,255,0.2);font-weight:700;letter-spacing:0.5px;}
 
 /* ── CONTENT ── */
@@ -460,18 +459,19 @@ header{
     }
     .pin-dot.filled{background:var(--blue);border-color:var(--blue);box-shadow:0 0 8px rgba(59,130,246,.5)}
     .pin-pad{
-      display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
-      max-width:240px;margin:0 auto;
+      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+      width:90vw;max-width:320px;margin:0 auto;
       direction:ltr;
     }
     .pin-key{
-      aspect-ratio:1;border-radius:12px;font-size:22px;font-weight:900;
+      aspect-ratio:1;border-radius:14px;font-size:26px;font-weight:900;
       background:linear-gradient(145deg,rgba(0,30,18,0.95),rgba(2,10,8,0.98));
       border:1.5px solid rgba(0,255,120,0.18);
       color:#afffcc;cursor:pointer;font-family:var(--font-mono);
       transition:all .15s;display:flex;align-items:center;justify-content:center;
       box-shadow:0 4px 16px rgba(0,0,0,0.6),inset 0 1px 0 rgba(0,255,120,0.08);
       position:relative;overflow:hidden;
+      min-height:70px;
     }
     .pin-key::before{
       content:'';position:absolute;inset:0;
@@ -674,95 +674,6 @@ header{
   .pin-dot { width:18px; height:18px; }
 }
 
-
-  /* ── SEARCH ── */
-  .search-wrap{position:relative;margin-bottom:10px}
-  .search-input{width:100%;padding:10px 38px 10px 14px;border-radius:10px;
-    background:rgba(0,170,255,0.05);border:1px solid rgba(0,170,255,0.15);
-    color:var(--text);font-family:var(--font-main);font-size:13px;font-weight:500;outline:none;transition:border-color .2s,box-shadow .2s}
-  .search-input:focus{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.15)}
-  .search-input::placeholder{color:var(--text3)}
-  .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none}
-  .filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
-  .filter-chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;
-    border:1px solid rgba(0,170,255,0.12);background:rgba(0,170,255,0.04);
-    color:var(--text3);cursor:pointer;font-family:var(--font-main);transition:all .15s;white-space:nowrap}
-  .filter-chip.active{background:rgba(0,170,255,0.15);border-color:var(--cyan);color:#fff;box-shadow:0 0 8px rgba(0,229,255,0.2)}
-  .search-results-count{font-size:11px;color:var(--text3);margin-bottom:8px;padding-right:2px}
-  .search-highlight{background:rgba(0,229,255,0.25);border-radius:2px;color:#fff;padding:0 2px;font-weight:700}
-  /* ── CHARTS ── */
-  .chart-card{background:linear-gradient(145deg,var(--card2),var(--card));
-    border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius);
-    padding:14px;margin-bottom:10px}
-  .chart-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
-    color:var(--text3);margin-bottom:12px;font-family:var(--font-display)}
-  .bar-chart{display:flex;align-items:flex-end;gap:6px;height:110px}
-  .bar-col{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0}
-  .bar-fill{width:100%;border-radius:4px 4px 0 0;transition:height .6s cubic-bezier(.34,1.2,.64,1);min-height:4px}
-  .bar-lbl{font-size:9px;color:var(--text3);font-weight:700;text-align:center;line-height:1.2;overflow:hidden;width:100%;text-overflow:ellipsis;white-space:nowrap}
-  .bar-val{font-size:11px;font-weight:800;color:var(--text2)}
-  .donut-wrap{display:flex;align-items:center;gap:16px}
-  .donut-legend{display:flex;flex-direction:column;gap:7px;flex:1}
-  .donut-item{display:flex;align-items:center;gap:7px;font-size:12px}
-  .donut-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-  .donut-lbl{color:var(--text2);flex:1}
-  .donut-cnt{font-weight:800;color:#fff}
-  /* ── CALENDAR ── */
-  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-  .cal-nav{width:32px;height:32px;border-radius:8px;border:1px solid rgba(0,170,255,0.15);
-    background:rgba(0,170,255,0.05);color:var(--text2);cursor:pointer;font-size:18px;
-    display:flex;align-items:center;justify-content:center;transition:all .15s}
-  .cal-nav:hover{border-color:var(--cyan);color:#fff}
-  .cal-month-lbl{font-size:15px;font-weight:800;color:#fff;font-family:var(--font-display);letter-spacing:.5px}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:12px}
-  .cal-day-head{font-size:10px;font-weight:700;color:var(--text3);text-align:center;padding:4px 0}
-  .cal-day{min-height:46px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);
-    border-radius:6px;padding:4px 3px;transition:all .15s;position:relative;cursor:default}
-  .cal-day.has-tasks{background:rgba(0,170,255,0.07);border-color:rgba(0,170,255,0.18);cursor:pointer}
-  .cal-day.has-tasks:hover{background:rgba(0,170,255,0.14);border-color:var(--cyan)}
-  .cal-day.today{border-color:rgba(0,229,255,0.5);box-shadow:0 0 8px rgba(0,229,255,0.15)}
-  .cal-day.other-month{opacity:.3}
-  .cal-day.overdue-day{border-color:rgba(255,59,92,0.35);background:rgba(255,59,92,0.05)}
-  .cal-day.cal-selected{border-color:var(--cyan);background:rgba(0,229,255,0.1)}
-  .cal-day-num{font-size:10px;font-weight:700;color:var(--text3);margin-bottom:2px}
-  .cal-day.today .cal-day-num{color:var(--cyan);font-weight:900}
-  .cal-dots{display:flex;flex-wrap:wrap;gap:2px}
-  .cal-dot{width:5px;height:5px;border-radius:50%;display:inline-block}
-  .cal-dot.open{background:var(--blue)}.cal-dot.progress{background:var(--yellow)}
-  .cal-dot.blocked{background:var(--red)}.cal-dot.done{background:var(--green)}
-  .cal-more{font-size:8px;color:var(--text3);font-weight:700}
-  .cal-popup{background:var(--card3);border:1px solid rgba(0,170,255,0.2);border-radius:10px;
-    padding:10px 12px;margin-bottom:10px;animation:cardIn .2s ease}
-  .cal-popup-title{font-size:11px;font-weight:800;color:var(--cyan);margin-bottom:8px}
-  .cal-task-row{display:flex;align-items:center;gap:8px;padding:5px 0;
-    border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer}
-  .cal-task-row:last-child{border-bottom:none}
-  .cal-task-row:hover .cal-task-nm{color:#fff}
-  .cal-task-nm{font-size:12px;font-weight:600;color:var(--text2);flex:1;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .cal-task-who{font-size:10px;color:var(--text3);white-space:nowrap}
-  /* ── COMMENTS PANEL ── */
-  .cpanel-filters{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
-  .cpanel-item{background:var(--card2);border:1px solid rgba(255,255,255,0.07);
-    border-radius:12px;padding:12px 14px;margin-bottom:8px;
-    cursor:pointer;transition:border-color .2s,background .2s;position:relative}
-  .cpanel-item:hover{border-color:rgba(0,170,255,0.3);background:var(--card3)}
-  .cpanel-item.unread{border-color:rgba(0,229,255,0.25);background:rgba(0,170,255,0.04)}
-  .cpanel-item.unread::before{content:'';position:absolute;top:14px;right:-1px;
-    width:3px;height:24px;border-radius:2px;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
-  .cpanel-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-  .cpanel-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));
-    display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;flex-shrink:0}
-  .cpanel-name{font-size:12px;font-weight:700;color:var(--text)}
-  .cpanel-time{font-size:10px;color:var(--text3);margin-right:auto}
-  .unread-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 5px var(--cyan);flex-shrink:0}
-  .cpanel-task{font-size:11px;color:var(--blue);margin-bottom:3px}
-  .cpanel-text{font-size:13px;color:var(--text2);line-height:1.4}
-  .cpanel-hint{font-size:10px;color:var(--text3);margin-top:5px;text-align:left}
-  .mark-all-btn{width:100%;padding:9px;border-radius:8px;background:rgba(0,170,255,0.08);
-    border:1px solid rgba(0,170,255,0.2);color:var(--blue);font-family:var(--font-main);
-    font-weight:700;font-size:12px;cursor:pointer;margin-bottom:10px;transition:all .2s}
-  .mark-all-btn:hover{background:rgba(0,170,255,0.15)}
 
   /* ── COMMENT FEED ── */
   .comment-feed-item{
@@ -1235,7 +1146,8 @@ header{
 
   /* Matrix rain canvas */
   #matrixCanvas {
-    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.35;
+    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.55;
+    display:block !important;
   }
 
 
@@ -1328,6 +1240,176 @@ header{
   .user-btn-count { font-size:11px !important; font-weight:700 !important; }
   .login-label { font-size:11px !important; font-weight:900 !important; letter-spacing:4px !important; }
 
+
+  /* ── TOP SECTION EFFECT ── */
+
+  /* Horizontal scan line sweeping across login-left */
+  .login-left {
+    position:relative;
+    overflow:visible;
+  }
+
+  /* Glowing arc above logo */
+  .login-logo::before {
+    content:'';
+    position:absolute;
+    top:-30px; left:50%; transform:translateX(-50%);
+    width:120px; height:60px;
+    background:radial-gradient(ellipse at 50% 100%, rgba(0,255,120,0.25), transparent 70%);
+    pointer-events:none;
+    animation:arc-pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes arc-pulse {
+    0%,100%{ opacity:0.5; transform:translateX(-50%) scaleX(1); }
+    50%{ opacity:1; transform:translateX(-50%) scaleX(1.2); }
+  }
+
+  /* Horizontal lines left and right of title */
+  .login-title::before,
+  .login-title::after {
+    content:'';
+    position:absolute;
+    top:50%; height:1px; width:30px;
+    background:linear-gradient(90deg, transparent, rgba(0,255,120,0.6));
+    transform:translateY(-50%);
+  }
+  .login-title { position:relative; }
+  .login-title::before { right:calc(100% + 8px); }
+  .login-title::after  { left:calc(100% + 8px); background:linear-gradient(270deg, transparent, rgba(0,255,120,0.6)); }
+
+  /* Corner brackets top-left and top-right of login-right */
+  .login-right {
+    position:relative;
+  }
+  .login-right::before,
+  .login-right::after {
+    content:'';
+    position:absolute;
+    width:20px; height:20px;
+    pointer-events:none;
+  }
+  .login-right::before {
+    top:-1px; right:-1px;
+    border-top:2px solid rgba(0,255,120,0.7);
+    border-right:2px solid rgba(0,255,120,0.7);
+    border-radius:0 12px 0 0;
+    animation:corner-pulse 3s ease-in-out infinite;
+  }
+  .login-right::after {
+    bottom:0; left:0; height:1px; width:100%;
+    background:linear-gradient(90deg,transparent,rgba(0,255,120,0.3),transparent);
+    animation:scanline 4s linear infinite;
+  }
+  @keyframes corner-pulse {
+    0%,100%{ opacity:0.5; }
+    50%{ opacity:1; box-shadow:0 0 8px rgba(0,255,120,0.4); }
+  }
+
+  /* Top-left corner bracket */
+  .login-right .corner-tl {
+    position:absolute;top:-1px;left:-1px;
+    width:20px;height:20px;
+    border-top:2px solid rgba(0,255,120,0.7);
+    border-left:2px solid rgba(0,255,120,0.7);
+    border-radius:12px 0 0 0;
+    animation:corner-pulse 3s ease-in-out infinite 1.5s;
+    pointer-events:none;
+  }
+
+  /* Typewriter dots under title */
+  .login-sub::after {
+    content:'...';
+    animation:typing 1.5s steps(3) infinite;
+    display:inline-block;
+    width:20px;
+    overflow:hidden;
+    vertical-align:bottom;
+  }
+  @keyframes typing {
+    0%{ width:0; }
+    100%{ width:20px; }
+  }
+
+  /* Data stream numbers above logo */
+  .data-stream {
+    font-family:var(--font-mono);
+    font-size:10px;
+    color:rgba(0,255,120,0.35);
+    letter-spacing:3px;
+    margin-bottom:8px;
+    animation:data-flicker 3s ease-in-out infinite;
+    text-shadow:0 0 6px rgba(0,255,120,0.3);
+  }
+  @keyframes data-flicker {
+    0%,100%{ opacity:0.4; }
+    30%{ opacity:0.8; }
+    60%{ opacity:0.3; }
+    80%{ opacity:0.9; }
+  }
+
+
+  /* ── PIN SCREEN TECH EFFECTS ── */
+  .pin-status-bar {
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    margin-bottom:6px;
+    font-family:'Share Tech Mono',monospace;font-size:9px;
+    color:rgba(0,255,120,0.6);letter-spacing:2px;
+  }
+  .pin-status-dot {
+    width:6px;height:6px;border-radius:50%;
+    background:#00ff88;
+    box-shadow:0 0 8px #00ff88;
+    animation:pin-blink 1.2s ease-in-out infinite;
+  }
+  @keyframes pin-blink {
+    0%,100%{ opacity:1; box-shadow:0 0 8px #00ff88; }
+    50%{ opacity:0.3; box-shadow:0 0 3px #00ff88; }
+  }
+  .pin-status-label { color:rgba(0,255,120,0.5); }
+
+  .pin-tech-lines {
+    display:flex;flex-direction:column;gap:3px;
+    margin:0 auto 8px;width:80%;
+  }
+  .pin-tech-line {
+    height:2px;border-radius:1px;
+    background:linear-gradient(90deg,transparent,rgba(0,255,120,0.3),transparent);
+    animation:tech-scan 2s ease-in-out infinite;
+  }
+  @keyframes tech-scan {
+    0%{ background-position:-100% 0; opacity:0.3; }
+    50%{ opacity:0.8; }
+    100%{ background-position:200% 0; opacity:0.3; }
+  }
+
+  /* Spinning ring around avatar */
+  #pinUserAvatar {
+    position:relative;
+    animation:avatar-glow 3s ease-in-out infinite !important;
+  }
+  @keyframes avatar-glow {
+    0%,100%{ box-shadow:0 0 16px rgba(0,255,120,0.2),inset 0 0 8px rgba(0,255,120,0.08) !important; }
+    50%{ box-shadow:0 0 28px rgba(0,255,120,0.4),inset 0 0 16px rgba(0,255,120,0.15) !important; }
+  }
+
+  /* PIN dots enhanced */
+  #pinDots {
+    gap:14px !important;
+    margin-bottom:10px !important;
+  }
+  .pin-dot {
+    width:12px !important; height:12px !important;
+    border-radius:3px !important;
+    border:1.5px solid rgba(0,255,120,0.25) !important;
+    transition:all .2s !important;
+  }
+  .pin-dot.filled {
+    background:#00ff88 !important;
+    border-color:#00ff88 !important;
+    border-radius:3px !important;
+    box-shadow:0 0 14px #00ff88, 0 0 5px #00ff88 !important;
+  }
+
 </style>
 </head>
 <body>
@@ -1337,33 +1419,33 @@ header{
 <div id="userSelectScreen" style="display:none">
   <div class="login-left">
     <div class="login-logo">
-            <svg width="72" height="80" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="52" height="58" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="techShield" x1="0" y1="0" x2="72" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#afffcc"/>
-            <stop offset="50%" stop-color="#00ff88"/>
-            <stop offset="100%" stop-color="#00cc44"/>
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="40%" stop-color="#00ccff"/>
+            <stop offset="100%" stop-color="#0066ff"/>
           </linearGradient>
           <filter id="techGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
           <filter id="techGlow2"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
         <path d="M36 3L5 16v22c0 18 14 34 31 40 17-6 31-22 31-40V16L36 3z"
-          fill="rgba(0,255,120,0.04)" stroke="url(#techShield)" stroke-width="1.5" filter="url(#techGlow)"/>
+          fill="rgba(0,150,255,0.08)" stroke="url(#techShield)" stroke-width="1.5" filter="url(#techGlow)"/>
         <path d="M36 12L12 23v16c0 12 9 23 24 28 15-5 24-16 24-28V23L36 12z"
-          fill="rgba(0,255,120,0.03)" stroke="rgba(0,255,120,0.25)" stroke-width="1"/>
+          fill="rgba(0,150,255,0.05)" stroke="rgba(0,200,255,0.35)" stroke-width="1"/>
         <path d="M24 40l9 9 16-16"
           stroke="url(#techShield)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#techGlow2)"/>
-        <circle cx="36" cy="39" r="12" fill="none" stroke="rgba(0,255,120,0.1)" stroke-width="1" stroke-dasharray="2 4"/>
-        <circle cx="36" cy="3" r="2" fill="#00ff88" opacity=".9" filter="url(#techGlow2)"/>
-        <circle cx="5" cy="16" r="1.5" fill="#00cc66" opacity=".7"/>
-        <circle cx="67" cy="16" r="1.5" fill="#00cc66" opacity=".7"/>
+        <circle cx="36" cy="39" r="12" fill="none" stroke="rgba(0,180,255,0.15)" stroke-width="1" stroke-dasharray="2 4"/>
+        <circle cx="36" cy="3" r="2" fill="#00ccff" opacity=".9" filter="url(#techGlow2)"/>
+        <circle cx="5" cy="16" r="1.5" fill="#0099ff" opacity=".7"/>
+        <circle cx="67" cy="16" r="1.5" fill="#0099ff" opacity=".7"/>
       </svg>
     </div>
     <div class="login-title">SPYDER Team Management Center</div>
     <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:'Rajdhani',sans-serif;background:linear-gradient(90deg,var(--cyan),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;text-shadow:none;filter:drop-shadow(0 0 8px rgba(0,229,255,0.4))">נכתב ע"י משה שושה &nbsp;|&nbsp; מוביל תשתיות טכנולוגיות</div>
     <div class="login-sub">בחר את שמך להמשך</div>
   </div>
-  <div class="login-right">
+  <div class="login-right" style="text-align:center"><div class="corner-tl"></div>
     <!-- Section 1: current user (moshe or assaf) -->
     <!-- Section 1.5: senior manager (hazi) — visible to moshe only -->
     <div id="managerSection" style="margin-bottom:8px;display:none">
@@ -1409,26 +1491,26 @@ header{
 <div id="loginScreen">
   <div class="login-left">
     <div class="login-logo">
-            <svg width="72" height="80" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="52" height="58" viewBox="0 0 72 80" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="techShield" x1="0" y1="0" x2="72" y2="80" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#afffcc"/>
-            <stop offset="50%" stop-color="#00ff88"/>
-            <stop offset="100%" stop-color="#00cc44"/>
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="40%" stop-color="#00ccff"/>
+            <stop offset="100%" stop-color="#0066ff"/>
           </linearGradient>
           <filter id="techGlow"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
           <filter id="techGlow2"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
         <path d="M36 3L5 16v22c0 18 14 34 31 40 17-6 31-22 31-40V16L36 3z"
-          fill="rgba(0,255,120,0.04)" stroke="url(#techShield)" stroke-width="1.5" filter="url(#techGlow)"/>
+          fill="rgba(0,150,255,0.08)" stroke="url(#techShield)" stroke-width="1.5" filter="url(#techGlow)"/>
         <path d="M36 12L12 23v16c0 12 9 23 24 28 15-5 24-16 24-28V23L36 12z"
-          fill="rgba(0,255,120,0.03)" stroke="rgba(0,255,120,0.25)" stroke-width="1"/>
+          fill="rgba(0,150,255,0.05)" stroke="rgba(0,200,255,0.35)" stroke-width="1"/>
         <path d="M24 40l9 9 16-16"
           stroke="url(#techShield)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#techGlow2)"/>
-        <circle cx="36" cy="39" r="12" fill="none" stroke="rgba(0,255,120,0.1)" stroke-width="1" stroke-dasharray="2 4"/>
-        <circle cx="36" cy="3" r="2" fill="#00ff88" opacity=".9" filter="url(#techGlow2)"/>
-        <circle cx="5" cy="16" r="1.5" fill="#00cc66" opacity=".7"/>
-        <circle cx="67" cy="16" r="1.5" fill="#00cc66" opacity=".7"/>
+        <circle cx="36" cy="39" r="12" fill="none" stroke="rgba(0,180,255,0.15)" stroke-width="1" stroke-dasharray="2 4"/>
+        <circle cx="36" cy="3" r="2" fill="#00ccff" opacity=".9" filter="url(#techGlow2)"/>
+        <circle cx="5" cy="16" r="1.5" fill="#0099ff" opacity=".7"/>
+        <circle cx="67" cy="16" r="1.5" fill="#0099ff" opacity=".7"/>
       </svg>
     </div>
     <div class="login-title">SPYDER Team Management Center</div>
@@ -1437,9 +1519,20 @@ header{
   </div>
   <div class="login-right" id="loginRight">
     <div style="text-align:center">
-      <div id="pinUserAvatar" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;margin:0 auto 10px">🛡️</div>
-      <div id="pinUserName" style="font-size:16px;font-weight:800;margin-bottom:4px;color:var(--text2)">מי אתה?</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:20px">הקלד את קוד ה-PIN שלך</div>
+      <!-- Tech status indicators -->
+      <div class="pin-status-bar">
+        <span class="pin-status-dot active"></span>
+        <span class="pin-status-label">SECURE CONNECTION</span>
+        <span class="pin-status-dot active" style="animation-delay:.4s"></span>
+      </div>
+      <div class="pin-tech-lines">
+        <div class="pin-tech-line" style="width:60%;animation-delay:0s"></div>
+        <div class="pin-tech-line" style="width:40%;animation-delay:.3s"></div>
+        <div class="pin-tech-line" style="width:80%;animation-delay:.6s"></div>
+      </div>
+      <div id="pinUserAvatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,rgba(0,255,120,0.2),rgba(0,170,255,0.3));border:2px solid rgba(0,255,120,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;margin:6px auto 8px;box-shadow:0 0 20px rgba(0,255,120,0.25),inset 0 0 12px rgba(0,255,120,0.1)">🛡️</div>
+      <div id="pinUserName" style="font-size:17px;font-weight:900;margin-bottom:4px;color:#afffcc;font-family:'Rajdhani',sans-serif;letter-spacing:2px;text-shadow:0 0 10px rgba(0,255,120,0.4);text-align:center">מי אתה?</div>
+      <div style="font-size:13px;color:rgba(0,220,255,0.85);margin-bottom:16px;font-family:'Share Tech Mono',monospace;letter-spacing:3px;text-shadow:0 0 10px rgba(0,200,255,0.6);font-weight:700">הקלד את קוד ה-PIN שלך</div>
       <div id="pinDots" style="display:flex;gap:12px;justify-content:center;margin-bottom:20px">
         <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
       </div>
@@ -1507,8 +1600,8 @@ header{
   const c = document.getElementById('matrixCanvas');
   const ctx = c.getContext('2d');
   let W, H, cols, drops;
-  const chars = 'SPYDER01アイウエオカキクケコサシスセソタチツテトナニヌネノ';
-  const fontSize = 13;
+  const chars = '0123456789';
+  const fontSize = 14;
 
   function init(){
     W = c.width = window.innerWidth;
@@ -1522,7 +1615,10 @@ header{
   function isLoginVisible(){
     const ls = document.getElementById('loginScreen');
     const us = document.getElementById('userSelectScreen');
-    return (ls && ls.style.display !== 'none') ||
+    const app = document.getElementById('app');
+    // if app is hidden, login is visible
+    if (app && (app.style.display === 'none' || app.style.display === '')) return true;
+    return (ls && ls.style.display !== 'none' && ls.style.display !== '') ||
            (us && us.style.display === 'flex');
   }
 
@@ -1536,10 +1632,10 @@ header{
       const ch = chars[Math.floor(Math.random()*chars.length)];
       const y = drops[i]*fontSize;
       // bright head
-      ctx.fillStyle = drops[i]*fontSize < H*0.3 ? '#afffcc' : '#00ff66';
+      ctx.fillStyle = drops[i]*fontSize < H*0.15 ? '#ffffff' : drops[i]*fontSize < H*0.4 ? '#afffcc' : '#00cc55';
       ctx.fillText(ch, i*fontSize, y);
       if(y > H && Math.random()>0.975) drops[i] = 0;
-      drops[i] += Math.random()*0.4+0.1;
+      drops[i] += Math.random()*0.3+0.08;
     }
   }
   draw();
@@ -1807,7 +1903,6 @@ header{
       });
     });
     allComments.sort((a,b) => b.ts - a.ts);
-    if (currentUser) _refreshCommentsBadge();
   });
 
 
@@ -2260,24 +2355,17 @@ header{
       document.getElementById('tabsRow').innerHTML = `
         <button class="tab active" onclick="setTab('dash',this)">📊 דשבורד</button>
         <button class="tab" onclick="setTab('tasks',this)">✅ משימות</button>
-        <button class="tab" onclick="setTab('search',this)">🔍 חיפוש</button>
-        <button class="tab" onclick="setTab('calendar',this)">📅 לוח</button>
-        <button class="tab" id="commentsTab" onclick="setTab('comments',this)">💬 תגובות</button>
         <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>
         ${isTrashUser ? `<button class="tab" id="trashTab" onclick="setTab('trash',this)">🗑️ סל${trash.length?' ('+trash.length+')':''}</button>` : ''}`;
     } else if (u.role === 'manager') {
       document.getElementById('tabsRow').innerHTML = `
         <button class="tab active" onclick="setTab('dash',this)">📊 דשבורד</button>
         <button class="tab" onclick="setTab('tasks',this)">✅ משימות</button>
-        <button class="tab" onclick="setTab('search',this)">🔍 חיפוש</button>
-        <button class="tab" onclick="setTab('calendar',this)">📅 לוח</button>
         <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>`;
     } else {
       document.getElementById('tabsRow').innerHTML = `
         <button class="tab active" onclick="setTab('dash',this)">📊 דשבורד</button>
         <button class="tab" onclick="setTab('tasks',this)">✅ משימות</button>
-        <button class="tab" onclick="setTab('search',this)">🔍 חיפוש</button>
-        <button class="tab" onclick="setTab('calendar',this)">📅 לוח</button>
         <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>`;
     }
     initNotifListener(uid);
@@ -2572,13 +2660,10 @@ header{
   function render() {
     if (!currentUser) return;
     const content = document.getElementById('mainContent');
-    if      (currentTab === 'dash')     renderDash(content);
-    else if (currentTab === 'tasks')    renderTasks(content);
-    else if (currentTab === 'add')      renderAdd(content);
-    else if (currentTab === 'trash')    renderTrash(content);
-    else if (currentTab === 'search')   renderSearch(content);
-    else if (currentTab === 'calendar') renderCalendar(content);
-    else if (currentTab === 'comments') renderCommentsPanel(content);
+    if (currentTab === 'dash')  renderDash(content);
+    else if (currentTab === 'tasks') renderTasks(content);
+    else if (currentTab === 'add')   renderAdd(content);
+    else if (currentTab === 'trash') renderTrash(content);
   }
 
   // ── DASHBOARD ──────────────────────────────────────
@@ -2650,21 +2735,6 @@ header{
         </div>`;
       });
       html += `</div>`;
-
-      // ── MINI CHARTS ──
-      html += `
-      <div class="sec-lbl">📈 סטטיסטיקות</div>
-      <div class="chart-card">
-        <div class="chart-title">עומס פעיל לפי חבר צוות</div>
-        <div class="bar-chart" id="dashBarChart"></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">התפלגות סטטוסים — כלל המשימות</div>
-        <div class="donut-wrap">
-          <svg id="dashDonutSvg" width="90" height="90" viewBox="0 0 90 90" style="flex-shrink:0"></svg>
-          <div class="donut-legend" id="dashDonutLegend"></div>
-        </div>
-      </div>`;
 
       // recent section removed
     } else {
@@ -2756,69 +2826,6 @@ header{
     }
 
     wrap.innerHTML = html;
-
-    // render charts after DOM insert (admin/manager only)
-    if (USERS[currentUser]?.role === 'admin' || USERS[currentUser]?.role === 'manager') {
-      setTimeout(() => { _renderBarChart(); _renderDonut(); _refreshCommentsBadge(); }, 30);
-    }
-  }
-
-  /* ── CHART RENDERERS ── */
-  function _renderBarChart() {
-    const el = document.getElementById('dashBarChart');
-    if (!el) return;
-    const uids = ['elad','alik','rif','tal','moshe','assaf','omer'];
-    const clrs = ['#00aaff','#00e5ff','#a259ff','#ffd600','#00ff9d','#ff3b5c','#f59e0b'];
-    const vals = uids.map(uid => tasks.filter(t=>isAssignedTo(t,uid)&&t.status!=='done').length);
-    const mx = Math.max(1,...vals);
-    el.innerHTML = uids.map((uid,i)=>{
-      const v=vals[i], pct=Math.round(v/mx*100);
-      return `<div class="bar-col">
-        <div class="bar-val">${v}</div>
-        <div class="bar-fill" style="height:${Math.max(pct,4)}%;background:linear-gradient(180deg,${clrs[i]},${clrs[i]}66)" title="${USERS[uid].name.split(' ')[0]}: ${v}"></div>
-        <div class="bar-lbl">${USERS[uid].name.split(' ')[0]}</div>
-      </div>`;
-    }).join('');
-  }
-
-  function _renderDonut() {
-    const svg = document.getElementById('dashDonutSvg');
-    const leg = document.getElementById('dashDonutLegend');
-    if (!svg) return;
-    const all = tasks;
-    const data = [
-      {k:'open',     l:'פתוח',    c:'#00aaff', n:all.filter(t=>t.status==='open').length},
-      {k:'progress', l:'בביצוע',  c:'#ffd600', n:all.filter(t=>t.status==='progress').length},
-      {k:'blocked',  l:'ממתין',   c:'#ff3b5c', n:all.filter(t=>t.status==='blocked').length},
-      {k:'done',     l:'בוצע',    c:'#00ff9d', n:all.filter(t=>t.status==='done').length},
-    ];
-    const total=data.reduce((s,d)=>s+d.n,0);
-    if (!total){svg.innerHTML='';return;}
-    const R=32,cx=45,cy=45,sw=12,circ=2*Math.PI*R;
-    let off=0,paths='';
-    data.forEach(d=>{
-      if(!d.n)return;
-      const dash=(d.n/total)*circ;
-      paths+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${d.c}" stroke-width="${sw}"
-        stroke-dasharray="${dash.toFixed(2)} ${(circ-dash).toFixed(2)}"
-        stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"/>`;
-      off+=dash;
-    });
-    svg.innerHTML=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="${sw}"/>
-      ${paths}
-      <text x="${cx}" y="${cy+5}" text-anchor="middle" font-size="14" font-weight="900" fill="#fff" font-family="'Share Tech Mono',monospace">${total}</text>`;
-    if(leg) leg.innerHTML=data.map(d=>`<div class="donut-item">
-      <div class="donut-dot" style="background:${d.c}"></div>
-      <div class="donut-lbl">${d.l}</div>
-      <div class="donut-cnt">${d.n}</div>
-    </div>`).join('');
-  }
-
-  function _refreshCommentsBadge() {
-    const tab=document.getElementById('commentsTab');
-    if(!tab) return;
-    const unread=allComments.filter(c=>!readComments.has(c.id)&&c.user!==currentUser).length;
-    tab.textContent = unread ? `💬 תגובות (${unread})` : '💬 תגובות';
   }
 
   function goToTask(taskId) {
@@ -3035,257 +3042,6 @@ header{
     taskPersonFilter = uid;
     const tasksBtn = Array.from(document.querySelectorAll('.tab')).find(b=>b.textContent.includes('משימות'));
     setTab('tasks', tasksBtn);
-  }
-
-  // ── SEARCH & FILTER ────────────────────────────────
-  let searchQuery='', searchSt='all', searchPr='all', searchPerson='all';
-
-  function renderSearch(wrap) {
-    const isAdmin = ['admin','manager'].includes(USERS[currentUser]?.role);
-    const pool = isAdmin ? tasks : tasks.filter(t=>isAssignedTo(t,currentUser));
-
-    let filtered = pool;
-    const q = searchQuery.trim().toLowerCase();
-    if (q) filtered = filtered.filter(t=>
-      (t.name||'').toLowerCase().includes(q) ||
-      (t.notes||'').toLowerCase().includes(q) ||
-      (t.steps ? Object.values(t.steps).some(s=>(s.name||'').toLowerCase().includes(q)) : false)
-    );
-    if (searchSt !== 'all') filtered = filtered.filter(t=>t.status===searchSt);
-    if (searchPr !== 'all') filtered = filtered.filter(t=>String(t.priority)===searchPr);
-    if (searchPerson !== 'all') filtered = filtered.filter(t=>isAssignedTo(t,searchPerson));
-
-    function hl(text) {
-      if (!q || !text) return esc(text||'');
-      const lo=text.toLowerCase(), idx=lo.indexOf(q);
-      if(idx===-1) return esc(text);
-      return esc(text.slice(0,idx))+`<mark class="search-highlight">${esc(text.slice(idx,idx+q.length))}</mark>`+esc(text.slice(idx+q.length));
-    }
-
-    let html = `
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input class="search-input" id="srchInp" placeholder="חפש שם משימה, הערות, שלבים..."
-        value="${esc(searchQuery)}"
-        oninput="searchQuery=this.value;render()"
-        onkeydown="if(event.key==='Escape'){searchQuery='';render()}"/>
-    </div>
-    <div class="filter-row">
-      <span style="font-size:10px;color:var(--text3);font-weight:700">סטטוס:</span>
-      ${[['all','הכל'],['open','פתוח'],['progress','בביצוע'],['blocked','ממתין'],['done','בוצע']].map(([k,l])=>
-        `<button class="filter-chip ${searchSt===k?'active':''}" onclick="searchSt='${k}';render()">${l}</button>`).join('')}
-    </div>
-    <div class="filter-row">
-      <span style="font-size:10px;color:var(--text3);font-weight:700">עדיפות:</span>
-      ${[['all','הכל'],['1','🔴 דחוף'],['2','🟡 גבוה'],['3','🔵 רגיל'],['4','⚪ נמוך']].map(([k,l])=>
-        `<button class="filter-chip ${searchPr===k?'active':''}" onclick="searchPr='${k}';render()">${l}</button>`).join('')}
-    </div>`;
-
-    if (isAdmin) {
-      html += `<div class="filter-row">
-        <span style="font-size:10px;color:var(--text3);font-weight:700">אחראי:</span>
-        <button class="filter-chip ${searchPerson==='all'?'active':''}" onclick="searchPerson='all';render()">הכל</button>
-        ${['elad','alik','rif','tal','moshe','assaf','omer'].map(uid=>
-          `<button class="filter-chip ${searchPerson===uid?'active':''}" onclick="searchPerson='${uid}';render()">${USERS[uid].name.split(' ')[0]}</button>`
-        ).join('')}
-      </div>`;
-    }
-
-    const anyF = q || searchSt!=='all' || searchPr!=='all' || searchPerson!=='all';
-    if (anyF) html += `<div class="search-results-count">נמצאו ${filtered.length} משימות</div>`;
-
-    if (!filtered.length) {
-      html += `<div class="empty"><div class="empty-ico">🔍</div><div>${q?'לא נמצאו תוצאות':'הכנס טקסט לחיפוש או בחר פילטר'}</div></div>`;
-    } else {
-      const byS = {blocked:[],progress:[],open:[],done:[]};
-      filtered.forEach(t=>(byS[t.status]||byS.open).push(t));
-      const ord=['blocked','progress','open','done'];
-      const lblS={blocked:'⏳ ממתין',progress:'🟡 בביצוע',open:'🔵 פתוח',done:'✅ בוצע'};
-      const todayS=new Date().toISOString().split('T')[0];
-      ord.forEach(s=>{
-        if(!byS[s].length) return;
-        html+=`<div class="sec-lbl">${lblS[s]} (${byS[s].length})</div>`;
-        byS[s].forEach(t=>{
-          const dlCls = t.deadline ? (t.deadline<todayS&&t.status!=='done'?'overdue':t.deadline<=new Date(Date.now()+3*86400000).toISOString().split('T')[0]?'soon':'ok') : '';
-          const notesHl = t.notes&&q&&t.notes.toLowerCase().includes(q)
-            ? `<div class="task-notes">${hl(t.notes)}</div>` : '';
-          const isAdmin2 = USERS[currentUser]?.role==='admin';
-          html+=`<div class="task-card s-${t.status}" style="cursor:pointer" onclick="openTaskView(tasks.find(x=>x.id==='${t.id}'))">
-            <div class="tc-top">
-              <div class="tc-name">${hl(t.name||'')}</div>
-              <div class="tc-actions">
-                ${isAdmin2?`<button class="iBtn edit" onclick="event.stopPropagation();openEdit('${t.id}')">✏️</button>`:''}
-              </div>
-            </div>
-            <div class="tc-meta">
-              ${(t.assignees||[t.assignee]).filter(Boolean).map(uid=>`<span class="badge assignee">👤 ${(USERS[uid]?.name||uid).split(' ')[0]}</span>`).join('')}
-              <span class="badge status-${t.status}">${STATUS_LABEL[t.status||'open']}</span>
-              ${t.deadline?`<span class="deadline-badge ${dlCls}">📅 ${t.deadline}</span>`:''}
-            </div>
-            ${notesHl}
-          </div>`;
-        });
-      });
-    }
-
-    wrap.innerHTML = html;
-    const inp=document.getElementById('srchInp');
-    if(inp&&searchQuery){inp.focus();inp.setSelectionRange(inp.value.length,inp.value.length);}
-  }
-
-  // ── CALENDAR ──────────────────────────────────────
-  let calY=new Date().getFullYear(), calM=new Date().getMonth(), calSelDay=null;
-
-  function renderCalendar(wrap) {
-    const isAdmin=['admin','manager'].includes(USERS[currentUser]?.role);
-    const pool=isAdmin?tasks:tasks.filter(t=>isAssignedTo(t,currentUser));
-    const dlMap={};
-    pool.filter(t=>t.deadline).forEach(t=>{if(!dlMap[t.deadline])dlMap[t.deadline]=[];dlMap[t.deadline].push(t);});
-
-    const today=new Date().toISOString().split('T')[0];
-    const mNames=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-    const dNames=['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
-    const first=new Date(calY,calM,1), last=new Date(calY,calM+1,0);
-    const startDow=first.getDay();
-
-    let html=`<div class="chart-card" style="padding:14px">
-      <div class="cal-header">
-        <button class="cal-nav" onclick="calM--;if(calM<0){calM=11;calY--;}calSelDay=null;render()">‹</button>
-        <div class="cal-month-lbl">${mNames[calM]} ${calY}</div>
-        <button class="cal-nav" onclick="calM++;if(calM>11){calM=0;calY++;}calSelDay=null;render()">›</button>
-      </div>
-      <div class="cal-grid">
-        ${dNames.map(d=>`<div class="cal-day-head">${d}</div>`).join('')}`;
-
-    for(let i=0;i<startDow;i++) html+=`<div class="cal-day other-month"></div>`;
-    for(let d=1;d<=last.getDate();d++){
-      const ds=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const dt=dlMap[ds]||[];
-      const isToday=ds===today, isSel=calSelDay===ds;
-      const hasOvd=dt.some(t=>t.status!=='done'&&ds<today);
-      const cls=['cal-day',dt.length?'has-tasks':'',isToday?'today':'',hasOvd?'overdue-day':'',isSel?'cal-selected':''].filter(Boolean).join(' ');
-      const dots=dt.slice(0,5).map(t=>`<span class="cal-dot ${t.status||'open'}"></span>`).join('');
-      const more=dt.length>5?`<div class="cal-more">+${dt.length-5}</div>`:'';
-      html+=`<div class="${cls}" onclick="${dt.length?`calClickDay('${ds}')`:''}" >
-        <div class="cal-day-num">${d}</div>
-        <div class="cal-dots">${dots}</div>${more}
-      </div>`;
-    }
-    const tot=startDow+last.getDate(), rem=tot%7===0?0:7-(tot%7);
-    for(let i=0;i<rem;i++) html+=`<div class="cal-day other-month"></div>`;
-    html+=`</div></div>`;
-
-    // Selected day popup
-    if(calSelDay&&dlMap[calSelDay]){
-      const [sy,sm,sd]=calSelDay.split('-');
-      html+=`<div class="cal-popup">
-        <div class="cal-popup-title">📅 ${parseInt(sd)}/${parseInt(sm)} — ${dlMap[calSelDay].length} משימות</div>
-        ${dlMap[calSelDay].map(t=>`<div class="cal-task-row" onclick="openTaskView(tasks.find(x=>x.id==='${t.id}'))">
-          <span class="cal-dot ${t.status||'open'}"></span>
-          <div class="cal-task-nm">${esc(t.name)}</div>
-          <div class="cal-task-who">${(t.assignees||[t.assignee]).filter(Boolean).map(uid=>(USERS[uid]?.name||uid).split(' ')[0]).join(', ')}</div>
-        </div>`).join('')}
-      </div>`;
-    }
-
-    // Overdue
-    const ovdTasks=Object.entries(dlMap).filter(([d])=>d<today).flatMap(([,arr])=>arr.filter(t=>t.status!=='done'));
-    if(ovdTasks.length){
-      html+=`<div class="sec-lbl" style="color:#fca5a5">⚠️ פגי תוקף (${ovdTasks.length})</div>`;
-      ovdTasks.sort((a,b)=>a.deadline.localeCompare(b.deadline)).forEach(t=>{
-        html+=`<div class="task-card s-${t.status}" style="cursor:pointer" onclick="openTaskView(tasks.find(x=>x.id==='${t.id}'))">
-          <div class="tc-top"><div class="tc-name">${esc(t.name)}</div></div>
-          <div class="tc-meta">
-            <span class="deadline-badge overdue">📅 ${t.deadline}</span>
-            ${(t.assignees||[t.assignee]).filter(Boolean).map(uid=>`<span class="badge assignee">👤 ${(USERS[uid]?.name||uid).split(' ')[0]}</span>`).join('')}
-          </div>
-        </div>`;
-      });
-    }
-
-    // Upcoming
-    const upcoming=Object.entries(dlMap).filter(([d])=>d>=today).sort(([a],[b])=>a.localeCompare(b)).slice(0,8);
-    if(upcoming.length){
-      html+=`<div class="sec-lbl">⏰ דדליינים קרובים</div>`;
-      upcoming.forEach(([date,arr])=>{
-        const [sy,sm,sd]=date.split('-');
-        const dLeft=Math.ceil((new Date(date)-new Date(today))/86400000);
-        const dLbl=dLeft===0?'היום!':dLeft===1?'מחר':`עוד ${dLeft} ימים`;
-        html+=`<div style="margin-bottom:10px">
-          <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:4px">📅 ${parseInt(sd)}/${parseInt(sm)}/${sy} <span style="color:${dLeft<3?'var(--yellow)':'var(--text3)'}">${dLbl}</span></div>
-          ${arr.map(t=>`<div class="cal-task-row" onclick="openTaskView(tasks.find(x=>x.id==='${t.id}'))">
-            <span class="cal-dot ${t.status||'open'}"></span>
-            <div class="cal-task-nm">${esc(t.name)}</div>
-            <div class="cal-task-who">${(t.assignees||[t.assignee]).filter(Boolean).map(uid=>(USERS[uid]?.name||uid).split(' ')[0]).join(', ')}</div>
-          </div>`).join('')}
-        </div>`;
-      });
-    }
-
-    if(!ovdTasks.length&&!upcoming.length)
-      html+=`<div class="empty" style="padding:24px"><div class="empty-ico">📅</div><div>אין דדליינים מוגדרים</div></div>`;
-
-    wrap.innerHTML=html;
-  }
-
-  function calClickDay(ds){calSelDay=calSelDay===ds?null:ds;render();}
-
-  // ── COMMENTS PANEL (admin) ─────────────────────────
-  let commentsPF='all';
-
-  function renderCommentsPanel(wrap) {
-    if(USERS[currentUser]?.role!=='admin'){
-      wrap.innerHTML='<div class="empty"><div class="empty-ico">🔒</div><div>גישה למנהלים בלבד</div></div>';return;
-    }
-    const others=allComments.filter(c=>c.user!==currentUser).sort((a,b)=>b.ts-a.ts);
-    const unread=others.filter(c=>!readComments.has(c.id));
-    let filtered=others;
-    if(commentsPF==='unread') filtered=unread;
-    else if(commentsPF!=='all') filtered=others.filter(c=>c.user===commentsPF);
-    const writers=[...new Set(others.map(c=>c.user))];
-
-    let html=`<div class="cpanel-filters">
-      <button class="filter-chip ${commentsPF==='all'?'active':''}" onclick="commentsPF='all';render()">הכל (${others.length})</button>
-      <button class="filter-chip ${commentsPF==='unread'?'active':''}" onclick="commentsPF='unread';render()">${unread.length?'🔵 ':''}לא נקראו (${unread.length})</button>
-      ${writers.map(uid=>`<button class="filter-chip ${commentsPF===uid?'active':''}" onclick="commentsPF='${uid}';render()">${(USERS[uid]?.name||uid).split(' ')[0]}</button>`).join('')}
-    </div>`;
-
-    if(unread.length) html+=`<button class="mark-all-btn" onclick="markAllRead()">✓ סמן הכל כנקרא (${unread.length})</button>`;
-
-    if(!filtered.length){
-      html+=`<div class="empty" style="padding:30px"><div class="empty-ico">💬</div><div>${commentsPF==='unread'?'אין הערות שלא נקראו':'אין הערות'}</div></div>`;
-    } else {
-      filtered.forEach(c=>{
-        const u2=USERS[c.user]||{name:c.user,initials:'?'};
-        const d=new Date(c.ts||0);
-        const ds=d.getDate()+'/'+(d.getMonth()+1)+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
-        const isUnread=!readComments.has(c.id);
-        html+=`<div class="cpanel-item ${isUnread?'unread':''}" onclick="openCmtTask('${c.taskId}','${c.id}')">
-          <div class="cpanel-top">
-            <div class="cpanel-avatar">${u2.initials||'?'}</div>
-            <div class="cpanel-name">${esc(u2.name)}</div>
-            <div class="cpanel-time">${ds}</div>
-            ${isUnread?'<div class="unread-dot"></div>':''}
-          </div>
-          <div class="cpanel-task">📋 ${esc(c.taskName)} › ${esc(c.stepName)}</div>
-          <div class="cpanel-text">${esc(c.text)}</div>
-          <div class="cpanel-hint">לחץ לפתיחת המשימה ←</div>
-        </div>`;
-      });
-    }
-    wrap.innerHTML=html;
-    _refreshCommentsBadge();
-  }
-
-  function openCmtTask(taskId,commentId){
-    readComments.add(commentId);
-    const t=tasks.find(x=>x.id===taskId);
-    if(t){openTaskView(t);if(currentTab==='comments')setTimeout(()=>render(),80);}
-  }
-
-  function markAllRead(){
-    allComments.filter(c=>c.user!==currentUser).forEach(c=>readComments.add(c.id));
-    _refreshCommentsBadge();render();
   }
 
   // ── ADD FORM ───────────────────────────────────────
