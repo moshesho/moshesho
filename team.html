@@ -1900,8 +1900,8 @@ header{
     <div class="m-lbl">שם המשימה</div>
     <input class="m-input" id="mTaskName" placeholder="תיאור המשימה..."/>
 
-    <div class="m-lbl">📁 פרויקט</div>
-    <div class="meta-row" id="mProjectRow" style="flex-wrap:wrap">
+    <div style="font-size:11px;font-weight:900;letter-spacing:2px;color:#00e5ff;margin:10px 0 6px;text-transform:uppercase;">📁 פרויקט</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;" id="mProjectRow">
       <button class="mchip" data-proj="" onclick="setProjChip(this,'')">ללא</button>
       <button class="mchip" data-proj="Romania" onclick="setProjChip(this,'Romania')">Romania</button>
       <button class="mchip" data-proj="ADSS" onclick="setProjChip(this,'ADSS')">ADSS</button>
@@ -1909,7 +1909,7 @@ header{
       <button class="mchip" data-proj="LMCP" onclick="setProjChip(this,'LMCP')">LMCP</button>
       <button class="mchip" data-proj="אחר" onclick="setProjChip(this,'אחר')">אחר ✏️</button>
     </div>
-    <input class="m-input" id="mProjectName" placeholder="או הקלד שם פרויקט חופשי..." style="margin-top:6px;height:38px!important;display:block!important;"/>
+    <input class="m-input" id="mProjectName" placeholder="או הקלד שם פרויקט חופשי..." style="margin-top:6px;height:38px;display:block;width:100%;box-sizing:border-box;"/>
 
     <div class="m-lbl">תיאור משימה / סטטוס</div>
     <textarea class="m-input" id="mTaskNotes" placeholder="תיאור משימה..." rows="1" style="height:42px!important;max-height:42px!important;resize:none;width:100%;box-sizing:border-box"></textarea>
