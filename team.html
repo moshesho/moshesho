@@ -2932,10 +2932,25 @@ header{
   function render() {
     if (!currentUser) return;
     const content = document.getElementById('mainContent');
+
+    // save search field state before render
+    const searchInp = document.getElementById('taskSearchInp');
+    const searchVal = searchInp ? searchInp.value : null;
+    const searchPos = searchInp ? searchInp.selectionStart : null;
+
     if (currentTab === 'dash')  renderDash(content);
     else if (currentTab === 'tasks') renderTasks(content);
     else if (currentTab === 'add')   renderAdd(content);
     else if (currentTab === 'trash') renderTrash(content);
+
+    // restore search focus after render
+    if (currentTab === 'tasks' && searchVal !== null) {
+      const newInp = document.getElementById('taskSearchInp');
+      if (newInp) {
+        newInp.focus();
+        try { newInp.setSelectionRange(searchPos, searchPos); } catch(e){}
+      }
+    }
   }
 
   // ── DASHBOARD ──────────────────────────────────────
