@@ -68,7 +68,7 @@ body::after{content:'';position:fixed;inset:0;
     padding:40px 20px;
     overflow-y:auto;
   }
-  .login-left{text-align:center;margin-bottom:10px;position:relative;}
+  .login-left{text-align:center;margin-bottom:4px;position:relative;}
   .login-logo{font-size:56px}
   .login-title{font-size:18px}
   .login-right{
@@ -173,7 +173,7 @@ body::after{content:'';position:fixed;inset:0;
 .login-title{font-size:22px;font-weight:900;margin-bottom:4px;
   background:linear-gradient(135deg,var(--blue),var(--cyan));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.login-sub{font-size:11px;color:var(--text2);margin-bottom:12px}
+.login-sub{font-size:11px;color:var(--text2);margin-bottom:6px}
 .login-label{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--blue);margin-bottom:6px;width:100%;max-width:340px;font-family:var(--font-display);text-shadow:0 0 6px rgba(0,170,255,0.3);}
 .user-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:340px;margin-bottom:10px}
 .user-btn-count{
@@ -459,8 +459,8 @@ header{
     }
     .pin-dot.filled{background:var(--blue);border-color:var(--blue);box-shadow:0 0 8px rgba(59,130,246,.5)}
     .pin-pad{
-      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
-      width:90vw;max-width:320px;margin:0 auto;
+      display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+      width:90vw;max-width:300px;margin:0 auto;
       direction:ltr;
     }
     .pin-key{
@@ -471,7 +471,7 @@ header{
       transition:all .15s;display:flex;align-items:center;justify-content:center;
       box-shadow:0 4px 16px rgba(0,0,0,0.6),inset 0 1px 0 rgba(0,255,120,0.08);
       position:relative;overflow:hidden;
-      min-height:70px;
+      min-height:62px;
     }
     .pin-key::before{
       content:'';position:absolute;inset:0;
@@ -1395,7 +1395,7 @@ header{
   /* PIN dots enhanced */
   #pinDots {
     gap:14px !important;
-    margin-bottom:10px !important;
+    margin-bottom:6px !important;
   }
   .pin-dot {
     width:12px !important; height:12px !important;
@@ -1519,20 +1519,10 @@ header{
   </div>
   <div class="login-right" id="loginRight">
     <div style="text-align:center">
-      <!-- Tech status indicators -->
-      <div class="pin-status-bar">
-        <span class="pin-status-dot active"></span>
-        <span class="pin-status-label">SECURE CONNECTION</span>
-        <span class="pin-status-dot active" style="animation-delay:.4s"></span>
-      </div>
-      <div class="pin-tech-lines">
-        <div class="pin-tech-line" style="width:60%;animation-delay:0s"></div>
-        <div class="pin-tech-line" style="width:40%;animation-delay:.3s"></div>
-        <div class="pin-tech-line" style="width:80%;animation-delay:.6s"></div>
-      </div>
-      <div id="pinUserAvatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,rgba(0,255,120,0.2),rgba(0,170,255,0.3));border:2px solid rgba(0,255,120,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;margin:6px auto 8px;box-shadow:0 0 20px rgba(0,255,120,0.25),inset 0 0 12px rgba(0,255,120,0.1)">🛡️</div>
+
+      <div id="pinUserAvatar" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,rgba(0,255,120,0.2),rgba(0,170,255,0.3));border:2px solid rgba(0,255,120,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;margin:2px auto 6px;box-shadow:0 0 20px rgba(0,255,120,0.25),inset 0 0 12px rgba(0,255,120,0.1)">🛡️</div>
       <div id="pinUserName" style="font-size:17px;font-weight:900;margin-bottom:4px;color:#afffcc;font-family:'Rajdhani',sans-serif;letter-spacing:2px;text-shadow:0 0 10px rgba(0,255,120,0.4);text-align:center">מי אתה?</div>
-      <div style="font-size:13px;color:rgba(0,220,255,0.85);margin-bottom:16px;font-family:'Share Tech Mono',monospace;letter-spacing:3px;text-shadow:0 0 10px rgba(0,200,255,0.6);font-weight:700">הקלד את קוד ה-PIN שלך</div>
+      <div style="font-size:13px;color:rgba(0,220,255,0.85);margin-bottom:8px;font-family:'Share Tech Mono',monospace;letter-spacing:3px;text-shadow:0 0 10px rgba(0,200,255,0.6);font-weight:700">הקלד את קוד ה-PIN שלך</div>
       <div id="pinDots" style="display:flex;gap:12px;justify-content:center;margin-bottom:20px">
         <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
       </div>
