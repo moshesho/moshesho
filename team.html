@@ -3348,10 +3348,7 @@ header{
       );
     }
 
-    // show count
-    if (taskSearchQuery || taskStatusFilter !== 'all' || taskPrioFilter !== 'all') {
-      html += `<div class="search-count">${filtered.length} תוצאות נמצאו</div>`;
-    }
+    html += `<div class="search-count" id="searchCountEl" style="display:${(taskSearchQuery||taskStatusFilter!=='all'||taskPrioFilter!=='all')?'':' none'}">` + filtered.length + ' תוצאות נמצאו</div>';
 
     const byStatus = {open:[],progress:[],blocked:[],done:[]};
     filtered.forEach(t=>(byStatus[t.status]||byStatus.open).push(t));
@@ -3388,7 +3385,39 @@ header{
     taskSearchQuery = v.toLowerCase();
     const clearBtn = document.getElementById('searchClearBtn');
     if (clearBtn) clearBtn.style.display = v ? 'block' : 'none';
-    applyTaskFilters();
+    // Don't re-render — just filter existing cards in DOM
+    filterTaskCards();
+  }
+  function filterTaskCards() {
+    const q = taskSearchQuery;
+    const cards = document.querySelectorAll('.task-card');
+    let visible = 0;
+    cards.forEach(card => {
+      const txt = card.textContent.toLowerCase();
+      const show = !q || txt.includes(q);
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    // update count
+    let countEl = document.getElementById('searchCountEl');
+    if (countEl) {
+      if (q) {
+        countEl.textContent = visible + ' תוצאות נמצאו';
+        countEl.style.display = '';
+      } else {
+        countEl.style.display = 'none';
+      }
+    }
+    // show/hide sec-lbl if all cards in section hidden
+    document.querySelectorAll('.sec-lbl').forEach(lbl => {
+      let next = lbl.nextElementSibling;
+      let hasVisible = false;
+      while (next && next.classList.contains('task-card')) {
+        if (next.style.display !== 'none') hasVisible = true;
+        next = next.nextElementSibling;
+      }
+      lbl.style.display = hasVisible ? '' : 'none';
+    });
   }
   function applyTaskFilters() { render(); }
   function clearSearch() {
@@ -3397,7 +3426,7 @@ header{
     if (inp) inp.value = '';
     const clearBtn = document.getElementById('searchClearBtn');
     if (clearBtn) clearBtn.style.display = 'none';
-    applyTaskFilters();
+    filterTaskCards();
   }
   function goToUserTasks(uid) {
     taskPersonFilter = uid;
