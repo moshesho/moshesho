@@ -3871,21 +3871,7 @@ header{
 
     document.getElementById('modalTitle').textContent = '✏️ עריכת משימה';
     document.getElementById('mTaskName').value  = t.name||'';
-    // set project chip
-    mProjectVal = t.project||'';
-    document.querySelectorAll('#mProjectRow .mchip').forEach(b=>b.classList.remove('sel'));
-    const projChip = document.querySelector('#mProjectRow .mchip[data-proj="'+mProjectVal+'"]');
-    const customInp = document.getElementById('mProjectName');
-    if (projChip) {
-      projChip.classList.add('sel');
-      customInp.value = mProjectVal;
-    } else if (mProjectVal) {
-      document.querySelector('#mProjectRow .mchip[data-proj="אחר"]').classList.add('sel');
-      customInp.value = mProjectVal;
-    } else {
-      document.querySelector('#mProjectRow .mchip[data-proj=""]').classList.add('sel');
-      customInp.value = '';
-    }
+    document.getElementById('mProjectName').value = t.project||'';
     document.getElementById('mTaskNotes').value = t.notes||'';
     document.getElementById('mDeadline').value  = t.deadline||'';
 
@@ -3913,10 +3899,6 @@ header{
     editId=null; mAssignee=null; mPrio=3; mStatus='open';
     document.getElementById('modalTitle').textContent='➕ משימה חדשה';
     document.getElementById('mTaskName').value='';
-    // reset project chips
-    mProjectVal='';
-    document.querySelectorAll('#mProjectRow .mchip').forEach(b=>b.classList.remove('sel'));
-    document.querySelector('#mProjectRow .mchip[data-proj=""]').classList.add('sel');
     document.getElementById('mProjectName').value='';
     document.getElementById('mTaskNotes').value='';
     document.getElementById('mDeadline').value='';
