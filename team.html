@@ -390,7 +390,7 @@ header{
 .m-box{background:linear-gradient(160deg,var(--card3),var(--card));border-radius:26px 26px 0 0;
   padding:20px 20px 44px;width:100%;border-top:1px solid rgba(59,130,246,0.2);
   transform:translateY(40px);transition:transform .3s cubic-bezier(.34,1.2,.64,1);
-  box-shadow:0 -20px 60px rgba(0,0,0,.7);max-height:88dvh;overflow-y:auto}
+  box-shadow:0 -20px 60px rgba(0,0,0,.7);max-height:92dvh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .m-overlay.open .m-box{transform:translateY(0)}
 .m-handle{width:36px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin:0 auto 16px}
 .m-title{font-size:16px;font-weight:900;background:linear-gradient(135deg,var(--blue),var(--cyan));
@@ -1632,6 +1632,13 @@ header{
   .load-name, .tc-name {
     font-family: Arial, sans-serif !important;
   }
+
+
+  /* ── COMPACT MODAL ── */
+  .m-box .m-lbl { margin-top:10px !important; margin-bottom:4px !important; }
+  .m-box .m-input { margin-bottom:0 !important; }
+  .m-box .meta-row { margin-bottom:4px !important; gap:5px !important; }
+  .m-box { padding:16px 16px 40px !important; }
 
 </style>
 </head>
