@@ -1839,6 +1839,17 @@ header{
     <div class="m-lbl">שם המשימה</div>
     <input class="m-input" id="mTaskName" placeholder="תיאור המשימה..."/>
 
+    <div class="m-lbl">📁 פרויקט</div>
+    <div class="meta-row" id="mProjectRow" style="flex-wrap:wrap">
+      <button class="mchip" data-proj="" onclick="setProjChip(this,'')">ללא</button>
+      <button class="mchip" data-proj="Romania" onclick="setProjChip(this,'Romania')">Romania</button>
+      <button class="mchip" data-proj="ADSS" onclick="setProjChip(this,'ADSS')">ADSS</button>
+      <button class="mchip" data-proj="Spider Marketing" onclick="setProjChip(this,'Spider Marketing')">Spider Marketing</button>
+      <button class="mchip" data-proj="LMCP" onclick="setProjChip(this,'LMCP')">LMCP</button>
+      <button class="mchip" data-proj="אחר" onclick="setProjChip(this,'אחר')">אחר ✏️</button>
+    </div>
+    <input class="m-input" id="mProjectName" placeholder="שם פרויקט מותאם אישית..." style="display:none;margin-top:6px"/>
+
     <div class="m-lbl">תיאור משימה / סטטוס</div>
     <textarea class="m-input" id="mTaskNotes" placeholder="תיאור משימה..." rows="2" style="height:70px;resize:none;width:100%;box-sizing:border-box"></textarea>
 
@@ -1852,9 +1863,6 @@ header{
       <button class="mchip" data-u="assaf" onclick="toggleMA(this)">אסף</button>
       <button class="mchip" data-u="omer" onclick="toggleMA(this)" style="display:none">עומר</button>
     </div>
-
-    <div class="m-lbl" style="color:var(--cyan)">📁 שם פרויקט</div>
-    <input class="m-input" id="mProjectName" placeholder="לדוגמה: Romania, ADSS, Spider..." />
 
     <div class="m-lbl">עדיפות</div>
     <div class="meta-row" id="mPrioRow">
@@ -3395,6 +3403,22 @@ header{
     }
   }
 
+  let mProjectVal = '';
+  function setProjChip(el, val) {
+    document.querySelectorAll('#mProjectRow .mchip').forEach(b=>b.classList.remove('sel'));
+    el.classList.add('sel');
+    const customInp = document.getElementById('mProjectName');
+    if (val === 'אחר') {
+      customInp.style.display = '';
+      customInp.focus();
+      mProjectVal = customInp.value;
+    } else {
+      customInp.style.display = 'none';
+      mProjectVal = val;
+      document.getElementById('mProjectName').value = val;
+    }
+  }
+
   let taskPersonFilter = 'all';
   let taskSearchQuery = '';
   let taskStatusFilter = 'all';
@@ -3801,7 +3825,23 @@ header{
 
     document.getElementById('modalTitle').textContent = '✏️ עריכת משימה';
     document.getElementById('mTaskName').value  = t.name||'';
-    document.getElementById('mProjectName').value = t.project||'';
+    // set project chip
+    mProjectVal = t.project||'';
+    document.querySelectorAll('#mProjectRow .mchip').forEach(b=>b.classList.remove('sel'));
+    const projChip = document.querySelector('#mProjectRow .mchip[data-proj="'+mProjectVal+'"]');
+    const customInp = document.getElementById('mProjectName');
+    if (projChip) {
+      projChip.classList.add('sel');
+      customInp.style.display='none';
+      customInp.value = mProjectVal;
+    } else if (mProjectVal) {
+      document.querySelector('#mProjectRow .mchip[data-proj="אחר"]').classList.add('sel');
+      customInp.style.display='';
+      customInp.value = mProjectVal;
+    } else {
+      document.querySelector('#mProjectRow .mchip[data-proj=""]').classList.add('sel');
+      customInp.style.display='none';
+    }
     document.getElementById('mTaskNotes').value = t.notes||'';
     document.getElementById('mDeadline').value  = t.deadline||'';
 
@@ -3829,6 +3869,11 @@ header{
     editId=null; mAssignee=null; mPrio=3; mStatus='open';
     document.getElementById('modalTitle').textContent='➕ משימה חדשה';
     document.getElementById('mTaskName').value='';
+    // reset project chips
+    mProjectVal='';
+    document.querySelectorAll('#mProjectRow .mchip').forEach(b=>b.classList.remove('sel'));
+    document.querySelector('#mProjectRow .mchip[data-proj=""]').classList.add('sel');
+    document.getElementById('mProjectName').style.display='none';
     document.getElementById('mProjectName').value='';
     document.getElementById('mTaskNotes').value='';
     document.getElementById('mDeadline').value='';
@@ -3861,7 +3906,7 @@ header{
     if (!mAssigneesList.length) return toast('⚠️ בחר לפחות אחראי אחד');
     const base = {
       name, priority:mPrio, status:mStatus,
-      project:document.getElementById('mProjectName').value.trim()||null,
+      project:(document.getElementById('mProjectName').value.trim())||mProjectVal||null,
       notes:document.getElementById('mTaskNotes').value.trim()||null,
       deadline:document.getElementById('mDeadline').value||null
     };
