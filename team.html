@@ -19,9 +19,9 @@
   --border:rgba(0,170,255,0.15);--radius:14px;--radius-sm:8px;
   --glow:0 0 20px rgba(0,170,255,0.3);
   --glow2:0 0 40px rgba(0,229,255,0.15);
-  --font-main:'Exo 2',sans-serif;
-  --font-display:'Rajdhani',sans-serif;
-  --font-mono:'Share Tech Mono',monospace;
+  --font-main:Arial,sans-serif;
+  --font-display:Arial,sans-serif;
+  --font-mono:Arial,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:var(--font-main);background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden}
@@ -1578,6 +1578,59 @@ header{
 
 
   
+
+
+  /* ── FORCE WHITE TEXT + ARIAL EVERYWHERE ── */
+  * {
+    font-family: Arial, sans-serif !important;
+  }
+  body, .task-card, .dash-card, .load-row, .m-box,
+  .tc-name, .tc-meta, .badge, .sec-lbl, .dash-lbl,
+  .load-name, .load-count, .tab, .hdr-name,
+  .expand-task-btn, .task-notes, .audit-item,
+  .m-lbl, .m-input, .mchip, .m-save, .m-cancel,
+  .step-comment, .sc-text, .sc-meta, .sc-name,
+  .notif-item, .cfi-task, .cfi-text, .empty,
+  .filter-chip, .search-input, .search-count,
+  .prio-lbl, .bar-name, .bar-val, .donut-label,
+  .completion-title, .completion-sub,
+  .login-label, .user-btn, .user-btn-count,
+  input, textarea, button, select, span, div, p {
+    color: #ffffff !important;
+  }
+
+  /* Exceptions — keep colored elements */
+  .badge.prio1, .badge.status-open, .badge.status-progress,
+  .badge.status-blocked, .badge.status-done,
+  .deadline-badge.overdue, .deadline-badge.soon, .deadline-badge.ok,
+  .sync-dot, .pin-dot.filled {
+    color: #ffffff !important;
+  }
+
+  /* Slightly dimmed secondary text — still readable */
+  .tc-audit .audit-item,
+  .user-btn-count,
+  .load-count,
+  .dash-lbl,
+  .completion-sub,
+  .search-count,
+  .login-sub {
+    color: rgba(255,255,255,0.65) !important;
+  }
+
+  /* Input placeholders */
+  ::placeholder {
+    color: rgba(255,255,255,0.35) !important;
+    font-family: Arial, sans-serif !important;
+  }
+
+  /* Force Arial on all font-family declarations */
+  .login-title, .hdr-name, .sec-lbl, .m-lbl,
+  .tab, .role-badge, .logout-btn, .filter-chip,
+  .bar-name, .completion-title, .prio-lbl,
+  .load-name, .tc-name {
+    font-family: Arial, sans-serif !important;
+  }
 
 </style>
 </head>
