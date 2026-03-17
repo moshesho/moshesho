@@ -3008,8 +3008,8 @@ header{
     if (currentTab === 'dash')  renderDash(content);
     else if (currentTab === 'tasks') renderTasks(content);
     else if (currentTab === 'add') {
-      // only render add tab once — don't destroy it on re-render
-      if (!content.querySelector('#quickName')) renderAdd(content);
+      // never re-render add tab if already rendered — preserves form state
+      if (!document.getElementById('quickName')) renderAdd(content);
     }
     else if (currentTab === 'trash') renderTrash(content);
 
@@ -3600,10 +3600,11 @@ header{
     if (!mAssignees.length) return toast('⚠️ בחר לפחות אחראי אחד');
     const deadline = document.getElementById('qDeadline')?.value || null;
     const notes    = document.getElementById('qNotes')?.value?.trim() || null;
+    const project  = document.getElementById('qProjectName')?.value?.trim() || null;
     const [firstUid, ...restUids] = mAssignees;
     const newRef = db.ref('team/tasks').push({
       name, assignee:firstUid, assignees:[...mAssignees], priority:mPrio, status:'open',
-      deadline, notes, createdAt:Date.now(), createdBy:currentUser
+      project, deadline, notes, createdAt:Date.now(), createdBy:currentUser
     });
     if (pendingSteps.length) {
       pendingSteps.forEach(s => db.ref('team/tasks/'+newRef.key+'/steps').push({...s}));
@@ -3614,6 +3615,8 @@ header{
     mAssignees = [];
     document.getElementById('quickName').value='';
     if (document.getElementById('qNotes')) document.getElementById('qNotes').value='';
+    if (document.getElementById('qProjectName')) document.getElementById('qProjectName').value='';
+    if (document.getElementById('qDeadline')) document.getElementById('qDeadline').value='';
     toast('✅ משימה נוספה ל-' + (names || 'הצוות'));
     const tasksBtn = Array.from(document.querySelectorAll('.tab')).find(b=>b.textContent.includes('משימות'));
     setTab('tasks', tasksBtn);
