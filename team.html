@@ -1429,6 +1429,47 @@ header{
     width:100% !important;
   }
 
+
+  /* ── CHARTS & STATS ── */
+  .charts-section { margin-bottom:16px; }
+  .chart-row { display:flex; gap:10px; margin-bottom:10px; }
+
+  /* Donut chart */
+  .donut-wrap { flex:1; background:linear-gradient(145deg,rgba(12,18,32,0.95),rgba(6,10,20,0.98)); border:1.5px solid rgba(0,170,255,0.12); border-radius:14px; padding:14px; display:flex;flex-direction:column;align-items:center; }
+  .donut-title { font-size:10px;font-weight:800;letter-spacing:2px;color:var(--blue);font-family:var(--font-display);text-transform:uppercase;margin-bottom:10px; }
+  .donut-svg { position:relative; }
+  .donut-center { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center; }
+  .donut-total { font-size:22px;font-weight:900;color:#fff;font-family:var(--font-mono);line-height:1; }
+  .donut-label { font-size:9px;color:var(--text3);letter-spacing:1px;font-family:var(--font-display); }
+  .donut-legend { display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center; }
+  .legend-item { display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2); }
+  .legend-dot { width:8px;height:8px;border-radius:2px;flex-shrink:0; }
+
+  /* Bar chart */
+  .bar-chart-wrap { flex:1.5; background:linear-gradient(145deg,rgba(12,18,32,0.95),rgba(6,10,20,0.98)); border:1.5px solid rgba(0,170,255,0.12); border-radius:14px; padding:14px; }
+  .bar-chart-title { font-size:10px;font-weight:800;letter-spacing:2px;color:var(--blue);font-family:var(--font-display);text-transform:uppercase;margin-bottom:12px; }
+  .bar-row { display:flex;align-items:center;gap:8px;margin-bottom:8px; }
+  .bar-name { font-size:11px;color:var(--text2);width:42px;text-align:right;flex-shrink:0;font-family:var(--font-display); }
+  .bar-track { flex:1;height:14px;background:rgba(0,170,255,0.06);border-radius:7px;overflow:hidden;position:relative; }
+  .bar-fill { height:100%;border-radius:7px;transition:width .8s cubic-bezier(.34,1.2,.64,1); position:relative; }
+  .bar-fill::after { content:'';position:absolute;top:0;left:0;right:0;height:50%;background:rgba(255,255,255,0.12);border-radius:7px 7px 0 0; }
+  .bar-val { font-size:11px;font-weight:800;color:var(--text);width:20px;text-align:left;font-family:var(--font-mono); }
+
+  /* Completion ring */
+  .completion-wrap { background:linear-gradient(145deg,rgba(12,18,32,0.95),rgba(6,10,20,0.98)); border:1.5px solid rgba(0,170,255,0.12); border-radius:14px; padding:14px; display:flex;align-items:center;gap:14px; margin-bottom:10px; }
+  .completion-title { font-size:10px;font-weight:800;letter-spacing:2px;color:var(--blue);font-family:var(--font-display);text-transform:uppercase;margin-bottom:4px; }
+  .completion-pct { font-size:32px;font-weight:900;color:#fff;font-family:var(--font-mono);line-height:1; }
+  .completion-sub { font-size:10px;color:var(--text3); }
+  .completion-right { flex:1; }
+  .completion-bar-track { height:8px;background:rgba(0,170,255,0.08);border-radius:4px;overflow:hidden;margin-top:8px; }
+  .completion-bar-fill { height:100%;border-radius:4px;background:linear-gradient(90deg,var(--blue),var(--cyan));box-shadow:0 0 8px rgba(0,229,255,0.4);transition:width .8s cubic-bezier(.34,1.2,.64,1); }
+
+  /* Priority breakdown */
+  .prio-row { display:flex;gap:6px;margin-bottom:10px; }
+  .prio-card { flex:1;background:linear-gradient(145deg,rgba(12,18,32,0.95),rgba(6,10,20,0.98));border:1.5px solid;border-radius:10px;padding:10px 8px;text-align:center; }
+  .prio-num { font-size:20px;font-weight:900;font-family:var(--font-mono);line-height:1; }
+  .prio-lbl { font-size:9px;font-weight:700;letter-spacing:1px;font-family:var(--font-display);text-transform:uppercase;margin-top:3px; }
+
 </style>
 </head>
 <body>
@@ -2147,6 +2188,122 @@ header{
       updatePinDots();
     }
   });
+
+  // ── CHARTS RENDERING ──────────────────────────────
+  function renderCharts(allTasks) {
+    const total   = allTasks.length;
+    const open    = allTasks.filter(t=>t.status==='open').length;
+    const prog    = allTasks.filter(t=>t.status==='progress').length;
+    const blocked = allTasks.filter(t=>t.status==='blocked').length;
+    const done    = allTasks.filter(t=>t.status==='done').length;
+    const active  = total - done;
+    const pct     = total ? Math.round(done/total*100) : 0;
+
+    // Priority counts
+    const p1 = allTasks.filter(t=>t.priority==1 && t.status!=='done').length;
+    const p2 = allTasks.filter(t=>t.priority==2 && t.status!=='done').length;
+    const p3 = allTasks.filter(t=>(t.priority==3||!t.priority) && t.status!=='done').length;
+    const p4 = allTasks.filter(t=>t.priority==4 && t.status!=='done').length;
+
+    // Donut segments (circumference = 2π*40 ≈ 251)
+    const C = 251;
+    const seg = (n) => total ? (n/total)*C : 0;
+    const colors = {open:'#00aaff', progress:'#ffd600', blocked:'#ff3b5c', done:'#00ff9d'};
+    let offset = 0;
+    const segments = [
+      {n:open, c:colors.open, lbl:'פתוח'},
+      {n:prog, c:colors.progress, lbl:'בביצוע'},
+      {n:blocked, c:colors.blocked, lbl:'ממתין'},
+      {n:done, c:colors.done, lbl:'בוצע'},
+    ];
+    let donutPaths = '';
+    segments.forEach(s => {
+      const len = seg(s.n);
+      if (len > 0) {
+        donutPaths += `<circle cx="50" cy="50" r="40" fill="none" stroke="${s.c}" stroke-width="12"
+          stroke-dasharray="${len.toFixed(1)} ${(C-len).toFixed(1)}"
+          stroke-dashoffset="${(-offset).toFixed(1)}"
+          transform="rotate(-90 50 50)"
+          style="filter:drop-shadow(0 0 4px ${s.c}88)"/>`;
+        offset += len;
+      }
+    });
+
+    // Bar chart — tasks per person
+    const uids = ['elad','alik','rif','tal','moshe','assaf','omer','hazi'];
+    const personData = uids.map(uid => ({
+      uid, name: USERS[uid]?.name.split(' ')[0]||uid,
+      cnt: allTasks.filter(t=>isAssignedTo(t,uid)&&t.status!=='done').length
+    })).filter(d=>d.cnt>0).sort((a,b)=>b.cnt-a.cnt).slice(0,6);
+    const maxCnt = Math.max(...personData.map(d=>d.cnt), 1);
+    const barColors = ['#00aaff','#00ff9d','#ffd600','#ff3b5c','#a259ff','#00e5ff'];
+
+    let barRows = personData.map((d,i) => {
+      const w = Math.round(d.cnt/maxCnt*100);
+      return `<div class="bar-row">
+        <div class="bar-name">${d.name}</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${w}%;background:linear-gradient(90deg,${barColors[i]},${barColors[i]}99);box-shadow:0 0 8px ${barColors[i]}66;"></div>
+        </div>
+        <div class="bar-val">${d.cnt}</div>
+      </div>`;
+    }).join('');
+
+    if (!barRows) barRows = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:10px">אין משימות פתוחות</div>';
+
+    return `
+    <div class="charts-section">
+      <div class="sec-lbl">📊 סטטיסטיקות</div>
+
+      <!-- Completion bar -->
+      <div class="completion-wrap">
+        <div style="position:relative">
+          <svg width="80" height="80" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(0,170,255,0.08)" stroke-width="12"/>
+            ${donutPaths}
+          </svg>
+          <div class="donut-center">
+            <div class="donut-total">${pct}%</div>
+          </div>
+        </div>
+        <div class="completion-right">
+          <div class="completion-title">השלמת משימות</div>
+          <div class="completion-pct">${done}<span style="font-size:14px;color:var(--text3)">/${total}</span></div>
+          <div class="completion-sub">משימות הושלמו</div>
+          <div class="completion-bar-track">
+            <div class="completion-bar-fill" style="width:${pct}%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Priority breakdown -->
+      <div class="prio-row">
+        <div class="prio-card" style="border-color:rgba(255,59,92,0.3)">
+          <div class="prio-num" style="color:#ff3b5c;text-shadow:0 0 10px rgba(255,59,92,0.5)">${p1}</div>
+          <div class="prio-lbl" style="color:#ff3b5c">דחוף</div>
+        </div>
+        <div class="prio-card" style="border-color:rgba(255,214,0,0.3)">
+          <div class="prio-num" style="color:#ffd600;text-shadow:0 0 10px rgba(255,214,0,0.5)">${p2}</div>
+          <div class="prio-lbl" style="color:#ffd600">גבוה</div>
+        </div>
+        <div class="prio-card" style="border-color:rgba(0,170,255,0.25)">
+          <div class="prio-num" style="color:#00aaff;text-shadow:0 0 10px rgba(0,170,255,0.5)">${p3}</div>
+          <div class="prio-lbl" style="color:#00aaff">רגיל</div>
+        </div>
+        <div class="prio-card" style="border-color:rgba(0,255,157,0.2)">
+          <div class="prio-num" style="color:#00ff9d;text-shadow:0 0 10px rgba(0,255,157,0.5)">${p4}</div>
+          <div class="prio-lbl" style="color:#00ff9d">נמוך</div>
+        </div>
+      </div>
+
+      <!-- Bar chart -->
+      <div class="bar-chart-wrap">
+        <div class="bar-chart-title">עומס לפי איש צוות</div>
+        ${barRows}
+      </div>
+    </div>`;
+  }
+
   // ── NOTIFICATIONS ──────────────────────────────────
   let notifUnsub = null;
 
@@ -2834,6 +2991,10 @@ header{
       });
     }
 
+    // add charts for admin/manager
+    if (u.role === 'admin' || u.role === 'manager') {
+      html = renderCharts(tasks) + html;
+    }
     wrap.innerHTML = html;
   }
 
