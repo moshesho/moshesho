@@ -1470,6 +1470,53 @@ header{
   .prio-num { font-size:20px;font-weight:900;font-family:var(--font-mono);line-height:1; }
   .prio-lbl { font-size:9px;font-weight:700;letter-spacing:1px;font-family:var(--font-display);text-transform:uppercase;margin-top:3px; }
 
+
+  /* ── SEARCH & FILTER ── */
+  .search-wrap {
+    display:flex;gap:8px;margin-bottom:10px;position:relative;
+  }
+  .search-input {
+    flex:1;background:rgba(0,170,255,0.04);border:1.5px solid rgba(0,170,255,0.15);
+    border-radius:10px;padding:9px 36px 9px 12px;color:#fff;
+    font-family:var(--font-main);font-size:13px;
+    transition:border-color .2s,box-shadow .2s;
+  }
+  .search-input:focus {
+    outline:none;border-color:var(--cyan);
+    box-shadow:0 0 12px rgba(0,229,255,0.15);
+  }
+  .search-input::placeholder { color:var(--text3); }
+  .search-icon {
+    position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    font-size:14px;pointer-events:none;color:var(--text3);
+  }
+  .search-clear {
+    position:absolute;left:10px;top:50%;transform:translateY(-50%);
+    background:none;border:none;color:var(--text3);cursor:pointer;
+    font-size:14px;padding:2px;display:none;
+  }
+  .filter-row {
+    display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;
+  }
+  .filter-chip {
+    padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700;
+    background:rgba(0,170,255,0.04);border:1.5px solid rgba(0,170,255,0.1);
+    color:var(--text3);cursor:pointer;transition:all .15s;
+    font-family:var(--font-display);letter-spacing:.5px;
+  }
+  .filter-chip.active {
+    background:rgba(0,170,255,0.15);border-color:var(--cyan);
+    color:#fff;box-shadow:0 0 8px rgba(0,229,255,0.2);
+  }
+  .filter-chip.f-blocked.active { background:rgba(255,59,92,0.15);border-color:var(--red);box-shadow:0 0 8px rgba(255,59,92,0.2); }
+  .filter-chip.f-progress.active { background:rgba(255,214,0,0.12);border-color:var(--yellow);box-shadow:0 0 8px rgba(255,214,0,0.2); }
+  .filter-chip.f-done.active { background:rgba(0,255,157,0.12);border-color:var(--green);box-shadow:0 0 8px rgba(0,255,157,0.2); }
+  .filter-chip.f-urgent.active { background:rgba(255,59,92,0.12);border-color:var(--red); }
+  .search-count {
+    font-size:11px;color:var(--text3);margin-bottom:8px;
+    font-family:var(--font-mono);letter-spacing:1px;
+  }
+
 </style>
 </head>
 <body>
@@ -3172,42 +3219,112 @@ header{
   // ── TASKS LIST ─────────────────────────────────────
   function renderTasks(wrap) {
     const u = USERS[currentUser];
-    const myTasks = (u.role==='admin' || u.role==='manager') ? tasks : tasks.filter(t=>isAssignedTo(t, currentUser));
     const isAdmin = u.role==='admin';
+    const isManager = u.role==='manager';
+    const canSeeAll = isAdmin || isManager;
+    const myTasks = canSeeAll ? tasks : tasks.filter(t=>isAssignedTo(t, currentUser));
 
     let html = '';
-    if (isAdmin || USERS[currentUser]?.role==='manager') {
-      // filter by person for admin/manager
-      html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px">
-        <button class="mchip ${taskPersonFilter==='all'?'sel':''}" style="grid-column:span 3" onclick="setTPF('all')">📋 כולם (${tasks.filter(t=>t.status!=='done').length})</button>
+
+    // ── SEARCH BAR ──
+    html += `<div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" id="taskSearchInp" placeholder="חפש משימה..." 
+        value="${esc(taskSearchQuery)}"
+        oninput="setSearchQ(this.value)" style="padding-right:12px;padding-left:36px">
+      <button class="search-clear" id="searchClearBtn" onclick="clearSearch()" style="display:${taskSearchQuery?'block':'none'}">✕</button>
+    </div>`;
+
+    // ── STATUS FILTER CHIPS ──
+    html += `<div class="filter-row">
+      <button class="filter-chip ${taskStatusFilter==='all'?'active':''}" onclick="setTSF('all')">📋 הכל</button>
+      <button class="filter-chip f-open ${taskStatusFilter==='open'?'active':''}" onclick="setTSF('open')">🔵 פתוח</button>
+      <button class="filter-chip f-progress ${taskStatusFilter==='progress'?'active':''}" onclick="setTSF('progress')">🟡 בביצוע</button>
+      <button class="filter-chip f-blocked ${taskStatusFilter==='blocked'?'active':''}" onclick="setTSF('blocked')">⏳ ממתין</button>
+      <button class="filter-chip f-done ${taskStatusFilter==='done'?'active':''}" onclick="setTSF('done')">✅ בוצע</button>
+      <button class="filter-chip f-urgent ${taskPrioFilter==='urgent'?'active':''}" onclick="setTPrioF(taskPrioFilter==='urgent'?'all':'urgent')">🔴 דחוף</button>
+    </div>`;
+
+    // ── PERSON FILTER (admin/manager only) ──
+    if (canSeeAll) {
+      html += `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
+        <button class="mchip ${taskPersonFilter==='all'?'sel':''}" onclick="setTPF('all')" style="font-size:11px">👥 כולם</button>
         ${['elad','alik','rif','tal','moshe','assaf','omer'].map(uid=>{
           const cnt = tasks.filter(t=>isAssignedTo(t,uid)&&t.status!=='done').length;
-          return `<button class="mchip ${taskPersonFilter===uid?'sel':''}" onclick="setTPF('${uid}')">${USERS[uid].name.split(' ')[0]} <span style="font-size:10px;opacity:.7">${cnt}</span></button>`;
+          return `<button class="mchip ${taskPersonFilter===uid?'sel':''}" onclick="setTPF('${uid}')" style="font-size:11px">${USERS[uid].name.split(' ')[0]} <span style="font-size:10px;opacity:.7">${cnt}</span></button>`;
         }).join('')}
       </div>`;
     }
 
-    const filtered = (isAdmin || USERS[currentUser]?.role==='manager')
+    // ── APPLY ALL FILTERS ──
+    let filtered = canSeeAll
       ? (taskPersonFilter==='all' ? tasks : tasks.filter(t=>isAssignedTo(t,taskPersonFilter)))
       : myTasks;
+
+    // status filter
+    if (taskStatusFilter !== 'all') filtered = filtered.filter(t=>t.status===taskStatusFilter);
+    // priority filter
+    if (taskPrioFilter === 'urgent') filtered = filtered.filter(t=>t.priority==1);
+    // search
+    if (taskSearchQuery) {
+      filtered = filtered.filter(t =>
+        (t.name||'').toLowerCase().includes(taskSearchQuery) ||
+        (t.notes||'').toLowerCase().includes(taskSearchQuery) ||
+        (USERS[t.assignee]?.name||'').toLowerCase().includes(taskSearchQuery)
+      );
+    }
+
+    // show count
+    if (taskSearchQuery || taskStatusFilter !== 'all' || taskPrioFilter !== 'all') {
+      html += `<div class="search-count">${filtered.length} תוצאות נמצאו</div>`;
+    }
 
     const byStatus = {open:[],progress:[],blocked:[],done:[]};
     filtered.forEach(t=>(byStatus[t.status]||byStatus.open).push(t));
 
-    const order = ['blocked','progress','open','done'];
+    const order = taskStatusFilter !== 'all'
+      ? [taskStatusFilter]
+      : ['blocked','progress','open','done'];
     const labels = {blocked:'⏳ ממתין',progress:'🟡 בביצוע',open:'🔵 פתוח',done:'✅ בוצע'};
     order.forEach(s=>{
       if (!byStatus[s].length) return;
       html += `<div class="sec-lbl">${labels[s]} (${byStatus[s].length})</div>`;
-      byStatus[s].forEach(t=>html+=taskCard(t,isAdmin));
+      byStatus[s].forEach(t=>html+=taskCard(t,isAdmin||isManager));
     });
 
-    if (!filtered.length) html += `<div class="empty"><div class="empty-ico">🎉</div><div>אין משימות</div></div>`;
+    if (!filtered.length) {
+      if (taskSearchQuery) {
+        html += `<div class="empty"><div class="empty-ico">🔍</div><div>לא נמצאו תוצאות עבור "${esc(taskSearchQuery)}"</div></div>`;
+      } else {
+        html += `<div class="empty"><div class="empty-ico">🎉</div><div>אין משימות</div></div>`;
+      }
+    }
     wrap.innerHTML = html;
   }
 
   let taskPersonFilter = 'all';
-  function setTPF(v) { taskPersonFilter=v; render(); }
+  let taskSearchQuery = '';
+  let taskStatusFilter = 'all';
+  let taskPrioFilter = 'all';
+
+  function setTPF(v) { taskPersonFilter=v; applyTaskFilters(); }
+  function setTSF(v) { taskStatusFilter=v; applyTaskFilters(); }
+  function setTPrioF(v) { taskPrioFilter=v; applyTaskFilters(); }
+  function setSearchQ(v) {
+    taskSearchQuery = v.toLowerCase();
+    const clearBtn = document.getElementById('searchClearBtn');
+    if (clearBtn) clearBtn.style.display = v ? 'block' : 'none';
+    applyTaskFilters();
+  }
+  function applyTaskFilters() { render(); }
+  function clearSearch() {
+    taskSearchQuery = '';
+    const inp = document.getElementById('taskSearchInp');
+    if (inp) inp.value = '';
+    const clearBtn = document.getElementById('searchClearBtn');
+    if (clearBtn) clearBtn.style.display = 'none';
+    applyTaskFilters();
+  }
   function goToUserTasks(uid) {
     taskPersonFilter = uid;
     const tasksBtn = Array.from(document.querySelectorAll('.tab')).find(b=>b.textContent.includes('משימות'));
