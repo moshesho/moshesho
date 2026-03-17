@@ -1577,18 +1577,7 @@ header{
   .audit-item b { color:rgba(255,255,255,0.65);font-weight:600; }
 
 
-  /* ── PROJECT BADGE ── */
-  .project-badge {
-    display:inline-block;
-    font-size:10px;font-weight:700;
-    background:rgba(162,89,255,0.15);
-    border:1px solid rgba(162,89,255,0.3);
-    color:#c084fc;
-    border-radius:6px;padding:1px 7px;
-    font-family:var(--font-display);letter-spacing:.5px;
-    vertical-align:middle;margin-left:4px;
-    box-shadow:0 0 6px rgba(162,89,255,0.2);
-  }
+  
 
 </style>
 </head>
@@ -1853,24 +1842,19 @@ header{
     <div class="m-lbl">תיאור משימה / סטטוס</div>
     <textarea class="m-input" id="mTaskNotes" placeholder="תיאור משימה..." rows="2" style="height:70px;resize:none;width:100%;box-sizing:border-box"></textarea>
 
-    <div style="display:flex;gap:12px;align-items:flex-start">
-      <div style="flex:1">
-        <div class="m-lbl">שייך ל <span style="font-size:10px;color:var(--text3);font-weight:400">(ניתן לבחור כמה)</span></div>
-        <div class="meta-row" id="mAssigneeRow">
-          <button class="mchip" data-u="elad" onclick="toggleMA(this)">אלעד</button>
-          <button class="mchip" data-u="alik" onclick="toggleMA(this)">אליק</button>
-          <button class="mchip" data-u="rif" onclick="toggleMA(this)">ריף</button>
-          <button class="mchip" data-u="tal" onclick="toggleMA(this)">טל</button>
-          <button class="mchip" data-u="moshe" onclick="toggleMA(this)">משה</button>
-          <button class="mchip" data-u="assaf" onclick="toggleMA(this)">אסף</button>
-          <button class="mchip" data-u="omer" onclick="toggleMA(this)" style="display:none">עומר</button>
-        </div>
-      </div>
-      <div style="width:130px;flex-shrink:0">
-        <div class="m-lbl" style="color:var(--cyan);text-shadow:0 0 6px rgba(0,229,255,0.4)">📁 פרויקט</div>
-        <input class="m-input" id="mProjectName" placeholder="Romania..." style="font-size:13px;border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.05)"/>
-      </div>
+    <div class="m-lbl">שייך ל <span style="font-size:10px;color:var(--text3);font-weight:400">(ניתן לבחור כמה)</span></div>
+    <div class="meta-row" id="mAssigneeRow">
+      <button class="mchip" data-u="elad" onclick="toggleMA(this)">אלעד</button>
+      <button class="mchip" data-u="alik" onclick="toggleMA(this)">אליק</button>
+      <button class="mchip" data-u="rif" onclick="toggleMA(this)">ריף</button>
+      <button class="mchip" data-u="tal" onclick="toggleMA(this)">טל</button>
+      <button class="mchip" data-u="moshe" onclick="toggleMA(this)">משה</button>
+      <button class="mchip" data-u="assaf" onclick="toggleMA(this)">אסף</button>
+      <button class="mchip" data-u="omer" onclick="toggleMA(this)" style="display:none">עומר</button>
     </div>
+
+    <div class="m-lbl" style="color:var(--cyan)">📁 שם פרויקט</div>
+    <input class="m-input" id="mProjectName" placeholder="לדוגמה: Romania, ADSS, Spider..." />
 
     <div class="m-lbl">עדיפות</div>
     <div class="meta-row" id="mPrioRow">
@@ -3715,7 +3699,7 @@ header{
     return `
     <div class="task-card s-${t.status||'open'}">
       <div class="tc-top">
-        ${t.project ? `<div style="margin-bottom:4px"><span class="project-badge">📁 ${esc(t.project)}</span></div>` : ''}
+        ${t.project ? `<div style="font-size:10px;color:var(--cyan);font-weight:700;margin-bottom:3px;letter-spacing:1px">📁 ${esc(t.project)}</div>` : ''}
         <div class="tc-name">${esc(t.name)}</div>
         <div class="tc-actions">
           ${canEdit ? `<button class="iBtn edit" onclick="openEdit('${t.id}')">✏️</button>` : ''}
@@ -3816,8 +3800,8 @@ header{
     mStatus  = t.status||'open';
 
     document.getElementById('modalTitle').textContent = '✏️ עריכת משימה';
-    document.getElementById('mProjectName').value = t.project||'';
     document.getElementById('mTaskName').value  = t.name||'';
+    document.getElementById('mProjectName').value = t.project||'';
     document.getElementById('mTaskNotes').value = t.notes||'';
     document.getElementById('mDeadline').value  = t.deadline||'';
 
@@ -3844,8 +3828,8 @@ header{
   function openAdd() {
     editId=null; mAssignee=null; mPrio=3; mStatus='open';
     document.getElementById('modalTitle').textContent='➕ משימה חדשה';
-    document.getElementById('mProjectName').value='';
     document.getElementById('mTaskName').value='';
+    document.getElementById('mProjectName').value='';
     document.getElementById('mTaskNotes').value='';
     document.getElementById('mDeadline').value='';
     mAssigneesList = [];
