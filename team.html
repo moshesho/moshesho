@@ -1847,24 +1847,29 @@ header{
     <div class="m-handle"></div>
     <div class="m-title" id="modalTitle">➕ משימה חדשה</div>
 
-    <div class="m-lbl">שם הפרויקט</div>
-    <input class="m-input" id="mProjectName" placeholder="לדוגמה: Romania, ADSS, Spider Marketing..."/>
-
     <div class="m-lbl">שם המשימה</div>
     <input class="m-input" id="mTaskName" placeholder="תיאור המשימה..."/>
 
     <div class="m-lbl">תיאור משימה / סטטוס</div>
     <textarea class="m-input" id="mTaskNotes" placeholder="תיאור משימה..." rows="2" style="height:70px;resize:none;width:100%;box-sizing:border-box"></textarea>
 
-    <div class="m-lbl">שייך ל <span style="font-size:10px;color:var(--text3);font-weight:400">(ניתן לבחור כמה)</span></div>
-    <div class="meta-row" id="mAssigneeRow">
-      <button class="mchip" data-u="elad" onclick="toggleMA(this)">אלעד</button>
-      <button class="mchip" data-u="alik" onclick="toggleMA(this)">אליק</button>
-      <button class="mchip" data-u="rif" onclick="toggleMA(this)">ריף</button>
-      <button class="mchip" data-u="tal" onclick="toggleMA(this)">טל</button>
-      <button class="mchip" data-u="moshe" onclick="toggleMA(this)">משה</button>
-      <button class="mchip" data-u="assaf" onclick="toggleMA(this)">אסף</button>
-      <button class="mchip" data-u="omer" onclick="toggleMA(this)" style="display:none">עומר</button>
+    <div style="display:flex;gap:12px;align-items:flex-start">
+      <div style="flex:1">
+        <div class="m-lbl">שייך ל <span style="font-size:10px;color:var(--text3);font-weight:400">(ניתן לבחור כמה)</span></div>
+        <div class="meta-row" id="mAssigneeRow">
+          <button class="mchip" data-u="elad" onclick="toggleMA(this)">אלעד</button>
+          <button class="mchip" data-u="alik" onclick="toggleMA(this)">אליק</button>
+          <button class="mchip" data-u="rif" onclick="toggleMA(this)">ריף</button>
+          <button class="mchip" data-u="tal" onclick="toggleMA(this)">טל</button>
+          <button class="mchip" data-u="moshe" onclick="toggleMA(this)">משה</button>
+          <button class="mchip" data-u="assaf" onclick="toggleMA(this)">אסף</button>
+          <button class="mchip" data-u="omer" onclick="toggleMA(this)" style="display:none">עומר</button>
+        </div>
+      </div>
+      <div style="width:130px;flex-shrink:0">
+        <div class="m-lbl">📁 שם פרויקט</div>
+        <input class="m-input" id="mProjectName" placeholder="Romania, ADSS..." style="font-size:12px;padding:8px 10px"/>
+      </div>
     </div>
 
     <div class="m-lbl">עדיפות</div>
