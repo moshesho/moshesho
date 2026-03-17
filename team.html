@@ -1576,6 +1576,20 @@ header{
   }
   .audit-item b { color:rgba(255,255,255,0.65);font-weight:600; }
 
+
+  /* ── PROJECT BADGE ── */
+  .project-badge {
+    display:inline-block;
+    font-size:10px;font-weight:700;
+    background:rgba(162,89,255,0.15);
+    border:1px solid rgba(162,89,255,0.3);
+    color:#c084fc;
+    border-radius:6px;padding:1px 7px;
+    font-family:var(--font-display);letter-spacing:.5px;
+    vertical-align:middle;margin-left:4px;
+    box-shadow:0 0 6px rgba(162,89,255,0.2);
+  }
+
 </style>
 </head>
 <body>
@@ -1832,6 +1846,9 @@ header{
   <div class="m-box">
     <div class="m-handle"></div>
     <div class="m-title" id="modalTitle">➕ משימה חדשה</div>
+
+    <div class="m-lbl">שם הפרויקט</div>
+    <input class="m-input" id="mProjectName" placeholder="לדוגמה: Romania, ADSS, Spider Marketing..."/>
 
     <div class="m-lbl">שם המשימה</div>
     <input class="m-input" id="mTaskName" placeholder="תיאור המשימה..."/>
@@ -3305,7 +3322,7 @@ header{
       <span class="search-icon">🔍</span>
       <input class="search-input" id="taskSearchInp" placeholder="חפש משימה..." 
         value="${esc(taskSearchQuery)}"
-        oninput="setSearchQ(this.value)" style="padding-right:12px;padding-left:36px">
+        style="padding-right:12px;padding-left:36px">
       <button class="search-clear" id="searchClearBtn" onclick="clearSearch()" style="display:${taskSearchQuery?'block':'none'}">✕</button>
     </div>`;
 
@@ -3371,6 +3388,22 @@ header{
       }
     }
     wrap.innerHTML = html;
+
+    // attach search listener AFTER DOM is ready - prevents focus loss
+    const sinp = document.getElementById('taskSearchInp');
+    if (sinp) {
+      sinp.addEventListener('input', function() {
+        taskSearchQuery = this.value.toLowerCase();
+        const cb = document.getElementById('searchClearBtn');
+        if (cb) cb.style.display = this.value ? 'block' : 'none';
+        filterTaskCards();
+      });
+      // focus if there was an active search
+      if (taskSearchQuery) {
+        sinp.focus();
+        sinp.setSelectionRange(sinp.value.length, sinp.value.length);
+      }
+    }
   }
 
   let taskPersonFilter = 'all';
@@ -3677,7 +3710,7 @@ header{
     return `
     <div class="task-card s-${t.status||'open'}">
       <div class="tc-top">
-        <div class="tc-name">${esc(t.name)}</div>
+        <div class="tc-name">${t.project ? `<span class="project-badge">📁 ${esc(t.project)}</span> ` : ''}${esc(t.name)}</div>
         <div class="tc-actions">
           ${canEdit ? `<button class="iBtn edit" onclick="openEdit('${t.id}')">✏️</button>` : ''}
           ${canDelete ? `<button class="iBtn del" onclick="delTask('${t.id}')">🗑</button>` : ''}
@@ -3777,6 +3810,7 @@ header{
     mStatus  = t.status||'open';
 
     document.getElementById('modalTitle').textContent = '✏️ עריכת משימה';
+    document.getElementById('mProjectName').value = t.project||'';
     document.getElementById('mTaskName').value  = t.name||'';
     document.getElementById('mTaskNotes').value = t.notes||'';
     document.getElementById('mDeadline').value  = t.deadline||'';
@@ -3804,6 +3838,7 @@ header{
   function openAdd() {
     editId=null; mAssignee=null; mPrio=3; mStatus='open';
     document.getElementById('modalTitle').textContent='➕ משימה חדשה';
+    document.getElementById('mProjectName').value='';
     document.getElementById('mTaskName').value='';
     document.getElementById('mTaskNotes').value='';
     document.getElementById('mDeadline').value='';
@@ -3836,6 +3871,7 @@ header{
     if (!mAssigneesList.length) return toast('⚠️ בחר לפחות אחראי אחד');
     const base = {
       name, priority:mPrio, status:mStatus,
+      project:document.getElementById('mProjectName').value.trim()||null,
       notes:document.getElementById('mTaskNotes').value.trim()||null,
       deadline:document.getElementById('mDeadline').value||null
     };
