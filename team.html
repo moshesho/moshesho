@@ -1563,6 +1563,19 @@ header{
     filter:drop-shadow(0 0 6px rgba(255,255,255,0.4)) !important;
   }
 
+
+  /* ── TASK AUDIT LINE ── */
+  .tc-audit {
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin-top:6px;padding-top:5px;
+    border-top:1px solid rgba(0,170,255,0.06);
+  }
+  .audit-item {
+    font-size:10px;color:rgba(255,255,255,0.4);
+    font-family:var(--font-mono);letter-spacing:.5px;
+  }
+  .audit-item b { color:rgba(255,255,255,0.65);font-weight:600; }
+
 </style>
 </head>
 <body>
@@ -3658,6 +3671,10 @@ header{
         })()}
       </div>
       ${t.notes ? `<div class="task-notes">${esc(t.notes)}</div>` : ''}
+      <div class="tc-audit">
+        ${t.createdBy && USERS[t.createdBy] ? `<span class="audit-item">✏️ נפתח: <b>${USERS[t.createdBy].name.split(' ')[0]}</b>${t.createdAt ? ' · '+new Date(t.createdAt).toLocaleDateString('he-IL') : ''}</span>` : ''}
+        ${t.updatedBy && USERS[t.updatedBy] ? `<span class="audit-item">🔄 עדכן: <b>${USERS[t.updatedBy].name.split(' ')[0]}</b>${t.updatedAt ? ' · '+new Date(t.updatedAt).toLocaleDateString('he-IL') : ''}</span>` : ''}
+      </div>
       ${canEdit && t.status!=='done' ? `
       <div class="status-sel">
         <span style="font-size:10px;color:var(--text3);font-weight:700;line-height:26px">עדכן:</span>
@@ -3781,7 +3798,7 @@ header{
     if (editId) {
       // update existing task with all assignees (no duplicates)
       const [first] = mAssigneesList;
-      db.ref('team/tasks/'+editId).update({...base, assignee:first, assignees:mAssigneesList});
+      db.ref('team/tasks/'+editId).update({...base, assignee:first, assignees:mAssigneesList, updatedBy:currentUser, updatedAt:Date.now()});
       toast('✏️ עודכן!');
     } else {
       mAssigneesList.forEach(uid => {
