@@ -3007,7 +3007,10 @@ header{
 
     if (currentTab === 'dash')  renderDash(content);
     else if (currentTab === 'tasks') renderTasks(content);
-    else if (currentTab === 'add')   renderAdd(content);
+    else if (currentTab === 'add') {
+      // only render add tab once — don't destroy it on re-render
+      if (!content.querySelector('#quickName')) renderAdd(content);
+    }
     else if (currentTab === 'trash') renderTrash(content);
 
     // restore search focus after render
