@@ -3276,7 +3276,7 @@ header{
                 <div style="display:flex;gap:6px;align-items:center;margin-bottom:2px">
                   <span style="font-size:11px;font-weight:700;color:#fff">${esc(u.name)}</span>
                   <span style="font-size:10px;color:var(--text3)">${ds}</span>
-                  ${canDel ? `<button onclick="viewDelComment('${t.id}','${sid}','${cid}')" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;margin-right:auto;padding:0">✕</button>` : ''}
+                  ${canDel ? '<button onclick="viewDelComment(\''+t.id+'\',\''+sid+'\',\''+cid+'\')" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;margin-right:auto;padding:0">✕</button>' : ''}
                 </div>
                 <div style="font-size:13px;color:var(--text2);line-height:1.4">${esc(c.text||'')}</div>
               </div>
@@ -3772,8 +3772,8 @@ header{
         ${t.project ? '<div style="font-size:10px;color:#00e5ff;font-weight:700;margin-bottom:3px">📁 '+esc(t.project)+'</div>' : ''}
         <div class="tc-name">${esc(t.name)}</div>
         <div class="tc-actions">
-          ${canEdit ? `<button class="iBtn edit" onclick="openEdit('${t.id}')">✏️</button>` : ''}
-          ${canDelete ? `<button class="iBtn del" onclick="delTask('${t.id}')">🗑</button>` : ''}
+          ${canEdit ? '<button class="iBtn edit" onclick="openEdit(\''+t.id+'\')" >✏️</button>' : ''}
+          ${canDelete ? '<button class="iBtn del" onclick="delTask(\''+t.id+'\')" >🗑</button>' : ''}
         </div>
       </div>
       <div class="tc-meta">
@@ -3807,10 +3807,10 @@ header{
           return `<span class="pct-badge${isDone?' done-badge':''}">${svg}${isDone?'✅ ':''} ${pct}%</span>`;
         })()}
       </div>
-      ${t.notes ? `<div class="task-notes">${esc(t.notes)}</div>` : ''}
+      ${t.notes ? '<div class="task-notes">'+esc(t.notes)+'</div>' : ''}
       <div class="tc-audit">
-        ${t.createdBy && USERS[t.createdBy] ? `<span class="audit-item">✏️ נפתח: <b>${USERS[t.createdBy].name.split(' ')[0]}</b>${t.createdAt ? ' · '+new Date(t.createdAt).toLocaleDateString('he-IL') : ''}</span>` : ''}
-        ${t.updatedBy && USERS[t.updatedBy] ? `<span class="audit-item">🔄 עדכן: <b>${USERS[t.updatedBy].name.split(' ')[0]}</b>${t.updatedAt ? ' · '+new Date(t.updatedAt).toLocaleDateString('he-IL') : ''}</span>` : ''}
+        ${t.createdBy && USERS[t.createdBy] ? '<span class="audit-item">✏️ נפתח: <b>'+USERS[t.createdBy].name.split(' ')[0]+'</b>'+(t.createdAt ? ' · '+new Date(t.createdAt).toLocaleDateString('he-IL') : '')+'</span>' : ''}
+        ${t.updatedBy && USERS[t.updatedBy] ? '<span class="audit-item">🔄 עדכן: <b>'+USERS[t.updatedBy].name.split(' ')[0]+'</b>'+(t.updatedAt ? ' · '+new Date(t.updatedAt).toLocaleDateString('he-IL') : '')+'</span>' : ''}
       </div>
       ${canEdit && t.status!=='done' ? `
       <div class="status-sel">
