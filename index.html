@@ -219,6 +219,39 @@
       .footer { font-size: 13px; }
     }
 
+  
+  /* ── PIN LOCK ── */
+  #lockScreen {
+    position:fixed;inset:0;z-index:9999;
+    background:#04070f;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:20px;
+  }
+  .lock-logo { font-size:52px; filter:drop-shadow(0 0 20px rgba(0,150,255,0.6)); animation:float 4s ease-in-out infinite; }
+  .lock-title { font-size:22px;font-weight:900;color:#fff;letter-spacing:2px; }
+  .lock-sub { font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:2px; }
+  .lock-dots { display:flex;gap:14px; }
+  .lock-dot {
+    width:14px;height:14px;border-radius:3px;
+    border:1.5px solid rgba(0,170,255,0.3);
+    transition:all .2s;
+  }
+  .lock-dot.filled { background:#00aaff;border-color:#00aaff;box-shadow:0 0 12px #00aaff; }
+  .lock-pad {
+    display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+    width:90vw;max-width:260px;direction:ltr;
+  }
+  .lock-key {
+    aspect-ratio:1;border-radius:12px;font-size:24px;font-weight:900;
+    background:rgba(0,170,255,0.06);border:1.5px solid rgba(0,170,255,0.2);
+    color:#fff;cursor:pointer;transition:all .15s;
+    display:flex;align-items:center;justify-content:center;
+    font-family:Arial,sans-serif;
+  }
+  .lock-key:hover { background:rgba(0,170,255,0.15);border-color:rgba(0,229,255,0.5); }
+  .lock-key:active { transform:scale(.93); }
+  .lock-err { font-size:12px;color:#ff3b5c;min-height:18px;letter-spacing:1px; }
+
   </style>
 </head>
 <body>
@@ -294,5 +327,79 @@
   </div>
 
 </div>
+
+<div id="lockScreen">
+  <div class="lock-logo">🛡️</div>
+  <div class="lock-title">מרכז שליטה</div>
+  <div class="lock-sub">הכנס קוד גישה</div>
+  <div class="lock-dots">
+    <div class="lock-dot" id="ld0"></div>
+    <div class="lock-dot" id="ld1"></div>
+    <div class="lock-dot" id="ld2"></div>
+    <div class="lock-dot" id="ld3"></div>
+  </div>
+  <div class="lock-pad">
+    <button class="lock-key" onclick="lk('1')">1</button>
+    <button class="lock-key" onclick="lk('2')">2</button>
+    <button class="lock-key" onclick="lk('3')">3</button>
+    <button class="lock-key" onclick="lk('4')">4</button>
+    <button class="lock-key" onclick="lk('5')">5</button>
+    <button class="lock-key" onclick="lk('6')">6</button>
+    <button class="lock-key" onclick="lk('7')">7</button>
+    <button class="lock-key" onclick="lk('8')">8</button>
+    <button class="lock-key" onclick="lk('9')">9</button>
+    <button class="lock-key" onclick="lkBack()" style="font-size:18px">⌫</button>
+    <button class="lock-key" onclick="lk('0')">0</button>
+    <button class="lock-key" onclick="lkBack()" style="font-size:18px">⌫</button>
+  </div>
+  <div class="lock-err" id="lockErr"></div>
+</div>
+
+<script>
+  const LOCK_PIN = '1956';
+  let lockVal = '';
+
+  // Check session
+  if (sessionStorage.getItem('unlocked') === '1') {
+    document.getElementById('lockScreen').style.display = 'none';
+  }
+
+  function lk(d) {
+    if (lockVal.length >= 4) return;
+    lockVal += d;
+    document.getElementById('ld'+(lockVal.length-1)).classList.add('filled');
+    if (lockVal.length === 4) {
+      setTimeout(() => {
+        if (lockVal === LOCK_PIN) {
+          sessionStorage.setItem('unlocked','1');
+          document.getElementById('lockScreen').style.display = 'none';
+        } else {
+          document.getElementById('lockErr').textContent = '❌ קוד שגוי';
+          // shake and reset
+          setTimeout(() => {
+            lockVal = '';
+            for(let i=0;i<4;i++) document.getElementById('ld'+i).classList.remove('filled');
+            document.getElementById('lockErr').textContent = '';
+          }, 800);
+        }
+      }, 200);
+    }
+  }
+
+  function lkBack() {
+    if (!lockVal.length) return;
+    lockVal = lockVal.slice(0,-1);
+    document.getElementById('ld'+lockVal.length).classList.remove('filled');
+    document.getElementById('lockErr').textContent = '';
+  }
+
+  // Keyboard support
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('lockScreen').style.display === 'none') return;
+    if (e.key >= '0' && e.key <= '9') lk(e.key);
+    if (e.key === 'Backspace') lkBack();
+  });
+</script>
+
 </body>
 </html>
