@@ -267,7 +267,7 @@
     <div class="logo-sub">מרכז ניהול אישי · Rafael</div>
   </div>
 
-  <a class="app-card card-family" href="family.html">
+  <a class="app-card card-family" href="#" onclick="goFamily(event)">
     <div class="card-top">
       <div class="card-icon">🏠</div>
       <div class="card-info">
@@ -354,6 +354,7 @@
         if (lockVal === LOCK_PIN) {
           sessionStorage.setItem('unlocked','1');
           document.getElementById('lockScreen').style.display = 'none';
+          if (lockTarget) { window.location.href = lockTarget; lockTarget = ''; }
         } else {
           document.getElementById('lockErr').textContent = '❌ קוד שגוי';
           // shake and reset
@@ -366,6 +367,18 @@
       }, 200);
     }
   }
+
+  function goFamily(e) {
+    e.preventDefault();
+    if (sessionStorage.getItem('unlocked') === '1') {
+      window.location.href = 'family.html';
+    } else {
+      document.getElementById('lockScreen').style.display = 'flex';
+      lockTarget = 'family.html';
+    }
+  }
+
+  let lockTarget = '';
 
   function lkBack() {
     if (!lockVal.length) return;
