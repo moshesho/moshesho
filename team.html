@@ -1968,6 +1968,7 @@ header{
 
 <div class="toast" id="toast"></div>
 
+</div><!-- /app-wrap -->
 
 <!-- Cal Modal -->
 <div class="m-overlay" id="calModal" onclick="maybeClose(event,'calModal')">
@@ -1997,7 +1998,7 @@ header{
     <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
   </div>
 </div>
-</div><!-- /app-wrap -->
+
 
 <script>
   // ── USERS ──────────────────────────────────────────
@@ -3826,11 +3827,9 @@ header{
     const from = fromEls[fromEls.length-1]?.value || '';
     const to   = toEls[toEls.length-1]?.value || '';
     const type = document.querySelectorAll('#calTypeRow .mchip.sel')[0]?.dataset.t || 'flight';
-    alert('DEBUG: from='+from+' to='+to+' fromEls='+fromEls.length+' toEls='+toEls.length);
     if (!from || !to) {
       const calOverlay = document.getElementById('calModal');
       const allDates = calOverlay ? calOverlay.querySelectorAll('[type="date"]') : [];
-      alert('FALLBACK: calOverlay='+!!calOverlay+' dates='+allDates.length+' v0='+allDates[0]?.value+' v1='+allDates[1]?.value);
       const fromFb = calOverlay ? calOverlay.querySelector('[type="date"]:first-of-type')?.value : '';
       const toFb   = calOverlay ? calOverlay.querySelectorAll('[type="date"]')[1]?.value : '';
       if (!fromFb || !toFb) return toast('⚠️ חסרים תאריכים');
