@@ -1996,10 +1996,10 @@ header{
     <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
 
     <div class="m-lbl">תאריך התחלה</div>
-    <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px" onchange="calFromVal=this.value" oninput="calFromVal=this.value"/>
+    <input class="m-input" id="calFrom" type="text" placeholder="DD/MM/YYYY" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px;direction:ltr"/>
 
     <div class="m-lbl">תאריך סיום</div>
-    <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px" onchange="calToVal=this.value" oninput="calToVal=this.value"/>
+    <input class="m-input" id="calTo" type="text" placeholder="DD/MM/YYYY" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px;direction:ltr"/>
 
     <button class="m-save" onclick="saveCalEvent()" style="margin-top:16px">💾 שמור אירוע</button>
     <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
@@ -3814,7 +3814,7 @@ header{
       });
       html += '</div>';
 
-      ALL_UIDS.forEach(uid => {
+      ALL_UIDS.filter(uid => !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid] ? Object.values(calEvents[uid]) : [];
         
@@ -3858,7 +3858,7 @@ header{
 
     // Other users (admins only)
     if (canSeeAll) {
-      ALL_UIDS.filter(uid => uid !== currentUser).forEach(uid => {
+      ALL_UIDS.filter(uid => uid !== currentUser && !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid]
           ? Object.entries(calEvents[uid]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
@@ -3885,8 +3885,10 @@ header{
     document.getElementById('calModalTitle').textContent = ev ? '✏️ עריכת אירוע' : '➕ אירוע חדש';
     document.getElementById('calFor').textContent = 'עבור: ' + (USERS[uid]?.name||uid);
     document.getElementById('calName').value = ev?.name || '';
-    document.getElementById('calFrom').value = ev?.from || '';
-    document.getElementById('calTo').value   = ev?.to   || '';
+    // Convert YYYY-MM-DD to DD/MM/YYYY for display
+    const toDisplay = d => d ? d.split('-').reverse().join('/') : '';
+    document.getElementById('calFrom').value = toDisplay(ev?.from||'');
+    document.getElementById('calTo').value   = toDisplay(ev?.to||'');
     calFromVal = ev?.from || '';
     calToVal   = ev?.to   || '';
     document.querySelectorAll('#calTypeRow .mchip').forEach(b => b.classList.toggle('sel', b.dataset.t === (ev?.type||'flight')));
