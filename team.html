@@ -3820,8 +3820,11 @@ header{
 
   function saveCalEvent() {
     const name = document.getElementById('calName').value.trim();
-    const from = document.getElementById('calFrom').value;
-    const to   = document.getElementById('calTo').value;
+    const fromEl = document.getElementById('calFrom');
+    const toEl = document.getElementById('calTo');
+    const from = fromEl ? fromEl.value : '';
+    const to = toEl ? toEl.value : '';
+    alert('from='+from+' to='+to+' fromEl='+!!fromEl+' toEl='+!!toEl);
     const type = document.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
     if (!from || !to) return toast('⚠️ חסרים תאריכים');
     if (from > to)    return toast('⚠️ תאריך סיום לפני תחילה');
