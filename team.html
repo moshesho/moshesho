@@ -3746,11 +3746,13 @@ header{
     const card = document.querySelector('[data-tid="'+tid+'"]');
     if (!card) return;
 
-    // save scroll from all possible containers
+    // find which element is actually scrolling
     const mainEl = document.getElementById('mainContent');
-    const bodyEl = document.documentElement;
-    const sy_win = window.scrollY || bodyEl.scrollTop;
+    const appWrap = document.getElementById('app');
+    const sy_win = window.scrollY || document.documentElement.scrollTop;
     const sy_main = mainEl ? mainEl.scrollTop : 0;
+    const sy_app = appWrap ? appWrap.scrollTop : 0;
+    console.log('SCROLL SAVE: win='+sy_win+' main='+sy_main+' app='+sy_app);
 
     const t = tasks.find(x=>x.id===tid);
     if (!t) return;
@@ -3786,12 +3788,15 @@ header{
       card.appendChild(div);
     }
 
-    // restore scroll to all containers
     requestAnimationFrame(() => {
       window.scrollTo(0, sy_win);
       document.documentElement.scrollTop = sy_win;
       const mainEl2 = document.getElementById('mainContent');
       if (mainEl2) mainEl2.scrollTop = sy_main;
+      const appWrap2 = document.getElementById('app');
+      if (appWrap2) appWrap2.scrollTop = sy_app;
+      console.log('SCROLL RESTORE: win='+sy_win+' main='+sy_main+' app='+sy_app);
+      console.log('AFTER: win='+window.scrollY+' main='+(mainEl2?mainEl2.scrollTop:0));
     });
   }
 
