@@ -3746,10 +3746,11 @@ header{
     const card = document.querySelector('[data-tid="'+tid+'"]');
     if (!card) return;
 
-    // save scroll — works for both window and content div
+    // save scroll from all possible containers
     const mainEl = document.getElementById('mainContent');
-    const useMain = mainEl && mainEl.scrollHeight > mainEl.clientHeight;
-    const sy = useMain ? mainEl.scrollTop : (window.scrollY || document.documentElement.scrollTop);
+    const bodyEl = document.documentElement;
+    const sy_win = window.scrollY || bodyEl.scrollTop;
+    const sy_main = mainEl ? mainEl.scrollTop : 0;
 
     const t = tasks.find(x=>x.id===tid);
     if (!t) return;
@@ -3785,12 +3786,12 @@ header{
       card.appendChild(div);
     }
 
-    // restore scroll
+    // restore scroll to all containers
     requestAnimationFrame(() => {
+      window.scrollTo(0, sy_win);
+      document.documentElement.scrollTop = sy_win;
       const mainEl2 = document.getElementById('mainContent');
-      const useMain2 = mainEl2 && mainEl2.scrollHeight > mainEl2.clientHeight;
-      if (useMain2) mainEl2.scrollTop = sy;
-      else window.scrollTo(0, sy);
+      if (mainEl2) mainEl2.scrollTop = sy_main;
     });
   }
 
