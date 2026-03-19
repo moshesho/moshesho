@@ -1644,13 +1644,13 @@ header{
   /* ── CALENDAR ── */
   .cal-wrap{max-width:600px;margin:0 auto}
   .cal-section{margin-bottom:20px}
-  .cal-section-title{font-size:11px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px;border-bottom:1px solid rgba(0,229,255,0.15);padding-bottom:6px}
+  .cal-section-title{font-size:13px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px;border-bottom:1px solid rgba(0,229,255,0.15);padding-bottom:6px}
   .cal-event{background:linear-gradient(145deg,rgba(12,18,32,0.95),rgba(6,10,20,0.98));border:1.5px solid rgba(0,170,255,0.12);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all .2s}
   .cal-event:hover{border-color:rgba(0,229,255,0.25)}
   .cal-event-icon{font-size:20px;flex-shrink:0}
   .cal-event-info{flex:1;min-width:0}
-  .cal-event-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
-  .cal-event-dates{font-size:11px;color:rgba(255,255,255,0.5)}
+  .cal-event-name{font-size:16px;font-weight:800;color:#fff;margin-bottom:3px}
+  .cal-event-dates{font-size:13px;color:rgba(255,255,255,0.65);font-weight:600}
   .cal-type-flight{border-right:3px solid #00aaff}
   .cal-type-vacation{border-right:3px solid #00ff9d}
   .cal-type-sick{border-right:3px solid #ff3b5c}
@@ -3734,7 +3734,7 @@ header{
     const TYPE_ICON  = {flight:'✈️', vacation:'🏖️', sick:'🤒', other:'📌'};
     const TYPE_LABEL = {flight:'טיסה', vacation:'חופשה', sick:'מחלה', other:'אחר'};
     const TYPE_CLS   = {flight:'cal-type-flight', vacation:'cal-type-vacation', sick:'cal-type-sick', other:'cal-type-other'};
-    const ALL_UIDS   = ['moshe','assaf','hazi','elad','alik','rif','tal','omer'];
+    const ALL_UIDS   = ['moshe','assaf','hazi','elad','alik','rif','tal'];
 
     function evCard(ev, uid, showEdit) {
       const del_fn = `delCalEvent('${uid}','${ev.id}')`;
