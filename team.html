@@ -3752,7 +3752,6 @@ header{
     const sy_win = window.scrollY || document.documentElement.scrollTop;
     const sy_main = mainEl ? mainEl.scrollTop : 0;
     const sy_app = appWrap ? appWrap.scrollTop : 0;
-    console.log('SCROLL SAVE: win='+sy_win+' main='+sy_main+' app='+sy_app);
 
     const t = tasks.find(x=>x.id===tid);
     if (!t) return;
@@ -3795,7 +3794,6 @@ header{
       if (mainEl2) mainEl2.scrollTop = sy_main;
       const appWrap2 = document.getElementById('app');
       if (appWrap2) appWrap2.scrollTop = sy_app;
-      console.log('SCROLL RESTORE: win='+sy_win+' main='+sy_main+' app='+sy_app);
       console.log('AFTER: win='+window.scrollY+' main='+(mainEl2?mainEl2.scrollTop:0));
     });
   }
