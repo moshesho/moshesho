@@ -1914,6 +1914,36 @@ header{
   </div>
 </div>
 
+
+<!-- Cal Modal -->
+<div class="m-overlay" id="calModal" onclick="maybeClose(event,'calModal')">
+  <div class="m-box">
+    <div class="m-handle"></div>
+    <div class="m-title" id="calModalTitle">➕ אירוע חדש</div>
+    <div id="calFor" style="font-size:11px;color:var(--cyan);margin-bottom:12px;letter-spacing:1px"></div>
+
+    <div class="m-lbl">סוג אירוע</div>
+    <div class="meta-row" id="calTypeRow">
+      <button class="mchip sel" data-t="flight" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">✈️ טיסה</button>
+      <button class="mchip" data-t="vacation" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">🏖️ חופשה</button>
+      <button class="mchip" data-t="sick" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">🤒 מחלה</button>
+      <button class="mchip" data-t="other" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">📌 אחר</button>
+    </div>
+
+    <div class="m-lbl">שם/תיאור (אופציונלי)</div>
+    <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
+
+    <div class="m-lbl">תאריך התחלה</div>
+    <input class="m-input date-input" id="calFrom" type="date"/>
+
+    <div class="m-lbl">תאריך סיום</div>
+    <input class="m-input date-input" id="calTo" type="date"/>
+
+    <button class="m-save" onclick="saveCalEvent()" style="margin-top:16px">💾 שמור אירוע</button>
+    <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
+  </div>
+</div>
+
 <!-- Task Modal -->
 <div class="m-overlay" id="taskModal" onclick="maybeClose(event,'taskModal')">
   <div class="m-box">
@@ -2781,7 +2811,7 @@ header{
         <button class="tab" onclick="setTab('tasks',this)">✅ משימות</button>
         <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>
         <button class="tab" onclick="setTab('cal',this)">📅 יומן</button>
-        ${isTrashUser ? `<button class="tab" id="trashTab" onclick="setTab('trash',this)">🗑️ סל${trash.length?' ('+trash.length+')':''}</button>` : ''}`;
+        ${isTrashUser ? '<button class="tab" id="trashTab" onclick="setTab(\'trash\',this)">🗑️ סל${trash.length?\' (\'+trash.length+\')\':\'\'}</button>' : ''}`;
     } else if (u.role === 'manager') {
       document.getElementById('tabsRow').innerHTML = `
         <button class="tab active" onclick="setTab('dash',this)">📊 דשבורד</button>
@@ -3744,7 +3774,7 @@ header{
           <div class="cal-event-name">${esc(ev.name||TYPE_LABEL[ev.type]||'אירוע')}</div>
           <div class="cal-event-dates">📆 ${ev.from} → ${ev.to}</div>
         </div>
-        ${showEdit ? `<button class="iBtn" onclick="${edt_fn}">✏️</button>` : ''}
+        ${showEdit ? '<button class="iBtn" onclick="'+edt_fn+'">✏️</button>' : ''}
         <button class="iBtn" onclick="${del_fn}">🗑</button>
       </div>`;
     }
