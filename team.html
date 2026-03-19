@@ -2535,11 +2535,18 @@ header{
     el.innerHTML = list.map(n => {
       const d = new Date(n.at||0);
       const ds = d.getDate()+'/'+(d.getMonth()+1)+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
-      return `<div style="padding:12px;border-radius:10px;margin-bottom:8px;
+      const clickable = n.taskId ? 'cursor:pointer' : '';
+      const onclick = n.taskId ? `onclick="closeModal('notifPanel');goToTask('${n.taskId}')"` : '';
+      return `<div ${onclick} style="padding:12px;border-radius:10px;margin-bottom:8px;${clickable};
         background:${n.read?'rgba(255,255,255,0.03)':'rgba(59,130,246,0.09)'};
-        border:1px solid ${n.read?'rgba(255,255,255,0.06)':'rgba(59,130,246,0.3)'}">
+        border:1px solid ${n.read?'rgba(255,255,255,0.06)':'rgba(59,130,246,0.3)'};
+        transition:all .15s"
+        onmouseover="if(this.style.cursor==='pointer')this.style.background='rgba(0,170,255,0.12)'"
+        onmouseout="this.style.background='${n.read?'rgba(255,255,255,0.03)':'rgba(59,130,246,0.09)'}'"
+      >
         <div style="font-size:13px;font-weight:${n.read?500:800};color:${n.read?'var(--text2)':'#fff'}">
           ${n.read?'':'🔵 '}📋 ${esc(n.taskName||'משימה חדשה')}
+          ${n.taskId ? '<span style="font-size:10px;color:var(--cyan);margin-right:6px">← לחץ לפתיחה</span>' : ''}
         </div>
         <div style="font-size:10px;color:var(--text3);margin-top:3px">שובצת למשימה · ${ds}</div>
       </div>`;
@@ -2565,10 +2572,9 @@ header{
   }
 
 
-  function pushNotif(uid, taskName) {
-    db.ref('team/notifs/'+uid).push({ taskName, at:Date.now(), read:false });
-    if (currentUser === uid) showBanner(taskName);
-
+  function pushNotif(uid, taskName, taskId) {
+    db.ref('team/notifs/'+uid).push({ taskName, taskId:taskId||null, at:Date.now(), read:false });
+    if (currentUser === uid) showBanner(taskName, taskId);
   }
 
   function playNotifSound() {
@@ -2587,22 +2593,30 @@ header{
     } catch(e) {}
   }
 
-  function showBanner(taskName) {
+  function showBanner(taskName, taskId) {
     playNotifSound();
-    // remove existing banner
     const old = document.getElementById('notifBanner');
     if (old) old.remove();
     const el = document.createElement('div');
     el.className = 'notif-banner';
     el.id = 'notifBanner';
+    el.style.cursor = taskId ? 'pointer' : 'default';
     el.innerHTML = `
       <div class="nb-icon">📋</div>
       <div class="nb-body">
-        <div class="nb-title">משימה חדשה שובצת!</div>
+        <div class="nb-title">משימה חדשה שובצת! ${taskId ? '<span style="font-size:10px;opacity:.7">← לחץ לפתיחה</span>' : ''}</div>
         <div class="nb-sub">${esc(taskName)}</div>
       </div>
-      <span class="nb-close" onclick="document.getElementById('notifBanner').remove()">✕</span>`;
-    el.onclick = e => { if (!e.target.classList.contains('nb-close')) { openNotifPanel(); el.remove(); } };
+      <span class="nb-close" onclick="event.stopPropagation();document.getElementById('notifBanner').remove()">✕</span>`;
+    el.onclick = e => {
+      if (e.target.classList.contains('nb-close')) return;
+      el.remove();
+      if (taskId) {
+        goToTask(taskId);
+      } else {
+        openNotifPanel();
+      }
+    };
     document.body.appendChild(el);
     requestAnimationFrame(() => { requestAnimationFrame(() => el.classList.add('show')); });
     setTimeout(() => { el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 6000);
@@ -3634,7 +3648,7 @@ header{
     }
     pendingSteps = [];
     const names = mAssignees.map(u=>USERS[u].name.split(' ')[0]).join(', ');
-    mAssignees.forEach(uid => pushNotif(uid, name));
+    mAssignees.forEach(uid => pushNotif(uid, name, newRef.key));
     mAssignees = [];
     document.getElementById('quickName').value='';
     if (document.getElementById('qNotes')) document.getElementById('qNotes').value='';
@@ -4027,8 +4041,8 @@ header{
       toast('✏️ עודכן!');
     } else {
       mAssigneesList.forEach(uid => {
-        db.ref('team/tasks').push({...base, assignee:uid, assignees:[uid], createdAt:Date.now(), createdBy:currentUser});
-        pushNotif(uid, base.name);
+        const nr = db.ref('team/tasks').push({...base, assignee:uid, assignees:[uid], createdAt:Date.now(), createdBy:currentUser});
+        pushNotif(uid, base.name, nr.key);
       });
       toast('✅ נוסף!');
     }
