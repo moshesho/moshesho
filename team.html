@@ -3752,21 +3752,64 @@ header{
 
     let html = '<div class="cal-wrap">';
 
-    // Overview
+    // Overview - weekly view
     if (canSeeAll) {
-      const today = new Date().toISOString().split('T')[0];
-      html += '<div class="cal-section"><div class="cal-section-title">👥 סטטוס צוות שבועי</div>';
+      // Get current week Mon-Thu (skip Fri/Sat)
+      const today = new Date();
+      const dow = today.getDay(); // 0=Sun,1=Mon,...,6=Sat
+      // Find Sunday of this week
+      const sunday = new Date(today);
+      sunday.setDate(today.getDate() - dow);
+      
+      // Build week days Sun-Thu (0-4), skip Fri(5) Sat(6)
+      const weekDays = [];
+      const dayNames = ['א','ב','ג','ד','ה'];
+      for (let i=0; i<=4; i++) {
+        const d = new Date(sunday);
+        d.setDate(sunday.getDate() + i);
+        weekDays.push({
+          date: d.toISOString().split('T')[0],
+          label: dayNames[i]
+        });
+      }
+
+      html += '<div class="cal-section">';
+      html += '<div class="cal-section-title">👥 סטטוס צוות שבועי</div>';
+      
+      // Header row with day names
+      html += '<div style="display:flex;gap:4px;margin-bottom:8px;padding-right:120px">';
+      weekDays.forEach(d => {
+        const isToday = d.date === today.toISOString().split('T')[0];
+        html += `<div style="flex:1;text-align:center;font-size:11px;font-weight:${isToday?900:600};color:${isToday?'var(--cyan)':'rgba(255,255,255,0.4)'};font-family:Arial">${d.label}<br><span style="font-size:9px">${d.date.slice(8)}</span></div>`;
+      });
+      html += '</div>';
+
       ALL_UIDS.forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid] ? Object.values(calEvents[uid]) : [];
-        const todayEv = evs.find(e => e.from <= today && e.to >= today);
-        html += `<div class="cal-overview-row">
+        
+        html += '<div style="display:flex;align-items:center;gap:4px;margin-bottom:6px">';
+        // Avatar + name
+        html += `<div style="display:flex;align-items:center;gap:8px;width:120px;flex-shrink:0">
           <div class="cal-avatar">${USERS[uid].initials}</div>
-          <div style="flex:1;font-size:15px;font-weight:800;color:#fff">${USERS[uid].name}</div>
-          ${todayEv
-            ? `<span class="cal-status-away">${TYPE_ICON[todayEv.type]||'📌'} ${todayEv.name||TYPE_LABEL[todayEv.type]}</span>`
-            : '<span class="cal-status-here">✅ במשרד</span>'}
+          <div style="font-size:13px;font-weight:800;color:#fff">${USERS[uid].name.split(' ')[0]}</div>
         </div>`;
+        
+        // Day cells
+        weekDays.forEach(d => {
+          const ev = evs.find(e => e.from <= d.date && e.to >= d.date);
+          const isToday = d.date === today.toISOString().split('T')[0];
+          if (ev) {
+            html += `<div style="flex:1;text-align:center;padding:4px 2px;border-radius:6px;background:rgba(255,59,92,0.15);border:1px solid rgba(255,59,92,0.3);font-size:11px;font-weight:700;color:#ff3b5c">
+              ${TYPE_ICON[ev.type]||'📌'}
+            </div>`;
+          } else {
+            html += `<div style="flex:1;text-align:center;padding:4px 2px;border-radius:6px;background:${isToday?'rgba(0,255,157,0.1)':'rgba(0,255,157,0.05)'};border:1px solid ${isToday?'rgba(0,255,157,0.3)':'rgba(0,255,157,0.1)'};font-size:11px;color:rgba(0,255,157,0.7)">
+              💼
+            </div>`;
+          }
+        });
+        html += '</div>';
       });
       html += '</div>';
     }
