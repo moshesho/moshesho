@@ -3743,6 +3743,7 @@ header{
   }
   function toggleTaskExpand(tidEnc) {
     const tid = decodeURIComponent(tidEnc);
+    const sy = window.scrollY || document.documentElement.scrollTop;
     const isExpanded = expandedTasks.has(tid);
     if (isExpanded) expandedTasks.delete(tid);
     else expandedTasks.add(tid);
@@ -3790,12 +3791,17 @@ header{
           } else btn.textContent = '+ הוסף שלבים';
         }
       }
-      window.scrollTo(0, sy);
+      requestAnimationFrame(()=>{
+        window.scrollTo(0,sy);
+        requestAnimationFrame(()=>window.scrollTo(0,sy));
+      });
     } else {
       // fallback
-      const sy = window.scrollY;
       render();
-      requestAnimationFrame(()=>window.scrollTo(0,sy));
+      requestAnimationFrame(()=>{
+        window.scrollTo(0,sy);
+        requestAnimationFrame(()=>window.scrollTo(0,sy));
+      });
     }
   }
 
