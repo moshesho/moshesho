@@ -3866,9 +3866,9 @@ header{
 
   // ── EDIT MODAL ─────────────────────────────────────
   function openEdit(id) {
-    // admins can edit any task
     const t = tasks.find(x=>x.id===id);
     if (!t) return;
+    window._savedScroll = window.scrollY || document.documentElement.scrollTop;
     editId   = id;
     mAssignee= t.assignee||null;
     mPrio    = t.priority||3;
@@ -3905,6 +3905,7 @@ header{
   }
 
   function openAdd() {
+    window._savedScroll = window.scrollY || document.documentElement.scrollTop;
     editId=null; mAssignee=null; mPrio=3; mStatus='open';
     document.getElementById('modalTitle').textContent='➕ משימה חדשה';
     document.getElementById('mTaskName').value='';
@@ -3970,7 +3971,12 @@ header{
     render();
   }
 
-  function closeModal(id){document.getElementById(id).classList.remove('open')}
+  function closeModal(id){
+    document.getElementById(id).classList.remove('open');
+    if (typeof window._savedScroll === 'number') {
+      setTimeout(()=>{ window.scrollTo(0, window._savedScroll); }, 10);
+    }
+  }
   function maybeClose(e,id){if(e.target===document.getElementById(id))closeModal(id)}
 
   function esc(s=''){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
