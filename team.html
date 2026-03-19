@@ -1984,10 +1984,10 @@ header{
     <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
 
     <div class="m-lbl">תאריך התחלה</div>
-    <input class="m-input" id="calFrom" type="date" dir="ltr" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px"/>
+    <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px" onchange="calFromVal=this.value" oninput="calFromVal=this.value"/>
 
     <div class="m-lbl">תאריך סיום</div>
-    <input class="m-input" id="calTo" type="date" dir="ltr" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px"/>
+    <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px" onchange="calToVal=this.value" oninput="calToVal=this.value"/>
 
     <button class="m-save" onclick="saveCalEvent()" style="margin-top:16px">💾 שמור אירוע</button>
     <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
@@ -3814,6 +3814,8 @@ header{
     document.getElementById('calName').value = ev?.name || '';
     document.getElementById('calFrom').value = ev?.from || '';
     document.getElementById('calTo').value   = ev?.to   || '';
+    calFromVal = ev?.from || '';
+    calToVal   = ev?.to   || '';
     document.querySelectorAll('#calTypeRow .mchip').forEach(b => b.classList.toggle('sel', b.dataset.t === (ev?.type||'flight')));
     document.getElementById('calModal').classList.add('open');
   }
