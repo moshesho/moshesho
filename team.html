@@ -3743,23 +3743,42 @@ header{
   }
   function toggleTaskExpand(tidEnc) {
     const tid = decodeURIComponent(tidEnc);
+    const card = document.querySelector('[data-tid="'+tid+'"]');
+    if (!card) return;
 
-    // Lock scroll position
-    const sy = window.scrollY || document.documentElement.scrollTop;
-    document.body.style.top = '-' + sy + 'px';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
+    const t = tasks.find(x=>x.id===tid);
+    if (!t) return;
 
-    if (expandedTasks.has(tid)) expandedTasks.delete(tid);
-    else expandedTasks.add(tid);
-
-    render();
-
-    // Restore scroll
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    window.scrollTo(0, sy);
+    const isExpanded = expandedTasks.has(tid);
+    if (isExpanded) {
+      expandedTasks.delete(tid);
+      // remove expanded section
+      const exp = card.querySelector('.task-expand-content');
+      if (exp) exp.remove();
+      // update button
+      const btn = card.querySelector('.expand-task-btn');
+      if (btn) {
+        const steps = t.steps ? Object.entries(t.steps) : [];
+        const doneCnt = steps.filter(([,s])=>s.done).length;
+        const pct = steps.length ? Math.round(doneCnt/steps.length*100) : 0;
+        if (steps.length) btn.innerHTML = '▼ שלבים ('+doneCnt+'/'+steps.length+')'+(pct>0?' <span style="font-size:10px;opacity:.7">'+pct+'%</span>':'');
+        else btn.textContent = '+ הוסף שלבים';
+      }
+    } else {
+      expandedTasks.add(tid);
+      // update button
+      const btn = card.querySelector('.expand-task-btn');
+      const steps = t.steps ? Object.entries(t.steps) : [];
+      const doneCnt = steps.filter(([,s])=>s.done).length;
+      if (btn) btn.textContent = '▲ שלבים ('+doneCnt+'/'+steps.length+')';
+      // build and insert expanded content
+      const isAdmin = USERS[currentUser]?.role==='admin';
+      const isManager = USERS[currentUser]?.role==='manager';
+      const div = document.createElement('div');
+      div.className = 'task-expand-content';
+      div.innerHTML = buildStepsHtml(t, isAdmin||isManager);
+      card.appendChild(div);
+    }
   }
 
   function addStepById(taskId) {
@@ -3790,7 +3809,7 @@ header{
     const statusMap = {open:'status-open',progress:'status-progress',blocked:'status-blocked',done:'status-done'};
 
     return `
-    <div class="task-card s-${t.status||'open'}">
+    <div class="task-card s-${t.status||'open'}" data-tid="${t.id}">
       <div class="tc-top">
         ${t.project ? '<div style="font-size:10px;color:#00e5ff;font-weight:700;margin-bottom:3px">📁 '+esc(t.project)+'</div>' : ''}
         <div class="tc-name">${esc(t.name)}</div>
