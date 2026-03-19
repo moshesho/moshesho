@@ -2727,7 +2727,6 @@ header{
     }
     initNotifListener(uid);
     if (uid === 'moshe') setTimeout(autoBackup, 2000);
-    setTimeout(registerPush, 1000);
     const pinBtn = document.getElementById('pinListBtn');
     if (pinBtn) pinBtn.style.display = uid === 'moshe' ? 'inline-block' : 'none';
     const backupBtn = document.getElementById('backupBtn');
@@ -3994,54 +3993,6 @@ header{
     document.getElementById('taskModal').classList.add('open');
   }
 
-
-  // ── WEB PUSH NOTIFICATIONS ──────────────────────────
-  const VAPID_PUBLIC_KEY = 'BJAiwPTmpiZ4yOMQhWszWww-0w6xBdTMR1wLqnW1FFveqgv0rMSBzfu9_phaRviS0BR1jp8d5HS5fMBtTx-kWiE';
-
-  function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-    const rawData = window.atob(base64);
-    return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
-  }
-
-  async function registerPush() {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-    try {
-      const reg = await navigator.serviceWorker.register('/moshesho/sw.js');
-      const perm = await Notification.requestPermission();
-      if (perm !== 'granted') return;
-      const sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-      });
-      // save subscription to Firebase under user's uid
-      if (currentUser) {
-        db.ref('team/pushSubs/' + currentUser).set(JSON.stringify(sub));
-        console.log('Push subscription saved for', currentUser);
-      }
-    } catch(e) { console.log('Push registration failed:', e); }
-  }
-
-  async function sendWebPush(uid, taskName) {
-    // Read subscription from Firebase and send via service worker postMessage
-    db.ref('team/pushSubs/' + uid).get().then(snap => {
-      if (!snap.exists()) return;
-      try {
-        const sub = JSON.parse(snap.val());
-        // Use Firebase Cloud Messaging via service worker broadcast
-        navigator.serviceWorker.ready.then(reg => {
-          reg.showNotification('SPYDER Team 🛡️', {
-            body: '📋 משימה חדשה: ' + taskName,
-            icon: '/moshesho/icon-192.png',
-            dir: 'rtl',
-            vibrate: [200, 100, 200],
-            data: { url: '/moshesho/team.html' }
-          });
-        });
-      } catch(e) {}
-    });
-  }
 
   function setMA(el){mAssignee=el.dataset.u;document.querySelectorAll('#mAssigneeRow .mchip').forEach(c=>c.classList.remove('sel'));el.classList.add('sel')}
   function toggleMA(el){
