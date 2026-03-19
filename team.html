@@ -2727,17 +2727,20 @@ header{
         <button class="tab active" onclick="setTab('dash',this)">📊 דשבורד</button>
         <button class="tab" onclick="setTab('tasks',this)">✅ משימות</button>
         <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>
+        <button class="tab" onclick="setTab('cal',this)">📅 יומן</button>
         ${isTrashUser ? `<button class="tab" id="trashTab" onclick="setTab('trash',this)">🗑️ סל${trash.length?' ('+trash.length+')':''}</button>` : ''}`;
     } else if (u.role === 'manager') {
       document.getElementById('tabsRow').innerHTML = `
         <button class="tab active" onclick="setTab('dash',this)">📊 דשבורד</button>
         <button class="tab" onclick="setTab('tasks',this)">✅ משימות</button>
-        <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>`;
+        <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>
+        <button class="tab" onclick="setTab('cal',this)">📅 יומן</button>`;
     } else {
       document.getElementById('tabsRow').innerHTML = `
         <button class="tab active" onclick="setTab('dash',this)">📊 דשבורד</button>
         <button class="tab" onclick="setTab('tasks',this)">✅ משימות</button>
-        <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>`;
+        <button class="tab" onclick="setTab('add',this)">➕ הוסף</button>
+        <button class="tab" onclick="setTab('cal',this)">📅 יומן</button>`;
     }
     initNotifListener(uid);
     if (uid === 'moshe') setTimeout(autoBackup, 2000);
