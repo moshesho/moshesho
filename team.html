@@ -3641,7 +3641,7 @@ header{
     let h = '<div class="task-footer">';
 
     // כפתור פתיחה/סגירה
-    h += '<button class="expand-task-btn" onclick="toggleTaskExpand(\''+tidEnc+'\')">'; 
+    h += '<button type="button" class="expand-task-btn" onclick="event.preventDefault();event.stopPropagation();toggleTaskExpand(\''+tidEnc+'\')">'; 
     if (steps.length) {
       h += (expanded ? '▲' : '▼') + ' שלבים (' + doneCnt + '/' + steps.length + ')';
       if (!expanded && pct > 0) {
