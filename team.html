@@ -3743,9 +3743,64 @@ header{
   }
   function toggleTaskExpand(tidEnc) {
     const tid = decodeURIComponent(tidEnc);
-    if (expandedTasks.has(tid)) expandedTasks.delete(tid);
+    const isExpanded = expandedTasks.has(tid);
+    if (isExpanded) expandedTasks.delete(tid);
     else expandedTasks.add(tid);
-    render();
+
+    // find the task card and update in-place without full re-render
+    const allCards = document.querySelectorAll('.task-card');
+    let targetCard = null;
+    allCards.forEach(card => {
+      const btn = card.querySelector('.expand-task-btn');
+      if (btn && btn.getAttribute('onclick') && btn.getAttribute('onclick').includes(tidEnc)) {
+        targetCard = card;
+      }
+    });
+
+    if (targetCard) {
+      // save scroll
+      const sy = window.scrollY;
+      // find footer and expanded content
+      const footer = targetCard.querySelector('.task-footer');
+      const existingExpand = targetCard.querySelector('.task-expanded');
+      if (existingExpand) existingExpand.remove();
+
+      // update button text
+      const btn = footer ? footer.querySelector('.expand-task-btn') : null;
+      const t = tasks.find(x=>x.id===tid);
+      if (t && btn) {
+        const steps = t.steps ? Object.entries(t.steps) : [];
+        const doneCnt = steps.filter(([,s])=>s.done).length;
+        const pct = steps.length ? Math.round(doneCnt/steps.length*100) : 0;
+        if (!isExpanded) {
+          if (steps.length) btn.textContent = '▲ שלבים ('+doneCnt+'/'+steps.length+')';
+          else btn.textContent = '▲ סגור';
+          // insert expanded content after footer
+          const isAdmin = USERS[currentUser]?.role==='admin';
+          const isManager = USERS[currentUser]?.role==='manager';
+          const expandDiv = document.createElement('div');
+          expandDiv.className = 'task-expanded';
+          expandDiv.innerHTML = buildStepsHtml(t, isAdmin||isManager);
+          targetCard.appendChild(expandDiv);
+          attachStepListeners(expandDiv, t);
+        } else {
+          if (steps.length) {
+            btn.textContent = '▼ שלבים ('+doneCnt+'/'+steps.length+')';
+            if (pct > 0) btn.textContent += ' '+pct+'%';
+          } else btn.textContent = '+ הוסף שלבים';
+        }
+      }
+      window.scrollTo(0, sy);
+    } else {
+      // fallback
+      const sy = window.scrollY;
+      render();
+      requestAnimationFrame(()=>window.scrollTo(0,sy));
+    }
+  }
+
+  function attachStepListeners(el, t) {
+    // no extra listeners needed — onclick inline handlers work
   }
 
   function addStepById(taskId) {
