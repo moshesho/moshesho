@@ -3001,7 +3001,8 @@ header{
     if (!currentUser) return;
     const content = document.getElementById('mainContent');
 
-    // save search field state before render
+    // save scroll + search field state before render
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
     const searchInp = document.getElementById('taskSearchInp');
     const searchVal = searchInp ? searchInp.value : null;
     const searchPos = searchInp ? searchInp.selectionStart : null;
@@ -3010,6 +3011,9 @@ header{
     else if (currentTab === 'tasks') renderTasks(content);
     else if (currentTab === 'add') renderAdd(content);
     else if (currentTab === 'trash') renderTrash(content);
+
+    // restore scroll position after render
+    requestAnimationFrame(() => { window.scrollTo(0, scrollY); });
 
     // restore search focus after render
     if (currentTab === 'tasks' && searchVal !== null) {
