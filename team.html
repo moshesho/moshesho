@@ -3746,6 +3746,11 @@ header{
     const card = document.querySelector('[data-tid="'+tid+'"]');
     if (!card) return;
 
+    // save scroll — works for both window and content div
+    const mainEl = document.getElementById('mainContent');
+    const useMain = mainEl && mainEl.scrollHeight > mainEl.clientHeight;
+    const sy = useMain ? mainEl.scrollTop : (window.scrollY || document.documentElement.scrollTop);
+
     const t = tasks.find(x=>x.id===tid);
     if (!t) return;
 
@@ -3779,6 +3784,14 @@ header{
       div.innerHTML = buildStepsHtml(t, isAdmin||isManager);
       card.appendChild(div);
     }
+
+    // restore scroll
+    requestAnimationFrame(() => {
+      const mainEl2 = document.getElementById('mainContent');
+      const useMain2 = mainEl2 && mainEl2.scrollHeight > mainEl2.clientHeight;
+      if (useMain2) mainEl2.scrollTop = sy;
+      else window.scrollTo(0, sy);
+    });
   }
 
   function addStepById(taskId) {
