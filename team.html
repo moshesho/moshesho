@@ -3755,7 +3755,7 @@ header{
     // Overview
     if (canSeeAll) {
       const today = new Date().toISOString().split('T')[0];
-      html += '<div class="cal-section"><div class="cal-section-title">👥 סטטוס צוות היום</div>';
+      html += '<div class="cal-section"><div class="cal-section-title">👥 סטטוס צוות שבועי</div>';
       ALL_UIDS.forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid] ? Object.values(calEvents[uid]) : [];
@@ -3777,7 +3777,7 @@ header{
       : [];
     html += '<div class="cal-section"><div class="cal-section-title">📅 היומן שלי</div>';
     if (myEvs.length) {
-      myEvs.forEach(e => { html += evCard(e, currentUser, false); });
+      myEvs.forEach(e => { html += evCard(e, currentUser, true); });
     } else {
       html += '<div class="cal-empty">אין אירועים מתוכננים</div>';
     }
