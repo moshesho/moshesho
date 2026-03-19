@@ -3858,7 +3858,7 @@ header{
 
     // Other users (admins only)
     if (canSeeAll) {
-      ALL_UIDS.filter(uid => uid !== currentUser).forEach(uid => {
+      ALL_UIDS.filter(uid => uid !== currentUser && !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid]
           ? Object.entries(calEvents[uid]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
