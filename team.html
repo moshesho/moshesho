@@ -1912,6 +1912,7 @@ header{
       <button class="mchip" data-u="moshe" onclick="toggleMA(this)">משה</button>
       <button class="mchip" data-u="assaf" onclick="toggleMA(this)">אסף</button>
       <button class="mchip" data-u="omer" onclick="toggleMA(this)" style="display:none">עומר</button>
+      <button class="mchip" data-u="hazi" onclick="toggleMA(this)" style="display:none" id="haziChip">חזי</button>
     </div>
 
     <div class="m-lbl">עדיפות</div>
@@ -3417,6 +3418,10 @@ header{
 
     html += `<div class="search-count" id="searchCountEl" style="display:${(taskSearchQuery||taskStatusFilter!=='all'||taskPrioFilter!=='all')?'':' none'}">` + filtered.length + ' תוצאות נמצאו</div>';
 
+    // hide hazi tasks from everyone except moshe and hazi
+    if (currentUser!=='moshe' && currentUser!=='hazi') {
+      filtered = filtered.filter(t => !isAssignedTo(t,'hazi'));
+    }
     const byStatus = {open:[],progress:[],blocked:[],done:[]};
     filtered.forEach(t=>(byStatus[t.status]||byStatus.open).push(t));
 
@@ -3561,7 +3566,7 @@ header{
     </div>
     <div class="m-lbl">שייך ל <span style="font-size:10px;color:var(--text3);font-weight:400">(ניתן לבחור כמה)</span></div>
     <div class="meta-row" id="qAssigneeRow">
-      ${Object.entries(USERS).filter(([uid,u]) => u.role !== 'lab' || ['admin','manager'].includes(USERS[currentUser]?.role)).map(([uid,u])=>`
+      ${Object.entries(USERS).filter(([uid,u]) => { if (u.role==='lab') return ['admin','manager'].includes(USERS[currentUser]?.role); if (uid==='hazi') return currentUser==='moshe'||currentUser==='hazi'; return true; }).map(([uid,u])=>`
         <button class="mchip ${mAssignees.includes(uid)?'sel':''}" data-u="${uid}" onclick="toggleQA(this)">${u.name.split(' ')[0]}</button>
       `).join('')}
     </div>
@@ -3781,7 +3786,7 @@ header{
           const all = (t.assignees && t.assignees.length > 0) ? t.assignees : [t.assignee];
           const isAdminUser = USERS[currentUser]?.role === 'admin';
           return all
-            .filter(uid => uid && (USERS[uid]?.role !== 'lab' || isAdminUser || USERS[currentUser]?.role==='manager' || uid === currentUser))
+            .filter(uid => uid && (USERS[uid]?.role !== 'lab' || isAdminUser || USERS[currentUser]?.role==='manager' || uid === currentUser) && (uid !== 'hazi' || currentUser==='moshe' || currentUser==='hazi'))
             .map(uid => `<span class="badge assignee">👤 ${USERS[uid]?.name.split(' ')[0]||uid}</span>`)
             .join('');
         })() : ''}
@@ -3892,6 +3897,9 @@ header{
     document.querySelectorAll('#mPrioRow .mchip').forEach(c=>{c.className='mchip';if(parseInt(c.dataset.p)===mPrio)c.classList.add('sp'+mPrio)});
     document.querySelectorAll('#mStatusRow .mchip').forEach(c=>c.classList.toggle('sel',c.dataset.s===mStatus));
 
+    // show hazi chip only for moshe and hazi
+    const haziChip = document.getElementById('haziChip');
+    if (haziChip) haziChip.style.display = (currentUser==='moshe'||currentUser==='hazi') ? 'inline-flex' : 'none';
     document.getElementById('taskModal').classList.add('open');
   }
 
@@ -3906,6 +3914,9 @@ header{
     document.querySelectorAll('#mAssigneeRow .mchip').forEach(c=>c.classList.remove('sel'));
     document.querySelectorAll('#mPrioRow .mchip').forEach(c=>{c.className='mchip';if(parseInt(c.dataset.p)===3)c.classList.add('sp3')});
     document.querySelectorAll('#mStatusRow .mchip').forEach(c=>c.classList.toggle('sel',c.dataset.s==='open'));
+    // show hazi chip only for moshe and hazi
+    const haziChipA = document.getElementById('haziChip');
+    if (haziChipA) haziChipA.style.display = (currentUser==='moshe'||currentUser==='hazi') ? 'inline-flex' : 'none';
     document.getElementById('taskModal').classList.add('open');
   }
 
