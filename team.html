@@ -2565,30 +2565,30 @@ header{
   }
 
 
-  function sendWhatsApp(uid, taskName, assignerName) {
-    const user = USERS[uid];
-    if (!user || !user.phone) return; // no phone = skip
-    const msg = encodeURIComponent(
-      '🛡️ SPYDER Team\n' +
-      '📋 משימה חדשה שובצה לך!\n\n' +
-      'שם המשימה: ' + taskName + '\n' +
-      'שובץ ע"י: ' + assignerName + '\n\n' +
-      'לצפייה: https://moshesho.github.io/moshesho/team.html'
-    );
-    window.open('https://wa.me/' + user.phone + '?text=' + msg, '_blank');
-  }
-
   function pushNotif(uid, taskName) {
     db.ref('team/notifs/'+uid).push({ taskName, at:Date.now(), read:false });
     if (currentUser === uid) showBanner(taskName);
-    // send WhatsApp if not sending to yourself
-    if (uid !== currentUser) {
-      const assignerName = USERS[currentUser]?.name.split(' ')[0] || 'מנהל';
-      sendWhatsApp(uid, taskName, assignerName);
-    }
+
+  }
+
+  function playNotifSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+    } catch(e) {}
   }
 
   function showBanner(taskName) {
+    playNotifSound();
     // remove existing banner
     const old = document.getElementById('notifBanner');
     if (old) old.remove();
