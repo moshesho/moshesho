@@ -3886,12 +3886,13 @@ header{
       const uid = c.dataset.u;
       const isSel = mAssigneesList.includes(uid);
       c.classList.toggle('sel', isSel);
-      // omer: show if assigned OR if admin; hide if not assigned and not admin
       if (uid === 'omer') {
         const showOmer = ['admin','manager'].includes(USERS[currentUser]?.role) || isSel;
         c.style.display = showOmer ? 'inline-flex' : 'none';
-        // non-admins can see omer is assigned but can't change it
-        // admins can always change assignees
+      }
+      if (uid === 'hazi') {
+        const showHazi = currentUser==='moshe' || currentUser==='hazi';
+        c.style.display = showHazi ? 'inline-flex' : 'none';
       }
     });
     document.querySelectorAll('#mPrioRow .mchip').forEach(c=>{c.className='mchip';if(parseInt(c.dataset.p)===mPrio)c.classList.add('sp'+mPrio)});
