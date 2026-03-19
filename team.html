@@ -1996,10 +1996,10 @@ header{
     <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
 
     <div class="m-lbl">תאריך התחלה</div>
-    <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px" onchange="calFromVal=this.value" oninput="calFromVal=this.value"/>
+    <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px;color-scheme:dark" onchange="calFromVal=this.value" oninput="calFromVal=this.value" onblur="calFromVal=this.value"/>
 
     <div class="m-lbl">תאריך סיום</div>
-    <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px" onchange="calToVal=this.value" oninput="calToVal=this.value"/>
+    <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px;color-scheme:dark" onchange="calToVal=this.value" oninput="calToVal=this.value" onblur="calToVal=this.value"/>
 
     <button class="m-save" onclick="saveCalEvent()" style="margin-top:16px">💾 שמור אירוע</button>
     <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
@@ -3814,7 +3814,7 @@ header{
       });
       html += '</div>';
 
-      ALL_UIDS.forEach(uid => {
+      ALL_UIDS.filter(uid => !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid] ? Object.values(calEvents[uid]) : [];
         
