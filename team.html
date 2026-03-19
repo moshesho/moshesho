@@ -2564,11 +2564,28 @@ header{
     closeModal('notifPanel');
   }
 
+
+  function sendWhatsApp(uid, taskName, assignerName) {
+    const user = USERS[uid];
+    if (!user || !user.phone) return; // no phone = skip
+    const msg = encodeURIComponent(
+      '🛡️ SPYDER Team\n' +
+      '📋 משימה חדשה שובצה לך!\n\n' +
+      'שם המשימה: ' + taskName + '\n' +
+      'שובץ ע"י: ' + assignerName + '\n\n' +
+      'לצפייה: https://moshesho.github.io/moshesho/team.html'
+    );
+    window.open('https://wa.me/' + user.phone + '?text=' + msg, '_blank');
+  }
+
   function pushNotif(uid, taskName) {
     db.ref('team/notifs/'+uid).push({ taskName, at:Date.now(), read:false });
     if (currentUser === uid) showBanner(taskName);
-    // send Web Push notification
-    sendWebPush(uid, taskName);
+    // send WhatsApp if not sending to yourself
+    if (uid !== currentUser) {
+      const assignerName = USERS[currentUser]?.name.split(' ')[0] || 'מנהל';
+      sendWhatsApp(uid, taskName, assignerName);
+    }
   }
 
   function showBanner(taskName) {
