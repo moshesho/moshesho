@@ -1820,6 +1820,30 @@ header{
   </div>
 </div>
 
+<!-- ── CAL MODAL ── -->
+<div class="m-overlay" id="calModal" onclick="maybeClose(event,'calModal')">
+  <div class="m-box">
+    <div class="m-handle"></div>
+    <div class="m-title" id="calModalTitle">➕ אירוע חדש</div>
+    <div id="calFor" style="font-size:11px;color:var(--cyan);margin-bottom:12px;letter-spacing:1px;font-family:Arial,sans-serif"></div>
+    <div class="m-lbl">סוג אירוע</div>
+    <div class="meta-row" id="calTypeRow">
+      <button class="mchip sel" data-t="flight"   onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">✈️ טיסה</button>
+      <button class="mchip"     data-t="vacation" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">🏖️ חופשה</button>
+      <button class="mchip"     data-t="sick"     onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">🤒 מחלה</button>
+      <button class="mchip"     data-t="other"    onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">📌 אחר</button>
+    </div>
+    <div class="m-lbl">שם/תיאור (אופציונלי)</div>
+    <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
+    <div class="m-lbl">תאריך התחלה</div>
+    <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
+    <div class="m-lbl">תאריך סיום</div>
+    <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
+    <button class="m-save" onclick="saveCalEvent()" style="margin-top:16px">💾 שמור אירוע</button>
+    <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
+  </div>
+</div>
+
 <!-- ── PIN LIST MODAL ── -->
 <div class="m-overlay" id="pinListModal" onclick="maybeClose(event,'pinListModal')">
   <div class="m-box">
@@ -1895,35 +1919,6 @@ header{
   draw();
 })();
 </script>
-
-<!-- Cal Modal -->
-<div class="m-overlay" id="calModal" onclick="maybeClose(event,'calModal')">
-  <div class="m-box">
-    <div class="m-handle"></div>
-    <div class="m-title" id="calModalTitle">➕ אירוע חדש</div>
-    <div id="calFor" style="font-size:11px;color:var(--cyan);margin-bottom:12px;letter-spacing:1px"></div>
-
-    <div class="m-lbl">סוג אירוע</div>
-    <div class="meta-row" id="calTypeRow">
-      <button class="mchip sel" data-t="flight" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">✈️ טיסה</button>
-      <button class="mchip" data-t="vacation" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">🏖️ חופשה</button>
-      <button class="mchip" data-t="sick" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">🤒 מחלה</button>
-      <button class="mchip" data-t="other" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">📌 אחר</button>
-    </div>
-
-    <div class="m-lbl">שם/תיאור (אופציונלי)</div>
-    <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
-
-    <div class="m-lbl">תאריך התחלה</div>
-    <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px;color-scheme:dark"/>
-
-    <div class="m-lbl">תאריך סיום</div>
-    <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color:#fff;background:rgba(0,170,255,0.05);border:1.5px solid rgba(0,170,255,0.2);border-radius:10px;padding:10px 12px;color-scheme:dark"/>
-
-    <button class="m-save" onclick="saveCalEvent()" style="margin-top:16px">💾 שמור אירוע</button>
-    <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
-  </div>
-</div>
 
 <!-- ── MAIN APP ── -->
 <div id="app" style="display:none">
