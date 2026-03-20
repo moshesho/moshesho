@@ -1669,6 +1669,31 @@ header{
 
 <!-- ── LOGIN ── -->
 <!-- ── USER SELECT SCREEN ── -->
+<!-- ── CAL MODAL ── -->
+<div class="m-overlay" id="calModal" onclick="maybeClose(event,'calModal')">
+  <div class="m-box">
+    <div class="m-handle"></div>
+    <div class="m-title" id="calModalTitle">➕ אירוע חדש</div>
+    <div id="calFor" style="font-size:11px;color:var(--cyan);margin-bottom:12px;letter-spacing:1px;font-family:Arial,sans-serif"></div>
+    <div class="m-lbl">סוג אירוע</div>
+    <div class="meta-row" id="calTypeRow">
+      <button class="mchip sel" data-t="flight"   onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">✈️ טיסה</button>
+      <button class="mchip"     data-t="vacation" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">🏖️ חופשה</button>
+      <button class="mchip"     data-t="sick"     onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">🤒 מחלה</button>
+      <button class="mchip"     data-t="other"    onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">📌 אחר</button>
+    </div>
+    <div class="m-lbl">שם/תיאור (אופציונלי)</div>
+    <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
+    <div class="m-lbl">תאריך התחלה</div>
+    <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
+    <div class="m-lbl">תאריך סיום</div>
+    <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
+    <button class="m-save" onclick="alert('calFrom=['+document.getElementById('calFrom').value+'] calTo=['+document.getElementById('calTo').value+']')" style="margin-top:16px">🔍 בדוק ערכים</button>
+    <button class="m-save" onclick="saveCalEvent()" style="margin-top:8px;background:green">💾 שמור</button>
+    <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
+  </div>
+</div>
+
 <div id="userSelectScreen" style="display:none">
   <div class="login-left">
     <div class="login-logo">
@@ -1817,31 +1842,6 @@ header{
     <div class="m-title">📱 טלפונים של הצוות</div>
     <div id="phoneListContent"></div>
     <button class="m-cancel" onclick="closeModal('phoneListModal')" style="margin-top:12px">סגור</button>
-  </div>
-</div>
-
-<!-- ── CAL MODAL ── -->
-<div class="m-overlay" id="calModal" onclick="maybeClose(event,'calModal')">
-  <div class="m-box">
-    <div class="m-handle"></div>
-    <div class="m-title" id="calModalTitle">➕ אירוע חדש</div>
-    <div id="calFor" style="font-size:11px;color:var(--cyan);margin-bottom:12px;letter-spacing:1px;font-family:Arial,sans-serif"></div>
-    <div class="m-lbl">סוג אירוע</div>
-    <div class="meta-row" id="calTypeRow">
-      <button class="mchip sel" data-t="flight"   onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">✈️ טיסה</button>
-      <button class="mchip"     data-t="vacation" onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">🏖️ חופשה</button>
-      <button class="mchip"     data-t="sick"     onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">🤒 מחלה</button>
-      <button class="mchip"     data-t="other"    onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">📌 אחר</button>
-    </div>
-    <div class="m-lbl">שם/תיאור (אופציונלי)</div>
-    <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
-    <div class="m-lbl">תאריך התחלה</div>
-    <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
-    <div class="m-lbl">תאריך סיום</div>
-    <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
-    <button class="m-save" onclick="alert('calFrom=['+document.getElementById('calFrom').value+'] calTo=['+document.getElementById('calTo').value+']')" style="margin-top:16px">🔍 בדוק ערכים</button>
-    <button class="m-save" onclick="saveCalEvent()" style="margin-top:8px;background:green">💾 שמור</button>
-    <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
   </div>
 </div>
 
