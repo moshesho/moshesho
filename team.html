@@ -2777,20 +2777,20 @@ header{
     updatePinDots();
   }
 
-    function checkPin() {
-    const entered = pinDigits.join('');
-    if (entered.length < 4) return;
-    const el = document.getElementById('pinError');
-    const matched = Object.entries(USERS).find(([uid, u]) => u.pin === entered);
-    if (matched) {
-      const [uid, u] = matched;
-      loggedInAs = uid;
-      if (u.role === 'admin' || u.role === 'manager') {
-        showUserSelect();
-      } else {
-        login(uid, u.role);
-      }
+  function checkPin() {
+  const entered = pinDigits.join('');
+  if (entered.length < 4) return;
+  const el = document.getElementById('pinError');
+  const matched = Object.entries(USERS).find(([uid, u]) => u.pin === entered);
+  if (matched) {
+    const [uid, u] = matched;
+    loggedInAs = uid;
+    if (u.role === 'admin' || u.role === 'manager') {
+      showUserSelect();
     } else {
+      login(uid, u.role);
+    }
+  } else {
       el.textContent = '❌ קוד שגוי';
       document.getElementById('pinDots').classList.add('shake');
       setTimeout(() => {
