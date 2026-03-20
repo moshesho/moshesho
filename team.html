@@ -1839,7 +1839,8 @@ header{
     <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
     <div class="m-lbl">תאריך סיום</div>
     <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
-    <button class="m-save" onclick="saveCalEvent()" style="margin-top:16px">💾 שמור אירוע</button>
+    <button class="m-save" onclick="alert('calFrom=['+document.getElementById('calFrom').value+'] calTo=['+document.getElementById('calTo').value+']')" style="margin-top:16px">🔍 בדוק ערכים</button>
+    <button class="m-save" onclick="saveCalEvent()" style="margin-top:8px;background:green">💾 שמור</button>
     <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
   </div>
 </div>
