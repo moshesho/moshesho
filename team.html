@@ -3891,10 +3891,14 @@ header{
 
   function saveCalEvent() {
     const modal = document.getElementById('calModal');
-    const name = modal.querySelector('#calName').value.trim();
-    const from = modal.querySelector('#calFrom').value;
-    const to   = modal.querySelector('#calTo').value;
+    if (!modal) { alert('NO MODAL'); return; }
+    const name = modal.querySelector('#calName') ? modal.querySelector('#calName').value.trim() : 'NO_NAME_EL';
+    const fromEl = modal.querySelector('#calFrom');
+    const toEl = modal.querySelector('#calTo');
+    const from = fromEl ? fromEl.value : 'NO_FROM_EL';
+    const to   = toEl ? toEl.value : 'NO_TO_EL';
     const type = modal.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
+    alert('SAVE: modal=YES from=['+from+'] to=['+to+'] fromEl='+!!fromEl+' toEl='+!!toEl);
     if (!from || !to) return toast('⚠️ חסרים תאריכים');
     if (from > to)    return toast('⚠️ תאריך סיום לפני תחילה');
     alert('שומר: from='+from+' to='+to+' type='+type+' uid='+calEditUid);
