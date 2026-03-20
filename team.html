@@ -2784,6 +2784,7 @@ header{
     // Read PIN from Firebase - not from code
     db.ref('team/pins').once('value', snap => {
       const pins = snap.val() || {};
+      alert('pins='+JSON.stringify(pins)+' entered='+entered);
       const matched = Object.entries(USERS).find(([uid, u]) => {
         return pins[uid] && String(pins[uid]) === String(entered);
       });
