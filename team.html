@@ -3897,6 +3897,7 @@ header{
     const type = modal.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
     if (!from || !to) return toast('⚠️ חסרים תאריכים');
     if (from > to)    return toast('⚠️ תאריך סיום לפני תחילה');
+    alert('שומר: from='+from+' to='+to+' type='+type+' uid='+calEditUid);
     const data = {type, name:name||null, from, to, createdBy:currentUser};
     if (calEditId) {
       db.ref('team/calendar/'+calEditUid+'/'+calEditId).update(data);
