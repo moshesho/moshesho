@@ -1670,7 +1670,7 @@ header{
 <!-- ── LOGIN ── -->
 <!-- ── USER SELECT SCREEN ── -->
 <!-- ── CAL MODAL ── -->
-<div class="m-overlay" id="calModal" onclick="maybeClose(event,'calModal')">
+<div class="m-overlay" id="calModal" onclick="maybeClose(event,'calModal')" style="z-index:99999">
   <div class="m-box">
     <div class="m-handle"></div>
     <div class="m-title" id="calModalTitle">➕ אירוע חדש</div>
@@ -1688,8 +1688,7 @@ header{
     <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
     <div class="m-lbl">תאריך סיום</div>
     <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
-    <button class="m-save" onclick="alert('calFrom=['+document.getElementById('calFrom').value+'] calTo=['+document.getElementById('calTo').value+']')" style="margin-top:16px">🔍 בדוק ערכים</button>
-    <button class="m-save" onclick="saveCalEvent()" style="margin-top:8px;background:green">💾 שמור</button>
+    <button class="m-save" onclick="saveCalEvent()" style="margin-top:8px">💾 שמור אירוע</button>
     <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
   </div>
 </div>
@@ -3891,10 +3890,11 @@ header{
   }
 
   function saveCalEvent() {
-    const name = document.getElementById('calName').value.trim();
-    const from = document.getElementById('calFrom').value;
-    const to   = document.getElementById('calTo').value;
-    const type = document.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
+    const modal = document.getElementById('calModal');
+    const name = modal.querySelector('#calName').value.trim();
+    const from = modal.querySelector('#calFrom').value;
+    const to   = modal.querySelector('#calTo').value;
+    const type = modal.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
     if (!from || !to) return toast('⚠️ חסרים תאריכים');
     if (from > to)    return toast('⚠️ תאריך סיום לפני תחילה');
     const data = {type, name:name||null, from, to, createdBy:currentUser};
