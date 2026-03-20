@@ -1685,9 +1685,17 @@ header{
     <div class="m-lbl">שם/תיאור (אופציונלי)</div>
     <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
     <div class="m-lbl">תאריך התחלה</div>
-    <input class="m-input" id="calFrom" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
+    <div style="display:flex;gap:6px;direction:ltr">
+      <input class="m-input" id="calFromD" type="number" placeholder="יום" min="1" max="31" style="width:60px;text-align:center"/>
+      <input class="m-input" id="calFromM" type="number" placeholder="חודש" min="1" max="12" style="width:70px;text-align:center"/>
+      <input class="m-input" id="calFromY" type="number" placeholder="שנה" min="2024" max="2030" style="width:80px;text-align:center" value="2026"/>
+    </div>
     <div class="m-lbl">תאריך סיום</div>
-    <input class="m-input" id="calTo" type="date" style="width:100%;box-sizing:border-box;color-scheme:dark"/>
+    <div style="display:flex;gap:6px;direction:ltr">
+      <input class="m-input" id="calToD" type="number" placeholder="יום" min="1" max="31" style="width:60px;text-align:center"/>
+      <input class="m-input" id="calToM" type="number" placeholder="חודש" min="1" max="12" style="width:70px;text-align:center"/>
+      <input class="m-input" id="calToY" type="number" placeholder="שנה" min="2024" max="2030" style="width:80px;text-align:center" value="2026"/>
+    </div>
     <button class="m-save" onclick="saveCalEvent()" style="margin-top:8px">💾 שמור אירוע</button>
     <button class="m-cancel" onclick="closeModal('calModal')">ביטול</button>
   </div>
@@ -3881,8 +3889,27 @@ header{
     document.getElementById('calModalTitle').textContent = ev ? '✏️ עריכת אירוע' : '➕ אירוע חדש';
     document.getElementById('calFor').textContent = 'עבור: ' + (USERS[uid]?.name||uid);
     document.getElementById('calName').value = ev?.name || '';
-    document.getElementById('calFrom').value = ev?.from || '';
-    document.getElementById('calTo').value   = ev?.to   || '';
+    // populate split date fields
+    if (ev?.from) {
+      const [fy,fm,fd] = ev.from.split('-');
+      document.getElementById('calFromY').value = fy;
+      document.getElementById('calFromM').value = parseInt(fm);
+      document.getElementById('calFromD').value = parseInt(fd);
+    } else {
+      document.getElementById('calFromD').value='';
+      document.getElementById('calFromM').value='';
+      document.getElementById('calFromY').value='2026';
+    }
+    if (ev?.to) {
+      const [ty,tm,td] = ev.to.split('-');
+      document.getElementById('calToY').value = ty;
+      document.getElementById('calToM').value = parseInt(tm);
+      document.getElementById('calToD').value = parseInt(td);
+    } else {
+      document.getElementById('calToD').value='';
+      document.getElementById('calToM').value='';
+      document.getElementById('calToY').value='2026';
+    }
     calFromVal = ev?.from || '';
     calToVal   = ev?.to   || '';
     document.querySelectorAll('#calTypeRow .mchip').forEach(b => b.classList.toggle('sel', b.dataset.t === (ev?.type||'flight')));
@@ -3891,17 +3918,15 @@ header{
 
   function saveCalEvent() {
     const modal = document.getElementById('calModal');
-    if (!modal) { alert('NO MODAL'); return; }
+    if (!modal) { return; }
     const name = modal.querySelector('#calName') ? modal.querySelector('#calName').value.trim() : 'NO_NAME_EL';
     const fromEl = modal.querySelector('#calFrom');
     const toEl = modal.querySelector('#calTo');
     const from = fromEl ? fromEl.value : 'NO_FROM_EL';
     const to   = toEl ? toEl.value : 'NO_TO_EL';
     const type = modal.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
-    alert('SAVE: modal=YES from=['+from+'] to=['+to+'] fromEl='+!!fromEl+' toEl='+!!toEl);
     if (!from || !to) return toast('⚠️ חסרים תאריכים');
     if (from > to)    return toast('⚠️ תאריך סיום לפני תחילה');
-    alert('שומר: from='+from+' to='+to+' type='+type+' uid='+calEditUid);
     const data = {type, name:name||null, from, to, createdBy:currentUser};
     if (calEditId) {
       db.ref('team/calendar/'+calEditUid+'/'+calEditId).update(data);
