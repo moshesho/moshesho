@@ -3896,24 +3896,10 @@ header{
 
   function saveCalEvent() {
     const name = document.getElementById('calName').value.trim();
-    // use last element in case of duplicates
-    const fromEls = document.querySelectorAll('#calFrom');
-    const toEls   = document.querySelectorAll('#calTo');
-    const from = fromEls[fromEls.length-1]?.value || '';
-    const to   = toEls[toEls.length-1]?.value || '';
-    const type = document.querySelectorAll('#calTypeRow .mchip.sel')[0]?.dataset.t || 'flight';
-    if (!from || !to) {
-      const calOverlay = document.getElementById('calModal');
-      const allDates = calOverlay ? calOverlay.querySelectorAll('[type="date"]') : [];
-      const fromFb = calOverlay ? calOverlay.querySelector('[type="date"]:first-of-type')?.value : '';
-      const toFb   = calOverlay ? calOverlay.querySelectorAll('[type="date"]')[1]?.value : '';
-      if (!fromFb || !toFb) return toast('⚠️ חסרים תאריכים');
-      const data2 = {type, name:name||null, from:fromFb, to:toFb, createdBy:currentUser};
-      if (calEditId) db.ref('team/calendar/'+calEditUid+'/'+calEditId).update(data2);
-      else db.ref('team/calendar/'+calEditUid).push(data2);
-      closeModal('calModal');
-      return toast('✅ אירוע נשמר!');
-    }
+    const from = document.getElementById('calFrom').value;
+    const to   = document.getElementById('calTo').value;
+    const type = document.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
+    if (!from || !to) return toast('⚠️ חסרים תאריכים');
     if (from > to)    return toast('⚠️ תאריך סיום לפני תחילה');
     const data = {type, name:name||null, from, to, createdBy:currentUser};
     if (calEditId) {
