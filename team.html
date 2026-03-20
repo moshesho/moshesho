@@ -2785,7 +2785,7 @@ header{
     db.ref('team/pins').once('value', snap => {
       const pins = snap.val() || {};
       const matched = Object.entries(USERS).find(([uid, u]) => {
-        return pins[uid] && pins[uid].toString() === entered;
+        return pins[uid] && String(pins[uid]) === String(entered);
       });
       if (matched) {
         const [uid, u] = matched;
