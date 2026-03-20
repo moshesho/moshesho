@@ -2018,14 +2018,14 @@ header{
 <script>
   // ── USERS ──────────────────────────────────────────
   const USERS = {
-    moshe:  { name:'משה שושה',     role:'admin',  initials:'מש', pin:'',  phone:'972525588555' },
-    assaf:  { name:'אסף בן מאיר',  role:'admin',  initials:'אב', pin:'',  phone:'972507857205' },
-    elad:   { name:'אלעד קומיסר',  role:'member', initials:'אק', pin:'',  phone:'972528721303' },
-    alik:   { name:'אליק אברמזון', role:'member', initials:'אא', pin:'',  phone:'972523201618' },
-    rif:    { name:'ריף פרץ',      role:'member', initials:'רפ', pin:'',  phone:'972533326272' },
-    tal:    { name:'טל כהן',       role:'member', initials:'טכ', pin:'',  phone:'972524713172' },
-    omer:   { name:'עומר תורג\'מן',   role:'lab',    initials:'עת', pin:'',  phone:'972545876986' },
-    hazi:   { name:'חזי בן-ארי',      role:'manager', initials:'חב', pin:'',  phone:'972523793086' },
+    moshe:  { name:'משה שושה',     role:'admin',  initials:'מש', pin:'1956',  phone:'972525588555' },
+    assaf:  { name:'אסף בן מאיר',  role:'admin',  initials:'אב', pin:'2168',  phone:'972507857205' },
+    elad:   { name:'אלעד קומיסר',  role:'member', initials:'אק', pin:'8623',  phone:'972528721303' },
+    alik:   { name:'אליק אברמזון', role:'member', initials:'אא', pin:'9195',  phone:'972523201618' },
+    rif:    { name:'ריף פרץ',      role:'member', initials:'רפ', pin:'5090',  phone:'972533326272' },
+    tal:    { name:'טל כהן',       role:'member', initials:'טכ', pin:'4810',  phone:'972524713172' },
+    omer:   { name:'עומר תורג\'מן',   role:'lab',    initials:'עת', pin:'1082',  phone:'972545876986' },
+    hazi:   { name:'חזי בן-ארי',      role:'manager', initials:'חב', pin:'7324',  phone:'972523793086' },
   };
   const PRIO_LABEL = {1:'🔴 דחוף',2:'🟡 גבוה',3:'🔵 רגיל',4:'⚪ נמוך'};
   const STATUS_LABEL = {open:'🔵 פתוח',progress:'🟡 בביצוע',blocked:'⏳ ממתין',done:'✅ בוצע'};
@@ -2777,35 +2777,21 @@ header{
     updatePinDots();
   }
 
-    function checkPin() {
-    const entered = pinDigits.join('');
-    if (entered.length < 4) return;
-    const el = document.getElementById('pinError');
-    // Read PIN from Firebase - not from code
-    db.ref('team/pins').once('value', snap => {
-      const pins = snap.val() || {};
-      const matched = Object.entries(USERS).find(([uid, u]) => {
-        return pins[uid] && pins[uid].toString() === entered;
-      });
-      if (matched) {
-        const [uid, u] = matched;
-        loggedInAs = uid;
-        if (u.role === 'admin' || u.role === 'manager') {
-          showUserSelect();
-        } else {
-          login(uid, u.role);
-        }
-      } else {
-        el.textContent = '❌ קוד שגוי';
-        document.getElementById('pinDots').classList.add('shake');
-        setTimeout(() => {
-          pinDigits = [];
-          updateDots();
-          el.textContent = '';
-          document.getElementById('pinDots').classList.remove('shake');
-        }, 800);
-      }
-    });
+  function checkPin() {
+    const match = Object.entries(USERS).find(([,u]) => u.pin === pinBuffer);
+    if (match) {
+      const [uid, u] = match;
+      loggedInAs = uid; // שמור מי נכנס עם PIN
+      document.getElementById('pinError').textContent = '';
+      login(uid, u.role);
+    } else {
+      document.getElementById('pinError').textContent = '❌ PIN שגוי, נסה שוב';
+      const dots = document.getElementById('pinDots');
+      dots.classList.add('pin-shake');
+      setTimeout(()=>{ dots.classList.remove('pin-shake'); }, 350);
+      pinBuffer = '';
+      updatePinDots();
+    }
   }
 
   function login(uid, role) {
