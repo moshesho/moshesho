@@ -3374,7 +3374,6 @@ header{
     }
 
     if (steps.length) {
-      html += `<div style="font-size:12px;font-weight:800;color:var(--text3);letter-spacing:1px;margin-bottom:10px">שלבים</div>`;
       steps.forEach(([sid, s]) => {
         const comments = s.comments ? Object.entries(s.comments).sort((a,b)=>(a[1].ts||0)-(b[1].ts||0)) : [];
         const tidEnc = encodeURIComponent(t.id);
