@@ -3940,16 +3940,18 @@ header{
   }
 
   function saveCalEvent() {
-    const modal = document.getElementById('calModal');
-    if (!modal) { return; }
-    const name = modal.querySelector('#calName') ? modal.querySelector('#calName').value.trim() : 'NO_NAME_EL';
-    const fromEl = modal.querySelector('#calFrom');
-    const toEl = modal.querySelector('#calTo');
-    const from = fromEl ? fromEl.value : 'NO_FROM_EL';
-    const to   = toEl ? toEl.value : 'NO_TO_EL';
-    const type = modal.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
-    if (!from || !to) return toast('⚠️ חסרים תאריכים');
-    if (from > to)    return toast('⚠️ תאריך סיום לפני תחילה');
+    const name = document.getElementById('calName')?.value.trim() || '';
+    const fD = document.getElementById('calFromD')?.value;
+    const fM = document.getElementById('calFromM')?.value;
+    const fY = document.getElementById('calFromY')?.value;
+    const tD = document.getElementById('calToD')?.value;
+    const tM = document.getElementById('calToM')?.value;
+    const tY = document.getElementById('calToY')?.value;
+    if (!fD||!fM||!fY||!tD||!tM||!tY) return toast('⚠️ חסרים תאריכים');
+    const from = fY+'-'+String(fM).padStart(2,'0')+'-'+String(fD).padStart(2,'0');
+    const to   = tY+'-'+String(tM).padStart(2,'0')+'-'+String(tD).padStart(2,'0');
+    const type = document.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
+    if (from > to) return toast('⚠️ תאריך סיום לפני תחילה');
     const data = {type, name:name||null, from, to, createdBy:currentUser};
     if (calEditId) {
       db.ref('team/calendar/'+calEditUid+'/'+calEditId).update(data);
