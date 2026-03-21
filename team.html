@@ -3879,7 +3879,8 @@ header{
         } else {
           html += '<div class="cal-empty">אין אירועים</div>';
         }
-        html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף</button></div>`;
+        if (currentUser === 'moshe') html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף לו אירוע</button>`;
+        html += '</div>';
       });
     }
 
