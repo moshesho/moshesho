@@ -4095,9 +4095,16 @@ header{
       // build and insert expanded content
       const isAdmin = USERS[currentUser]?.role==='admin';
       const isManager = USERS[currentUser]?.role==='manager';
+      // Get only the expanded content (skip the task-footer part)
+      const fullHtml = buildStepsHtml(t, isAdmin||isManager);
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = fullHtml;
+      // Remove the task-footer from the temp div (it's already in the card)
+      const footerEl = tempDiv.querySelector('.task-footer');
+      if (footerEl) footerEl.remove();
       const div = document.createElement('div');
       div.className = 'task-expand-content';
-      div.innerHTML = buildStepsHtml(t, isAdmin||isManager);
+      div.innerHTML = tempDiv.innerHTML;
       card.appendChild(div);
     }
 
