@@ -1643,7 +1643,7 @@ header{
 
   /* ── CALENDAR ── */
   .cal-wrap{max-width:600px;margin:0 auto}
-  .cal-section{margin-bottom:0;padding:16px 0;border-bottom:2px solid rgba(0,170,255,0.2);position:relative;}
+  .cal-section{margin-bottom:0;padding:16px 0 20px;position:relative;}
   .cal-section-title{font-size:13px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px;border-bottom:1px solid rgba(0,229,255,0.15);padding-bottom:6px}
   .cal-event{background:linear-gradient(145deg,rgba(12,18,32,0.95),rgba(6,10,20,0.98));border:1.5px solid rgba(0,170,255,0.12);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all .2s}
   .cal-event:hover{border-color:rgba(0,229,255,0.25)}
@@ -1665,16 +1665,18 @@ header{
 
 
   /* ── CAL SECTION DIVIDER ── */
-  .cal-section + .cal-section {
-    border-top: none;
+  .cal-section::after {
+    content: '';
+    display: block;
+    height: 3px;
+    margin-top: 16px;
+    background: linear-gradient(90deg, var(--cyan), var(--blue), transparent);
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(0,229,255,0.4);
+    opacity: 0.7;
   }
-  .cal-section:last-child {
-    border-bottom: none;
-  }
-  .cal-section-title {
-    padding-bottom: 8px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid rgba(0,229,255,0.1);
+  .cal-section:last-child::after {
+    display: none;
   }
 
 </style>
