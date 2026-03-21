@@ -3860,16 +3860,22 @@ header{
     }
     html += `<button class="cal-add-btn" onclick="openCalModal('${currentUser}')">➕ הוסף אירוע</button></div>`;
 
-    // Other users (admins only)
-    if (canSeeAllCalendars) {
-      ALL_UIDS.filter(uid => uid !== currentUser && !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
+    // Other users - everyone can view, only admins can edit
+    {
+      ALL_UIDS.filter(uid => {
+        if (uid === currentUser) return false;
+        if (uid === 'hazi' && currentUser !== 'moshe') return false;
+        if (currentUser === 'assaf' && uid === 'hazi') return false;
+        return true;
+      }).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid]
           ? Object.entries(calEvents[uid]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
           : [];
+        const canEditOther = canSeeAllCalendars; // only admins can edit others
         html += `<div class="cal-section"><div class="cal-section-title">${USERS[uid].name}</div>`;
         if (evs.length) {
-          evs.forEach(e => { html += evCard(e, uid, true); });
+          evs.forEach(e => { html += evCard(e, uid, canEditOther); });
         } else {
           html += '<div class="cal-empty">אין אירועים</div>';
         }
