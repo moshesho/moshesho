@@ -2494,7 +2494,7 @@ header{
     const personData = uids.map(uid => ({
       uid, name: USERS[uid]?.name.split(' ')[0]||uid,
       cnt: allTasks.filter(t=>isAssignedTo(t,uid)&&t.status!=='done').length
-    })).filter(d=>d.cnt>0).sort((a,b)=>b.cnt-a.cnt).slice(0,6);
+    })).sort((a,b)=>b.cnt-a.cnt).slice(0,7);
     const maxCnt = Math.max(...personData.map(d=>d.cnt), 1);
     const barColors = ['#00aaff','#00ff9d','#ffd600','#ff3b5c','#a259ff','#00e5ff'];
 
