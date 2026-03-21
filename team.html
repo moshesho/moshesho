@@ -3763,7 +3763,8 @@ header{
   }
 
   function renderCal(wrap) {
-    const canSeeAll = ['moshe','assaf','hazi'].includes(currentUser);
+    const canSeeAll = true; // everyone sees weekly status
+    const canSeeAllCalendars = ['moshe','assaf','hazi'].includes(currentUser);
     const TYPE_ICON  = {flight:'✈️', vacation:'🏖️', sick:'🤒', other:'📌'};
     const TYPE_LABEL = {flight:'טיסה', vacation:'חופשה', sick:'מחלה', other:'אחר'};
     const TYPE_CLS   = {flight:'cal-type-flight', vacation:'cal-type-vacation', sick:'cal-type-sick', other:'cal-type-other'};
@@ -3786,7 +3787,7 @@ header{
     let html = '<div class="cal-wrap">';
 
     // Overview - weekly view
-    if (canSeeAll) {
+    if (true) { // everyone sees weekly status
       // Get current week Mon-Thu (skip Fri/Sat)
       const today = new Date();
       const dow = today.getDay(); // 0=Sun,1=Mon,...,6=Sat
@@ -3817,7 +3818,7 @@ header{
       });
       html += '</div>';
 
-      ALL_UIDS.filter(uid => !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
+      ALL_UIDS.filter(uid => !(uid==='hazi' && currentUser!=='moshe')).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid] ? Object.values(calEvents[uid]) : [];
         
@@ -3860,7 +3861,7 @@ header{
     html += `<button class="cal-add-btn" onclick="openCalModal('${currentUser}')">➕ הוסף אירוע</button></div>`;
 
     // Other users (admins only)
-    if (canSeeAll) {
+    if (canSeeAllCalendars) {
       ALL_UIDS.filter(uid => uid !== currentUser && !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid]
