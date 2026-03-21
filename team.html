@@ -3793,7 +3793,7 @@ header{
         <div class="cal-event-icon">${TYPE_ICON[ev.type]||'📌'}</div>
         <div class="cal-event-info">
           <div class="cal-event-name">${esc(ev.name||TYPE_LABEL[ev.type]||'אירוע')}</div>
-          <div class="cal-event-dates">📆 ${ev.from} → ${ev.to}</div>
+          <div class="cal-event-dates" dir="ltr">📆 ${ev.from.split('-').reverse().join('/')} → ${ev.to.split('-').reverse().join('/')}</div>
         </div>
         ${showEdit ? '<button class="iBtn" onclick="'+edt_fn+'">✏️</button>' : ''}
         <button class="iBtn" onclick="${del_fn}">🗑</button>
