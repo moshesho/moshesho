@@ -3872,14 +3872,14 @@ header{
         const evs = calEvents[uid]
           ? Object.entries(calEvents[uid]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
           : [];
-        const canEditOther = currentUser === 'moshe'; // only moshe can edit others
+        const canEditOther = currentUser === 'moshe' || currentUser === 'assaf';
         html += `<div class="cal-section"><div class="cal-section-title">${USERS[uid].name}</div>`;
         if (evs.length) {
           evs.forEach(e => { html += evCard(e, uid, canEditOther); });
         } else {
           html += '<div class="cal-empty">אין אירועים</div>';
         }
-        if (currentUser === 'moshe') html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף לו אירוע</button>`;
+        if (currentUser === 'moshe' || currentUser === 'assaf') html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף לו אירוע</button>`;
         html += '</div>';
       });
     }
