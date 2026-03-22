@@ -1679,7 +1679,41 @@ header{
     display: none;
   }
 
+
+  /* ── OTP SCREEN ── */
+  #otpScreen {
+    position:fixed;inset:0;background:#04070f;
+    display:none;flex-direction:column;align-items:center;justify-content:center;
+    z-index:9999;padding:30px 20px;
+  }
+  .otp-box {
+    width:100%;max-width:400px;
+    background:linear-gradient(145deg,#0c1220,#080e1a);
+    border:1.5px solid rgba(0,170,255,0.2);border-radius:20px;
+    padding:32px 28px;text-align:center;
+  }
+  .otp-title { font-size:20px;font-weight:900;color:#fff;margin-bottom:6px; }
+  .otp-sub { font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:24px; }
+  .otp-inputs { display:flex;gap:8px;justify-content:center;margin-bottom:20px; }
+  .otp-input {
+    width:44px;height:54px;border-radius:10px;border:1.5px solid rgba(0,170,255,0.2);
+    background:rgba(0,170,255,0.05);color:#fff;font-size:22px;font-weight:900;
+    text-align:center;font-family:monospace;outline:none;
+  }
+  .otp-input:focus { border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,229,255,0.15); }
+  .otp-btn {
+    width:100%;padding:13px;border-radius:12px;border:none;
+    background:linear-gradient(135deg,#0066cc,#00aaff);
+    color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:12px;
+  }
+  .otp-btn:disabled { opacity:0.5;cursor:not-allowed; }
+  .otp-resend { font-size:12px;color:rgba(255,255,255,0.4);cursor:pointer; }
+  .otp-resend span { color:var(--cyan);cursor:pointer; }
+  .otp-timer { font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px; }
+  .otp-error { font-size:12px;color:#ff3b5c;margin-bottom:8px;min-height:16px; }
+
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -2034,14 +2068,14 @@ header{
 <script>
   // ── USERS ──────────────────────────────────────────
   const USERS = {
-    moshe:  { name:'משה שושה',     role:'admin',  initials:'מש', pin:'1956',  phone:'972525588555' },
-    assaf:  { name:'אסף בן מאיר',  role:'admin',  initials:'אב', pin:'2168',  phone:'972507857205' },
-    elad:   { name:'אלעד קומיסר',  role:'member', initials:'אק', pin:'8623',  phone:'972528721303' },
-    alik:   { name:'אליק אברמזון', role:'member', initials:'אא', pin:'9195',  phone:'972523201618' },
-    rif:    { name:'ריף פרץ',      role:'member', initials:'רפ', pin:'5090',  phone:'972533326272' },
-    tal:    { name:'טל כהן',       role:'member', initials:'טכ', pin:'4810',  phone:'972524713172' },
-    omer:   { name:'עומר תורג\'מן',   role:'lab',    initials:'עת', pin:'1082',  phone:'972545876986' },
-    hazi:   { name:'חזי בן-ארי',      role:'manager', initials:'חב', pin:'7324',  phone:'972523793086' },
+    moshe:  { name:'משה שושה',     role:'admin',  initials:'מש', pin:'1956',  phone:'972525588555', email:'moshesho@rafael.co.il' },
+    assaf:  { name:'אסף בן מאיר',  role:'admin',  initials:'אב', pin:'2168',  phone:'972507857205', email:'asafbenm@rafael.co.il' },
+    elad:   { name:'אלעד קומיסר',  role:'member', initials:'אק', pin:'8623',  phone:'972528721303', email:'eladkom@rafael.co.il' },
+    alik:   { name:'אליק אברמזון', role:'member', initials:'אא', pin:'9195',  phone:'972523201618', email:'albertab@rafael.co.il' },
+    rif:    { name:'ריף פרץ',      role:'member', initials:'רפ', pin:'5090',  phone:'972533326272', email:'rifpe@rafael.co.il' },
+    tal:    { name:'טל כהן',       role:'member', initials:'טכ', pin:'4810',  phone:'972524713172', email:'talcoh1@rafael.co.il' },
+    omer:   { name:'עומר תורג\'מן',   role:'lab',    initials:'עת', pin:'1082',  phone:'972545876986', email:'omertur@rafael.co.il' },
+    hazi:   { name:'חזי בן-ארי',      role:'manager', initials:'חב', pin:'7324',  phone:'972523793086', email:'hezib@rafael.co.il' },
   };
   const PRIO_LABEL = {1:'🔴 דחוף',2:'🟡 גבוה',3:'🔵 רגיל',4:'⚪ נמוך'};
   const STATUS_LABEL = {open:'🔵 פתוח',progress:'🟡 בביצוע',blocked:'⏳ ממתין',done:'✅ בוצע'};
@@ -2580,6 +2614,128 @@ header{
     </div>`;
   }
 
+
+  // ── OTP / EMAIL VERIFICATION ────────────────────────
+  const EMAILJS_SERVICE  = 'service_g2grbok';
+  const EMAILJS_TEMPLATE = 'template_bymnq5c';
+  const EMAILJS_KEY      = 'ZPi9YBdHcBntjqCfq';
+  const OTP_EXPIRY_MS    = 10 * 60 * 1000; // 10 minutes
+
+  let otpCode        = '';
+  let otpExpiry      = 0;
+  let otpUid         = '';
+  let otpTimerInt    = null;
+
+  function initEmailJS() {
+    emailjs.init(EMAILJS_KEY);
+  }
+
+  function generateOTP() {
+    return String(Math.floor(100000 + Math.random() * 900000));
+  }
+
+  function sendOTP(uid) {
+    const u = USERS[uid];
+    if (!u || !u.email) return toast('⚠️ אין מייל מוגדר למשתמש זה');
+    otpUid    = uid;
+    otpCode   = generateOTP();
+    otpExpiry = Date.now() + OTP_EXPIRY_MS;
+
+    // Send via EmailJS
+    emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
+      to_email:        u.email,
+      otp_code:        otpCode,
+      expiry_minutes:  '10',
+      user_name:       u.name,
+    }).then(() => {
+      showOTPScreen(u.email);
+    }).catch(err => {
+      console.error('EmailJS error:', err);
+      toast('⚠️ שגיאה בשליחת מייל — נסה שוב');
+    });
+  }
+
+  function showOTPScreen(email) {
+    // mask email: m***@rafael.co.il
+    const parts = email.split('@');
+    const masked = parts[0][0] + '***@' + parts[1];
+    document.getElementById('otpSubText').textContent = 'נשלח קוד למייל: ' + masked;
+    document.getElementById('otpError').textContent = '';
+    // clear inputs
+    for (let i=0; i<6; i++) {
+      const el = document.getElementById('otp'+i);
+      el.value = '';
+    }
+    document.getElementById('otpScreen').style.display = 'flex';
+    document.getElementById('loginScreen').style.display = 'none';
+    setTimeout(() => document.getElementById('otp0').focus(), 200);
+    startOTPTimer();
+    setupOTPInputs();
+  }
+
+  function setupOTPInputs() {
+    for (let i=0; i<6; i++) {
+      const el = document.getElementById('otp'+i);
+      el.oninput = function() {
+        this.value = this.value.replace(/[^0-9]/g,'').slice(-1);
+        if (this.value && i < 5) document.getElementById('otp'+(i+1)).focus();
+        // auto verify when all filled
+        const code = Array.from({length:6}, (_,j) => document.getElementById('otp'+j).value).join('');
+        if (code.length === 6) verifyOTP();
+      };
+      el.onkeydown = function(e) {
+        if (e.key === 'Backspace' && !this.value && i > 0) {
+          document.getElementById('otp'+(i-1)).focus();
+        }
+      };
+    }
+  }
+
+  function verifyOTP() {
+    const entered = Array.from({length:6}, (_,i) => document.getElementById('otp'+i).value).join('');
+    const errEl = document.getElementById('otpError');
+    if (entered.length < 6) { errEl.textContent = '⚠️ הכנס 6 ספרות'; return; }
+    if (Date.now() > otpExpiry) { errEl.textContent = '⚠️ הקוד פג תוקף — שלח שוב'; return; }
+    if (entered !== otpCode) {
+      errEl.textContent = '❌ קוד שגוי';
+      for (let i=0; i<6; i++) document.getElementById('otp'+i).value='';
+      document.getElementById('otp0').focus();
+      return;
+    }
+    // OTP correct!
+    clearInterval(otpTimerInt);
+    document.getElementById('otpScreen').style.display = 'none';
+    // Proceed to login
+    const u = USERS[otpUid];
+    loggedInAs = otpUid;
+    if (u.role === 'admin' || u.role === 'manager') {
+      showUserSelect();
+    } else {
+      login(otpUid, u.role);
+    }
+  }
+
+  function resendOTP() {
+    clearInterval(otpTimerInt);
+    sendOTP(otpUid);
+    toast('📧 קוד חדש נשלח!');
+  }
+
+  function startOTPTimer() {
+    clearInterval(otpTimerInt);
+    const timerEl = document.getElementById('otpTimer');
+    otpTimerInt = setInterval(() => {
+      const left = Math.max(0, otpExpiry - Date.now());
+      const m = Math.floor(left/60000);
+      const s = Math.floor((left%60000)/1000);
+      timerEl.textContent = 'הקוד תקף עוד: ' + m + ':' + String(s).padStart(2,'0');
+      if (left === 0) {
+        clearInterval(otpTimerInt);
+        timerEl.textContent = '⚠️ הקוד פג תוקף';
+      }
+    }, 1000);
+  }
+
   // ── NOTIFICATIONS ──────────────────────────────────
   let notifUnsub = null;
 
@@ -2724,6 +2880,7 @@ header{
     setTimeout(() => { el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 6000);
   }
 
+  initEmailJS();
   firebase.auth().signInAnonymously().catch(e => console.warn('auth:', e));
   firebase.auth().onAuthStateChanged(user => {
     if (!user) return;
@@ -4389,5 +4546,6 @@ header{
     setTimeout(()=>el.classList.remove('show'),2200);
   }
 </script>
+
 </body>
 </html>
