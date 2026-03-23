@@ -2729,10 +2729,15 @@ header{
     setTimeout(() => { el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 6000);
   }
 
+  // Show login screen immediately - don't wait for Firebase
+  window.addEventListener('DOMContentLoaded', () => {
+    const loginEl = document.getElementById('loginScreen');
+    if (loginEl) loginEl.style.display = 'flex';
+  });
+
   firebase.auth().signInAnonymously().catch(e => console.warn('auth:', e));
   firebase.auth().onAuthStateChanged(user => {
     if (!user) return;
-    // Firebase connected — listeners already running
   });
 
   db.ref('team/trash').on('value', snap => {
@@ -2749,11 +2754,7 @@ header{
     const raw = snap.val() || {};
     tasks = Object.entries(raw).map(([id,v])=>({id,...v}))
       .sort((a,b)=>(a.priority||3)-(b.priority||3));
-    // show login on first load
-    const loginEl = document.getElementById('loginScreen');
-    if (loginEl && loginEl.style.display === '') {
-      loginEl.style.display = 'flex';
-    }
+    // login screen shown immediately on load
     if (document.getElementById('syncDot')) {
       document.getElementById('syncDot').className = 'sync-dot live';
     }
