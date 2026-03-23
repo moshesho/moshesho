@@ -2817,6 +2817,11 @@ header{
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('userSelectScreen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    // simulate click on dash tab to force render
+    setTimeout(() => {
+      const dashBtn = document.querySelector('.tab.active') || document.querySelector('[onclick*="dash"]');
+      if (dashBtn) dashBtn.click();
+    }, 100);
     document.getElementById('hdrName').textContent = u.name;
     const rb = document.getElementById('roleBadge');
     rb.textContent = u.role === 'admin' ? '👑 מנהל' : '👤 צוות';
