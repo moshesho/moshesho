@@ -1020,7 +1020,7 @@ header{
   /* Dark solid login bg */
   #loginScreen, #userSelectScreen {
     background:#020508;
-    position:relative;
+    position:fixed;
     overflow:hidden;
   }
 
@@ -2214,10 +2214,7 @@ header{
   // ── COMMENTS FEED LISTENER ─────────────────────────
   let allComments = []; // {taskId, taskName, stepId, stepName, text, user, ts}
   const readComments = new Set(); // comment ids that current admin has read
-
-  console.log('2. Tasks listener attached');
   db.ref('team/tasks').on('value', snap => {
-    console.log('3. Tasks received:', Object.keys(snap.val()||{}).length);
     // rebuild allComments from all tasks/steps
     allComments = [];
     const raw = snap.val() || {};
@@ -2729,8 +2726,6 @@ header{
     requestAnimationFrame(() => { requestAnimationFrame(() => el.classList.add('show')); });
     setTimeout(() => { el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 6000);
   }
-
-  console.log('1. Firebase auth starting...');
   firebase.auth().signInAnonymously().catch(e => console.warn('auth:', e));
   firebase.auth().onAuthStateChanged(user => {
     if (!user) return;
@@ -2745,10 +2740,7 @@ header{
     if (trashTab) trashTab.textContent = '🗑️ סל' + (trash.length ? ' ('+trash.length+')' : '');
     if (currentUser && USERS[currentUser] && USERS[currentUser].role==='admin' && currentTab==='trash') render();
   });
-
-  console.log('2. Tasks listener attached');
   db.ref('team/tasks').on('value', snap => {
-    console.log('3. Tasks received:', Object.keys(snap.val()||{}).length);
     const raw = snap.val() || {};
     tasks = Object.entries(raw).map(([id,v])=>({id,...v}))
       .sort((a,b)=>(a.priority||3)-(b.priority||3));
@@ -2798,7 +2790,6 @@ header{
   }
 
   function checkPin() {
-    console.log('checkPin called, pinBuffer=', pinBuffer);
     const match = Object.entries(USERS).find(([,u]) => u.pin === pinBuffer);
     if (match) {
       const [uid, u] = match;
@@ -2816,7 +2807,6 @@ header{
   }
 
   function login(uid, role) {
-    console.log('login called:', uid);
     currentUser = uid;
     loggedInAs = uid; // always track who is logged in
     const u = USERS[uid];
@@ -4174,7 +4164,6 @@ header{
       if (mainEl2) mainEl2.scrollTop = sy_main;
       const appWrap2 = document.getElementById('app');
       if (appWrap2) appWrap2.scrollTop = sy_app;
-      console.log('AFTER: win='+window.scrollY+' main='+(mainEl2?mainEl2.scrollTop:0));
     });
   }
 
