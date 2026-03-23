@@ -1643,7 +1643,7 @@ header{
 
   /* ── CALENDAR ── */
   .cal-wrap{max-width:600px;margin:0 auto}
-  .cal-section{margin-bottom:20px}
+  .cal-section{margin-bottom:0;padding:16px 0 20px;position:relative;}
   .cal-section-title{font-size:13px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px;border-bottom:1px solid rgba(0,229,255,0.15);padding-bottom:6px}
   .cal-event{background:linear-gradient(145deg,rgba(12,18,32,0.95),rgba(6,10,20,0.98));border:1.5px solid rgba(0,170,255,0.12);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all .2s}
   .cal-event:hover{border-color:rgba(0,229,255,0.25)}
@@ -1662,6 +1662,22 @@ header{
   .cal-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0;box-shadow:0 0 10px rgba(0,170,255,0.3)}
   .cal-status-away{background:rgba(0,170,255,0.15);color:#7dd3fc;border:1px solid rgba(0,170,255,0.3);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
   .cal-status-here{background:rgba(0,255,157,0.1);color:#6ee7b7;border:1px solid rgba(0,255,157,0.2);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+
+
+  /* ── CAL SECTION DIVIDER ── */
+  .cal-section::after {
+    content: '';
+    display: block;
+    height: 3px;
+    margin-top: 16px;
+    background: linear-gradient(90deg, var(--cyan), var(--blue), transparent);
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(0,229,255,0.4);
+    opacity: 0.7;
+  }
+  .cal-section:last-child::after {
+    display: none;
+  }
 
 </style>
 </head>
@@ -1683,7 +1699,7 @@ header{
       <button class="mchip"     data-t="other"    onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">📌 אחר</button>
     </div>
     <div class="m-lbl">שם/תיאור (אופציונלי)</div>
-    <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
+    <input class="m-input" id="calName" placeholder="תיאור (אופציונלי)"/>
     <div class="m-lbl">תאריך התחלה</div>
     <div style="display:flex;gap:6px;direction:ltr">
       <input class="m-input" id="calFromD" type="number" placeholder="יום" min="1" max="31" style="width:60px;text-align:center"/>
@@ -2494,7 +2510,7 @@ header{
     const personData = uids.map(uid => ({
       uid, name: USERS[uid]?.name.split(' ')[0]||uid,
       cnt: allTasks.filter(t=>isAssignedTo(t,uid)&&t.status!=='done').length
-    })).filter(d=>d.cnt>0).sort((a,b)=>b.cnt-a.cnt).slice(0,6);
+    })).sort((a,b)=>b.cnt-a.cnt).slice(0,7);
     const maxCnt = Math.max(...personData.map(d=>d.cnt), 1);
     const barColors = ['#00aaff','#00ff9d','#ffd600','#ff3b5c','#a259ff','#00e5ff'];
 
@@ -3763,7 +3779,8 @@ header{
   }
 
   function renderCal(wrap) {
-    const canSeeAll = ['moshe','assaf','hazi'].includes(currentUser);
+    const canSeeAll = true; // everyone sees weekly status
+    const canSeeAllCalendars = ['moshe','assaf','hazi'].includes(currentUser);
     const TYPE_ICON  = {flight:'✈️', vacation:'🏖️', sick:'🤒', other:'📌'};
     const TYPE_LABEL = {flight:'טיסה', vacation:'חופשה', sick:'מחלה', other:'אחר'};
     const TYPE_CLS   = {flight:'cal-type-flight', vacation:'cal-type-vacation', sick:'cal-type-sick', other:'cal-type-other'};
@@ -3776,7 +3793,7 @@ header{
         <div class="cal-event-icon">${TYPE_ICON[ev.type]||'📌'}</div>
         <div class="cal-event-info">
           <div class="cal-event-name">${esc(ev.name||TYPE_LABEL[ev.type]||'אירוע')}</div>
-          <div class="cal-event-dates">📆 ${ev.from} → ${ev.to}</div>
+          <div class="cal-event-dates" dir="ltr">📆 ${ev.from.split('-').reverse().join('/')} → ${ev.to.split('-').reverse().join('/')}</div>
         </div>
         ${showEdit ? '<button class="iBtn" onclick="'+edt_fn+'">✏️</button>' : ''}
         <button class="iBtn" onclick="${del_fn}">🗑</button>
@@ -3786,7 +3803,7 @@ header{
     let html = '<div class="cal-wrap">';
 
     // Overview - weekly view
-    if (canSeeAll) {
+    if (true) { // everyone sees weekly status
       // Get current week Mon-Thu (skip Fri/Sat)
       const today = new Date();
       const dow = today.getDay(); // 0=Sun,1=Mon,...,6=Sat
@@ -3817,7 +3834,7 @@ header{
       });
       html += '</div>';
 
-      ALL_UIDS.filter(uid => !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
+      ALL_UIDS.filter(uid => !(uid==='hazi' && currentUser!=='moshe')).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid] ? Object.values(calEvents[uid]) : [];
         
@@ -3859,20 +3876,27 @@ header{
     }
     html += `<button class="cal-add-btn" onclick="openCalModal('${currentUser}')">➕ הוסף אירוע</button></div>`;
 
-    // Other users (admins only)
-    if (canSeeAll) {
-      ALL_UIDS.filter(uid => uid !== currentUser && !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
+    // Other users - everyone can view, only admins can edit
+    {
+      ALL_UIDS.filter(uid => {
+        if (uid === currentUser) return false;
+        if (uid === 'hazi' && currentUser !== 'moshe') return false;
+        if (currentUser === 'assaf' && uid === 'hazi') return false;
+        return true;
+      }).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid]
           ? Object.entries(calEvents[uid]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
           : [];
+        const canEditOther = currentUser === 'moshe' || currentUser === 'assaf';
         html += `<div class="cal-section"><div class="cal-section-title">${USERS[uid].name}</div>`;
         if (evs.length) {
-          evs.forEach(e => { html += evCard(e, uid, true); });
+          evs.forEach(e => { html += evCard(e, uid, canEditOther); });
         } else {
           html += '<div class="cal-empty">אין אירועים</div>';
         }
-        html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף</button></div>`;
+        if (currentUser === 'moshe' || currentUser === 'assaf') html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף לו אירוע</button>`;
+        html += '</div>';
       });
     }
 
@@ -3916,16 +3940,18 @@ header{
   }
 
   function saveCalEvent() {
-    const modal = document.getElementById('calModal');
-    if (!modal) { return; }
-    const name = modal.querySelector('#calName') ? modal.querySelector('#calName').value.trim() : 'NO_NAME_EL';
-    const fromEl = modal.querySelector('#calFrom');
-    const toEl = modal.querySelector('#calTo');
-    const from = fromEl ? fromEl.value : 'NO_FROM_EL';
-    const to   = toEl ? toEl.value : 'NO_TO_EL';
-    const type = modal.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
-    if (!from || !to) return toast('⚠️ חסרים תאריכים');
-    if (from > to)    return toast('⚠️ תאריך סיום לפני תחילה');
+    const name = document.getElementById('calName')?.value.trim() || '';
+    const fD = document.getElementById('calFromD')?.value;
+    const fM = document.getElementById('calFromM')?.value;
+    const fY = document.getElementById('calFromY')?.value;
+    const tD = document.getElementById('calToD')?.value;
+    const tM = document.getElementById('calToM')?.value;
+    const tY = document.getElementById('calToY')?.value;
+    if (!fD||!fM||!fY||!tD||!tM||!tY) return toast('⚠️ חסרים תאריכים');
+    const from = fY+'-'+String(fM).padStart(2,'0')+'-'+String(fD).padStart(2,'0');
+    const to   = tY+'-'+String(tM).padStart(2,'0')+'-'+String(tD).padStart(2,'0');
+    const type = document.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
+    if (from > to) return toast('⚠️ תאריך סיום לפני תחילה');
     const data = {type, name:name||null, from, to, createdBy:currentUser};
     if (calEditId) {
       db.ref('team/calendar/'+calEditUid+'/'+calEditId).update(data);
