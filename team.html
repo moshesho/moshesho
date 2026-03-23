@@ -4389,7 +4389,6 @@ header{
     if (!name) return toast('⚠️ חסר שם');
     if (!mAssigneesList.length) return toast('⚠️ בחר לפחות אחראי אחד');
     const _dl = mDeadlineVal || document.getElementById('mDeadline').value;
-    alert('deadline to save: ['+_dl+'] mDeadlineVal=['+mDeadlineVal+'] DOM=['+document.getElementById('mDeadline').value+']');
     const base = {
       name, priority:mPrio, status:mStatus,
       project:document.getElementById('mProjectName').value.trim()||null,
