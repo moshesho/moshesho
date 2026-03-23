@@ -2681,8 +2681,9 @@ header{
       const el = document.getElementById('otp'+i);
       el.value = '';
     }
-    document.getElementById('otpScreen').style.display = 'flex';
     document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('userSelectScreen').style.display = 'none';
+    document.getElementById('otpScreen').style.display = 'flex';
     setTimeout(() => document.getElementById('otp0').focus(), 200);
     startOTPTimer();
     setupOTPInputs();
