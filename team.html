@@ -2016,7 +2016,7 @@ header{
     <input class="m-input" id="mProjectName" placeholder="שם הפרויקט" style="width:100%;box-sizing:border-box;"/>
 
     <div class="m-lbl">דדליין</div>
-    <input class="m-input date-input" id="mDeadline" type="date"/>
+    <input class="m-input date-input" id="mDeadline" type="date" onchange="mDeadlineVal=this.value" oninput="mDeadlineVal=this.value"/>
 
     <div class="m-lbl">סטטוס</div>
     <div class="meta-row" id="mStatusRow">
@@ -4322,6 +4322,7 @@ header{
     document.getElementById('mProjectName').value = t.project||'';
     document.getElementById('mTaskNotes').value = t.notes||'';
     document.getElementById('mDeadline').value  = t.deadline||'';
+    mDeadlineVal = t.deadline||'';
 
     // load existing assignees into mAssigneesList
     mAssigneesList = t.assignees ? [...t.assignees] : (t.assignee ? [t.assignee] : []);
@@ -4355,6 +4356,7 @@ header{
     document.getElementById('mProjectName').value='';
     document.getElementById('mTaskNotes').value='';
     document.getElementById('mDeadline').value='';
+    mDeadlineVal='';
     mAssigneesList = [];
     document.querySelectorAll('#mAssigneeRow .mchip').forEach(c=>c.classList.remove('sel'));
     document.querySelectorAll('#mPrioRow .mchip').forEach(c=>{c.className='mchip';if(parseInt(c.dataset.p)===3)c.classList.add('sp3')});
@@ -4390,7 +4392,7 @@ header{
       name, priority:mPrio, status:mStatus,
       project:document.getElementById('mProjectName').value.trim()||null,
       notes:document.getElementById('mTaskNotes').value.trim()||null,
-      deadline:document.getElementById('mDeadline').value||null
+      deadline:(document.getElementById('mDeadline').value || mDeadlineVal) || null
     };
     if (editId) {
       // update existing task with all assignees (no duplicates)
