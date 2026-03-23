@@ -2822,6 +2822,8 @@ header{
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('userSelectScreen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    // load pinned task from localStorage
+    try { pinnedTaskId = localStorage.getItem('pinned_'+uid) || null; } catch(e){}
     // simulate click on dash tab to force render
     setTimeout(() => {
       const dashBtn = document.querySelector('.tab.active') || document.querySelector('[onclick*="dash"]');
@@ -2856,10 +2858,13 @@ header{
     }
     initNotifListener(uid);
     initCalListener();
-    db.ref('team/pinned/'+uid).on('value', snap => {
-      pinnedTaskId = snap.val() || null;
-      if (currentTab === 'tasks') render();
-    });
+    // load pinned AFTER app is shown
+    setTimeout(() => {
+      db.ref('team/pinned/'+uid).on('value', snap => {
+        pinnedTaskId = snap.val() || null;
+        if (currentTab === 'tasks') render();
+      });
+    }, 1000);
     if (uid === 'moshe') setTimeout(autoBackup, 2000);
     const pinBtn = document.getElementById('pinListBtn');
     if (pinBtn) pinBtn.style.display = uid === 'moshe' ? 'inline-block' : 'none';
@@ -3995,13 +4000,14 @@ header{
   function togglePinTask(taskId) {
     if (pinnedTaskId === taskId) {
       pinnedTaskId = null;
-      db.ref('team/pinned/'+currentUser).remove();
+      try { localStorage.removeItem('pinned_'+currentUser); } catch(e){}
       toast('הוסרה ההצמדה');
     } else {
       pinnedTaskId = taskId;
-      db.ref('team/pinned/'+currentUser).set(taskId);
+      try { localStorage.setItem('pinned_'+currentUser, taskId); } catch(e){}
       toast('📌 משימה הוצמדה לראש הרשימה!');
     }
+    render();
   }
 
   // ── TASK CARD ──────────────────────────────────────
