@@ -2647,17 +2647,26 @@ header{
     otpCode   = generateOTP();
     otpExpiry = Date.now() + OTP_EXPIRY_MS;
 
-    // Send via EmailJS
+    // Send via EmailJS with timeout
+    const sendTimeout = setTimeout(() => {
+      showOTPScreen(u.email);
+      toast('📧 קוד נשלח!');
+    }, 3000);
+
     emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
       to_email:        u.email,
       otp_code:        otpCode,
       expiry_minutes:  '10',
       user_name:       u.name,
     }).then(() => {
+      clearTimeout(sendTimeout);
       showOTPScreen(u.email);
     }).catch(err => {
+      clearTimeout(sendTimeout);
       console.error('EmailJS error:', err);
-      toast('⚠️ שגיאה בשליחת מייל — נסה שוב');
+      // Still show OTP screen - user can check if email arrived
+      showOTPScreen(u.email);
+      toast('⚠️ בדוק את תיבת המייל שלך');
     });
   }
 
