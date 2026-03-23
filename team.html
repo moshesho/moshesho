@@ -1643,7 +1643,7 @@ header{
 
   /* ── CALENDAR ── */
   .cal-wrap{max-width:600px;margin:0 auto}
-  .cal-section{margin-bottom:0;padding:16px 0 20px;position:relative;}
+  .cal-section{margin-bottom:20px}
   .cal-section-title{font-size:13px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px;border-bottom:1px solid rgba(0,229,255,0.15);padding-bottom:6px}
   .cal-event{background:linear-gradient(145deg,rgba(12,18,32,0.95),rgba(6,10,20,0.98));border:1.5px solid rgba(0,170,255,0.12);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:all .2s}
   .cal-event:hover{border-color:rgba(0,229,255,0.25)}
@@ -1663,63 +1663,7 @@ header{
   .cal-status-away{background:rgba(0,170,255,0.15);color:#7dd3fc;border:1px solid rgba(0,170,255,0.3);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
   .cal-status-here{background:rgba(0,255,157,0.1);color:#6ee7b7;border:1px solid rgba(0,255,157,0.2);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
 
-
-  /* ── CAL SECTION DIVIDER ── */
-  .cal-section::after {
-    content: '';
-    display: block;
-    height: 3px;
-    margin-top: 16px;
-    background: linear-gradient(90deg, var(--cyan), var(--blue), transparent);
-    border-radius: 2px;
-    box-shadow: 0 0 8px rgba(0,229,255,0.4);
-    opacity: 0.7;
-  }
-  .cal-section:last-child::after {
-    display: none;
-  }
-
-
-  /* ── OTP SCREEN ── */
-  #otpScreen {
-    position:fixed;inset:0;background:#04070f;
-    display:none;flex-direction:column;align-items:center;justify-content:center;
-    z-index:9999;padding:30px 20px;
-  }
-  .otp-box {
-    width:100%;max-width:400px;
-    background:linear-gradient(145deg,#0c1220,#080e1a);
-    border:1.5px solid rgba(0,170,255,0.2);border-radius:20px;
-    padding:32px 28px;text-align:center;
-  }
-  .otp-title { font-size:20px;font-weight:900;color:#fff;margin-bottom:6px; }
-  .otp-sub { font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:24px; }
-  .otp-inputs { display:flex;gap:8px;justify-content:center;margin-bottom:20px; }
-  .otp-input {
-    width:44px;height:54px;border-radius:10px;border:1.5px solid rgba(0,170,255,0.2);
-    background:rgba(0,170,255,0.05);color:#fff;font-size:22px;font-weight:900;
-    text-align:center;font-family:monospace;outline:none;
-  }
-  .otp-input:focus { border-color:var(--cyan);box-shadow:0 0 0 2px rgba(0,229,255,0.15); }
-  .otp-btn {
-    width:100%;padding:13px;border-radius:12px;border:none;
-    background:linear-gradient(135deg,#0066cc,#00aaff);
-    color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:12px;
-  }
-  .otp-btn:disabled { opacity:0.5;cursor:not-allowed; }
-  .otp-resend { font-size:12px;color:rgba(255,255,255,0.4);cursor:pointer; }
-  .otp-resend span { color:var(--cyan);cursor:pointer; }
-  .otp-timer { font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px; }
-  .otp-error { font-size:12px;color:#ff3b5c;margin-bottom:8px;min-height:16px; }
-
-
-  .task-pin-btn { background:none;border:none;cursor:pointer;font-size:14px;opacity:0.4;transition:all .2s;padding:2px 4px; }
-  .task-pin-btn.pinned { opacity:1;filter:drop-shadow(0 0 4px gold); }
-  .task-card.is-pinned { border-color:rgba(255,215,0,0.4)!important;box-shadow:0 0 12px rgba(255,215,0,0.15)!important; }
-  .pinned-label { font-size:10px;font-weight:800;color:gold;letter-spacing:1px;margin-bottom:4px; }
-
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -1739,7 +1683,7 @@ header{
       <button class="mchip"     data-t="other"    onclick="document.querySelectorAll('#calTypeRow .mchip').forEach(b=>b.classList.remove('sel'));this.classList.add('sel')">📌 אחר</button>
     </div>
     <div class="m-lbl">שם/תיאור (אופציונלי)</div>
-    <input class="m-input" id="calName" placeholder="תיאור (אופציונלי)"/>
+    <input class="m-input" id="calName" placeholder="לדוגמה: Romania, אירופה..."/>
     <div class="m-lbl">תאריך התחלה</div>
     <div style="display:flex;gap:6px;direction:ltr">
       <input class="m-input" id="calFromD" type="number" placeholder="יום" min="1" max="31" style="width:60px;text-align:center"/>
@@ -2074,14 +2018,14 @@ header{
 <script>
   // ── USERS ──────────────────────────────────────────
   const USERS = {
-    moshe:  { name:'משה שושה',     role:'admin',  initials:'מש', pin:'1956',  phone:'972525588555', email:'moshesho@rafael.co.il' },
-    assaf:  { name:'אסף בן מאיר',  role:'admin',  initials:'אב', pin:'2168',  phone:'972507857205', email:'asafbenm@rafael.co.il' },
-    elad:   { name:'אלעד קומיסר',  role:'member', initials:'אק', pin:'8623',  phone:'972528721303', email:'eladkom@rafael.co.il' },
-    alik:   { name:'אליק אברמזון', role:'member', initials:'אא', pin:'9195',  phone:'972523201618', email:'albertab@rafael.co.il' },
-    rif:    { name:'ריף פרץ',      role:'member', initials:'רפ', pin:'5090',  phone:'972533326272', email:'rifpe@rafael.co.il' },
-    tal:    { name:'טל כהן',       role:'member', initials:'טכ', pin:'4810',  phone:'972524713172', email:'talcoh1@rafael.co.il' },
-    omer:   { name:'עומר תורג\'מן',   role:'lab',    initials:'עת', pin:'1082',  phone:'972545876986', email:'omertur@rafael.co.il' },
-    hazi:   { name:'חזי בן-ארי',      role:'manager', initials:'חב', pin:'7324',  phone:'972523793086', email:'hezib@rafael.co.il' },
+    moshe:  { name:'משה שושה',     role:'admin',  initials:'מש', pin:'1956',  phone:'972525588555' },
+    assaf:  { name:'אסף בן מאיר',  role:'admin',  initials:'אב', pin:'2168',  phone:'972507857205' },
+    elad:   { name:'אלעד קומיסר',  role:'member', initials:'אק', pin:'8623',  phone:'972528721303' },
+    alik:   { name:'אליק אברמזון', role:'member', initials:'אא', pin:'9195',  phone:'972523201618' },
+    rif:    { name:'ריף פרץ',      role:'member', initials:'רפ', pin:'5090',  phone:'972533326272' },
+    tal:    { name:'טל כהן',       role:'member', initials:'טכ', pin:'4810',  phone:'972524713172' },
+    omer:   { name:'עומר תורג\'מן',   role:'lab',    initials:'עת', pin:'1082',  phone:'972545876986' },
+    hazi:   { name:'חזי בן-ארי',      role:'manager', initials:'חב', pin:'7324',  phone:'972523793086' },
   };
   const PRIO_LABEL = {1:'🔴 דחוף',2:'🟡 גבוה',3:'🔵 רגיל',4:'⚪ נמוך'};
   const STATUS_LABEL = {open:'🔵 פתוח',progress:'🟡 בביצוע',blocked:'⏳ ממתין',done:'✅ בוצע'};
@@ -2550,7 +2494,7 @@ header{
     const personData = uids.map(uid => ({
       uid, name: USERS[uid]?.name.split(' ')[0]||uid,
       cnt: allTasks.filter(t=>isAssignedTo(t,uid)&&t.status!=='done').length
-    })).sort((a,b)=>b.cnt-a.cnt).slice(0,7);
+    })).filter(d=>d.cnt>0).sort((a,b)=>b.cnt-a.cnt).slice(0,6);
     const maxCnt = Math.max(...personData.map(d=>d.cnt), 1);
     const barColors = ['#00aaff','#00ff9d','#ffd600','#ff3b5c','#a259ff','#00e5ff'];
 
@@ -2618,138 +2562,6 @@ header{
         ${barRows}
       </div>
     </div>`;
-  }
-
-
-  // ── OTP / EMAIL VERIFICATION ────────────────────────
-  const EMAILJS_SERVICE  = 'service_g2grbok';
-  const EMAILJS_TEMPLATE = 'template_bymnq5c';
-  const EMAILJS_KEY      = 'ZPi9YBdHcBntjqCfq';
-  const OTP_EXPIRY_MS    = 10 * 60 * 1000; // 10 minutes
-
-  let otpCode        = '';
-  let otpExpiry      = 0;
-  let otpUid         = '';
-  let otpTimerInt    = null;
-
-  function initEmailJS() {
-    emailjs.init(EMAILJS_KEY);
-  }
-
-  function generateOTP() {
-    return String(Math.floor(100000 + Math.random() * 900000));
-  }
-
-  function sendOTP(uid) {
-    const u = USERS[uid];
-    if (!u || !u.email) return toast('⚠️ אין מייל מוגדר למשתמש זה');
-    otpUid    = uid;
-    otpCode   = generateOTP();
-    otpExpiry = Date.now() + OTP_EXPIRY_MS;
-
-    // Send via EmailJS with timeout
-    const sendTimeout = setTimeout(() => {
-      showOTPScreen(u.email);
-      toast('📧 קוד נשלח!');
-    }, 3000);
-
-    emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE, {
-      to_email:        u.email,
-      otp_code:        otpCode,
-      expiry_minutes:  '10',
-      user_name:       u.name,
-    }).then(() => {
-      clearTimeout(sendTimeout);
-      showOTPScreen(u.email);
-    }).catch(err => {
-      clearTimeout(sendTimeout);
-      console.error('EmailJS error:', err);
-      // Still show OTP screen - user can check if email arrived
-      showOTPScreen(u.email);
-      toast('⚠️ בדוק את תיבת המייל שלך');
-    });
-  }
-
-  function showOTPScreen(email) {
-    // mask email: m***@rafael.co.il
-    const parts = email.split('@');
-    const masked = parts[0][0] + '***@' + parts[1];
-    document.getElementById('otpSubText').textContent = 'נשלח קוד למייל: ' + masked;
-    document.getElementById('otpError').textContent = '';
-    // clear inputs
-    for (let i=0; i<6; i++) {
-      const el = document.getElementById('otp'+i);
-      el.value = '';
-    }
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('userSelectScreen').style.display = 'none';
-    document.getElementById('otpScreen').style.display = 'flex';
-    setTimeout(() => document.getElementById('otp0').focus(), 200);
-    startOTPTimer();
-    setupOTPInputs();
-  }
-
-  function setupOTPInputs() {
-    for (let i=0; i<6; i++) {
-      const el = document.getElementById('otp'+i);
-      el.oninput = function() {
-        this.value = this.value.replace(/[^0-9]/g,'').slice(-1);
-        if (this.value && i < 5) document.getElementById('otp'+(i+1)).focus();
-        // auto verify when all filled
-        const code = Array.from({length:6}, (_,j) => document.getElementById('otp'+j).value).join('');
-        if (code.length === 6) verifyOTP();
-      };
-      el.onkeydown = function(e) {
-        if (e.key === 'Backspace' && !this.value && i > 0) {
-          document.getElementById('otp'+(i-1)).focus();
-        }
-      };
-    }
-  }
-
-  function verifyOTP() {
-    const entered = Array.from({length:6}, (_,i) => document.getElementById('otp'+i).value).join('');
-    const errEl = document.getElementById('otpError');
-    if (entered.length < 6) { errEl.textContent = '⚠️ הכנס 6 ספרות'; return; }
-    if (Date.now() > otpExpiry) { errEl.textContent = '⚠️ הקוד פג תוקף — שלח שוב'; return; }
-    if (entered !== otpCode) {
-      errEl.textContent = '❌ קוד שגוי';
-      for (let i=0; i<6; i++) document.getElementById('otp'+i).value='';
-      document.getElementById('otp0').focus();
-      return;
-    }
-    // OTP correct!
-    clearInterval(otpTimerInt);
-    document.getElementById('otpScreen').style.display = 'none';
-    // Proceed to login
-    const u = USERS[otpUid];
-    loggedInAs = otpUid;
-    if (u.role === 'admin' || u.role === 'manager') {
-      showUserSelect();
-    } else {
-      login(otpUid, u.role);
-    }
-  }
-
-  function resendOTP() {
-    clearInterval(otpTimerInt);
-    sendOTP(otpUid);
-    toast('📧 קוד חדש נשלח!');
-  }
-
-  function startOTPTimer() {
-    clearInterval(otpTimerInt);
-    const timerEl = document.getElementById('otpTimer');
-    otpTimerInt = setInterval(() => {
-      const left = Math.max(0, otpExpiry - Date.now());
-      const m = Math.floor(left/60000);
-      const s = Math.floor((left%60000)/1000);
-      timerEl.textContent = 'הקוד תקף עוד: ' + m + ':' + String(s).padStart(2,'0');
-      if (left === 0) {
-        clearInterval(otpTimerInt);
-        timerEl.textContent = '⚠️ הקוד פג תוקף';
-      }
-    }, 1000);
   }
 
   // ── NOTIFICATIONS ──────────────────────────────────
@@ -2896,7 +2708,6 @@ header{
     setTimeout(() => { el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 6000);
   }
 
-  initEmailJS();
   firebase.auth().signInAnonymously().catch(e => console.warn('auth:', e));
   firebase.auth().onAuthStateChanged(user => {
     if (!user) return;
@@ -3019,11 +2830,6 @@ header{
     }
     initNotifListener(uid);
     initCalListener();
-    // load pinned task
-    db.ref('team/pinned/'+uid).once('value', snap => {
-      pinnedTaskId = snap.val() || null;
-      if (currentTab === 'tasks') render();
-    });
     if (uid === 'moshe') setTimeout(autoBackup, 2000);
     const pinBtn = document.getElementById('pinListBtn');
     if (pinBtn) pinBtn.style.display = uid === 'moshe' ? 'inline-block' : 'none';
@@ -3746,23 +3552,14 @@ header{
     const byStatus = {open:[],progress:[],blocked:[],done:[]};
     filtered.forEach(t=>(byStatus[t.status]||byStatus.open).push(t));
 
-    // Show pinned task first
-    if (pinnedTaskId && taskStatusFilter === 'all') {
-      const pinned = filtered.find(t => t.id === pinnedTaskId);
-      if (pinned) {
-        html += `<div class="sec-lbl" style="color:gold">📌 מוצמד (${pinned.status === 'done' ? '✅ בוצע' : pinned.status === 'progress' ? '🟡 בביצוע' : pinned.status === 'blocked' ? '⏳ ממתין' : '🔵 פתוח'})</div>`;
-        html += taskCard({...pinned, _pinned:true}, isAdmin||isManager);
-      }
-    }
-
     const order = taskStatusFilter !== 'all'
       ? [taskStatusFilter]
-      : ['progress','open','blocked','done'];
+      : ['blocked','progress','open','done'];
     const labels = {blocked:'⏳ ממתין',progress:'🟡 בביצוע',open:'🔵 פתוח',done:'✅ בוצע'};
     order.forEach(s=>{
       if (!byStatus[s].length) return;
       html += `<div class="sec-lbl">${labels[s]} (${byStatus[s].length})</div>`;
-      byStatus[s].filter(t => t.id !== pinnedTaskId || taskStatusFilter !== 'all').forEach(t=>html+=taskCard(t,isAdmin||isManager));
+      byStatus[s].forEach(t=>html+=taskCard(t,isAdmin||isManager));
     });
 
     if (!filtered.length) {
@@ -3966,8 +3763,7 @@ header{
   }
 
   function renderCal(wrap) {
-    const canSeeAll = true; // everyone sees weekly status
-    const canSeeAllCalendars = ['moshe','assaf','hazi'].includes(currentUser);
+    const canSeeAll = ['moshe','assaf','hazi'].includes(currentUser);
     const TYPE_ICON  = {flight:'✈️', vacation:'🏖️', sick:'🤒', other:'📌'};
     const TYPE_LABEL = {flight:'טיסה', vacation:'חופשה', sick:'מחלה', other:'אחר'};
     const TYPE_CLS   = {flight:'cal-type-flight', vacation:'cal-type-vacation', sick:'cal-type-sick', other:'cal-type-other'};
@@ -3980,7 +3776,7 @@ header{
         <div class="cal-event-icon">${TYPE_ICON[ev.type]||'📌'}</div>
         <div class="cal-event-info">
           <div class="cal-event-name">${esc(ev.name||TYPE_LABEL[ev.type]||'אירוע')}</div>
-          <div class="cal-event-dates" dir="ltr">📆 ${ev.from.split('-').reverse().join('/')} → ${ev.to.split('-').reverse().join('/')}</div>
+          <div class="cal-event-dates">📆 ${ev.from} → ${ev.to}</div>
         </div>
         ${showEdit ? '<button class="iBtn" onclick="'+edt_fn+'">✏️</button>' : ''}
         <button class="iBtn" onclick="${del_fn}">🗑</button>
@@ -3990,7 +3786,7 @@ header{
     let html = '<div class="cal-wrap">';
 
     // Overview - weekly view
-    if (true) { // everyone sees weekly status
+    if (canSeeAll) {
       // Get current week Mon-Thu (skip Fri/Sat)
       const today = new Date();
       const dow = today.getDay(); // 0=Sun,1=Mon,...,6=Sat
@@ -4021,7 +3817,7 @@ header{
       });
       html += '</div>';
 
-      ALL_UIDS.filter(uid => !(uid==='hazi' && currentUser!=='moshe')).forEach(uid => {
+      ALL_UIDS.filter(uid => !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid] ? Object.values(calEvents[uid]) : [];
         
@@ -4063,27 +3859,20 @@ header{
     }
     html += `<button class="cal-add-btn" onclick="openCalModal('${currentUser}')">➕ הוסף אירוע</button></div>`;
 
-    // Other users - everyone can view, only admins can edit
-    {
-      ALL_UIDS.filter(uid => {
-        if (uid === currentUser) return false;
-        if (uid === 'hazi' && currentUser !== 'moshe') return false;
-        if (currentUser === 'assaf' && uid === 'hazi') return false;
-        return true;
-      }).forEach(uid => {
+    // Other users (admins only)
+    if (canSeeAll) {
+      ALL_UIDS.filter(uid => uid !== currentUser && !(currentUser==='assaf' && uid==='hazi')).forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid]
           ? Object.entries(calEvents[uid]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
           : [];
-        const canEditOther = currentUser === 'moshe' || currentUser === 'assaf';
         html += `<div class="cal-section"><div class="cal-section-title">${USERS[uid].name}</div>`;
         if (evs.length) {
-          evs.forEach(e => { html += evCard(e, uid, canEditOther); });
+          evs.forEach(e => { html += evCard(e, uid, true); });
         } else {
           html += '<div class="cal-empty">אין אירועים</div>';
         }
-        if (currentUser === 'moshe' || currentUser === 'assaf') html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף לו אירוע</button>`;
-        html += '</div>';
+        html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף</button></div>`;
       });
     }
 
@@ -4127,18 +3916,16 @@ header{
   }
 
   function saveCalEvent() {
-    const name = document.getElementById('calName')?.value.trim() || '';
-    const fD = document.getElementById('calFromD')?.value;
-    const fM = document.getElementById('calFromM')?.value;
-    const fY = document.getElementById('calFromY')?.value;
-    const tD = document.getElementById('calToD')?.value;
-    const tM = document.getElementById('calToM')?.value;
-    const tY = document.getElementById('calToY')?.value;
-    if (!fD||!fM||!fY||!tD||!tM||!tY) return toast('⚠️ חסרים תאריכים');
-    const from = fY+'-'+String(fM).padStart(2,'0')+'-'+String(fD).padStart(2,'0');
-    const to   = tY+'-'+String(tM).padStart(2,'0')+'-'+String(tD).padStart(2,'0');
-    const type = document.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
-    if (from > to) return toast('⚠️ תאריך סיום לפני תחילה');
+    const modal = document.getElementById('calModal');
+    if (!modal) { return; }
+    const name = modal.querySelector('#calName') ? modal.querySelector('#calName').value.trim() : 'NO_NAME_EL';
+    const fromEl = modal.querySelector('#calFrom');
+    const toEl = modal.querySelector('#calTo');
+    const from = fromEl ? fromEl.value : 'NO_FROM_EL';
+    const to   = toEl ? toEl.value : 'NO_TO_EL';
+    const type = modal.querySelector('#calTypeRow .mchip.sel')?.dataset.t || 'flight';
+    if (!from || !to) return toast('⚠️ חסרים תאריכים');
+    if (from > to)    return toast('⚠️ תאריך סיום לפני תחילה');
     const data = {type, name:name||null, from, to, createdBy:currentUser};
     if (calEditId) {
       db.ref('team/calendar/'+calEditUid+'/'+calEditId).update(data);
@@ -4360,12 +4147,11 @@ header{
     const statusMap = {open:'status-open',progress:'status-progress',blocked:'status-blocked',done:'status-done'};
 
     return `
-    <div class="task-card s-${t.status||'open'} ${t.id === pinnedTaskId ? 'is-pinned' : ''}" data-tid="${t.id}">
+    <div class="task-card s-${t.status||'open'}" data-tid="${t.id}">
       <div class="tc-top">
         ${t.project ? '<div style="font-size:10px;color:#00e5ff;font-weight:700;margin-bottom:3px">📁 '+esc(t.project)+'</div>' : ''}
         <div class="tc-name">${esc(t.name)}</div>
         <div class="tc-actions">
-          <button class="task-pin-btn ${t.id === pinnedTaskId ? 'pinned' : ''}" onclick="event.stopPropagation();togglePinTask('${t.id}')" title="הצמד לראש">📌</button>
           ${canEdit ? '<button class="iBtn edit" onclick="openEdit(\''+t.id+'\')" >✏️</button>' : ''}
           ${canDelete ? '<button class="iBtn del" onclick="delTask(\''+t.id+'\')" >🗑</button>' : ''}
         </div>
@@ -4577,6 +4363,5 @@ header{
     setTimeout(()=>el.classList.remove('show'),2200);
   }
 </script>
-
 </body>
 </html>
