@@ -62,6 +62,7 @@ body::after{content:'';position:fixed;inset:0;
   }
   #loginScreen{
     position:fixed;inset:0;
+    display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
@@ -901,7 +902,7 @@ header{
       radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,120,0,0.06),transparent 60%),
       radial-gradient(ellipse 40% 30% at 90% 90%,rgba(255,60,0,0.04),transparent 50%),
       #04070f;
-    position:relative;
+    position:fixed;
     overflow:hidden;
   }
 
@@ -1920,18 +1921,16 @@ header{
   window.addEventListener('resize', init);
 
   function isLoginVisible(){
-    const ls = document.getElementById('loginScreen');
-    const us = document.getElementById('userSelectScreen');
     const app = document.getElementById('app');
-    // if app is hidden, login is visible
-    if (app && (app.style.display === 'none' || app.style.display === '')) return true;
-    return (ls && ls.style.display !== 'none' && ls.style.display !== '') ||
-           (us && us.style.display === 'flex');
+    return !app || app.style.display !== 'block';
   }
 
-  function draw(){
+  let lastFrame = 0;
+  function draw(ts){
     requestAnimationFrame(draw);
     if(!isLoginVisible()){ctx.clearRect(0,0,W,H);return;}
+    if (ts - lastFrame < 50) return; // max 20fps
+    lastFrame = ts;
     ctx.fillStyle = 'rgba(2,8,6,0.05)';
     ctx.fillRect(0,0,W,H);
     ctx.font = fontSize+'px "Share Tech Mono",monospace';
@@ -2728,12 +2727,6 @@ header{
     requestAnimationFrame(() => { requestAnimationFrame(() => el.classList.add('show')); });
     setTimeout(() => { el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 6000);
   }
-
-  // Show login screen immediately - don't wait for Firebase
-  window.addEventListener('DOMContentLoaded', () => {
-    const loginEl = document.getElementById('loginScreen');
-    if (loginEl) loginEl.style.display = 'flex';
-  });
 
   firebase.auth().signInAnonymously().catch(e => console.warn('auth:', e));
   firebase.auth().onAuthStateChanged(user => {
