@@ -3226,7 +3226,7 @@ header{
 
     // overdue
     const today = new Date().toISOString().split('T')[0];
-    const overdue = myTasks.filter(t=>t.deadline && t.deadline < today && t.status!=='done');
+    const overdue = myTasks.filter(t=>t.deadline && t.deadline < today && t.status!=='done' && t.deadline !== today);
     if (overdue.length) {
       html += `<div class="sec-lbl" style="color:#fca5a5">⚠️ באיחור (${overdue.length})</div>`;
       overdue.forEach(t => html += taskCard(t, false));
@@ -3295,7 +3295,7 @@ header{
       html += '</div>';
 
       // overdue for this member
-      const overdueM = myPersonalTasks.filter(t=>t.deadline && t.deadline < today && t.status!=='done');
+      const overdueM = myPersonalTasks.filter(t=>t.deadline && t.deadline < today && t.status!=='done' && t.deadline !== today);
       if (overdueM.length) {
         html += `<div class="sec-lbl" style="color:#fca5a5">⚠️ באיחור (${overdueM.length})</div>`;
         overdueM.forEach(t => html += taskCard(t, false));
@@ -4200,7 +4200,8 @@ header{
     const today = new Date().toISOString().split('T')[0];
     let deadlineBadge = '';
     if (t.deadline) {
-      const diff = Math.ceil((new Date(t.deadline)-new Date(today))/(1000*60*60*24));
+      // Use string comparison to avoid timezone issues
+      const diff = t.deadline > today ? Math.ceil((new Date(t.deadline+'T12:00:00')-new Date(today+'T12:00:00'))/(1000*60*60*24)) : (t.deadline === today ? 0 : -Math.ceil((new Date(today+'T12:00:00')-new Date(t.deadline+'T12:00:00'))/(1000*60*60*24)));
       if (diff < 0)      deadlineBadge = `<span class="deadline-badge overdue">⚠️ באיחור ${Math.abs(diff)}י'</span>`;
       else if (diff <= 3) deadlineBadge = `<span class="deadline-badge soon">⏰ ${diff===0?'היום':diff+'י\''}</span>`;
       else                deadlineBadge = `<span class="deadline-badge ok">📅 ${t.deadline}</span>`;
