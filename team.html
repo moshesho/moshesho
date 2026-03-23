@@ -62,7 +62,6 @@ body::after{content:'';position:fixed;inset:0;
   }
   #loginScreen{
     position:fixed;inset:0;
-    display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
@@ -1020,7 +1019,7 @@ header{
   /* Dark solid login bg */
   #loginScreen, #userSelectScreen {
     background:#020508;
-    position:fixed;
+    position:relative;
     overflow:hidden;
   }
 
@@ -1679,11 +1678,6 @@ header{
   .cal-section:last-child::after {
     display: none;
   }
-
-
-  .task-pin-btn { background:none;border:none;cursor:pointer;font-size:14px;opacity:0.35;transition:all .2s;padding:2px 4px;line-height:1; }
-  .task-pin-btn.pinned { opacity:1;filter:drop-shadow(0 0 4px gold); }
-  .task-card.is-pinned { border-color:rgba(255,215,0,0.45)!important;box-shadow:0 0 14px rgba(255,215,0,0.12)!important; }
 
 </style>
 </head>
@@ -2852,10 +2846,6 @@ header{
     }
     initNotifListener(uid);
     initCalListener();
-    db.ref('team/pinned/'+uid).on('value', snap => {
-      pinnedTaskId = snap.val() || null;
-      if (currentTab === 'tasks') render();
-    });
     if (uid === 'moshe') setTimeout(autoBackup, 2000);
     const pinBtn = document.getElementById('pinListBtn');
     if (pinBtn) pinBtn.style.display = uid === 'moshe' ? 'inline-block' : 'none';
@@ -3578,16 +3568,6 @@ header{
     const byStatus = {open:[],progress:[],blocked:[],done:[]};
     filtered.forEach(t=>(byStatus[t.status]||byStatus.open).push(t));
 
-    // Pinned task at top
-    if (pinnedTaskId && taskStatusFilter === 'all') {
-      const pinned = filtered.find(t => t.id === pinnedTaskId);
-      if (pinned) {
-        const pinLabel = {progress:'🟡 בביצוע',open:'🔵 פתוח',blocked:'⏳ ממתין',done:'✅ בוצע'}[pinned.status]||'';
-        html += `<div class="sec-lbl" style="color:gold">📌 מוצמד — ${pinLabel}</div>`;
-        html += taskCard(pinned, isAdmin||isManager);
-      }
-    }
-
     const order = taskStatusFilter !== 'all'
       ? [taskStatusFilter]
       : ['progress','open','blocked','done'];
@@ -3595,7 +3575,7 @@ header{
     order.forEach(s=>{
       if (!byStatus[s].length) return;
       html += `<div class="sec-lbl">${labels[s]} (${byStatus[s].length})</div>`;
-      byStatus[s].filter(t => !(t.id === pinnedTaskId && taskStatusFilter === 'all')).forEach(t=>html+=taskCard(t,isAdmin||isManager));
+      byStatus[s].forEach(t=>html+=taskCard(t,isAdmin||isManager));
     });
 
     if (!filtered.length) {
@@ -3988,19 +3968,6 @@ header{
     toast('🗑️ נמחק');
   }
 
-
-  function togglePinTask(taskId) {
-    if (pinnedTaskId === taskId) {
-      pinnedTaskId = null;
-      db.ref('team/pinned/'+currentUser).remove();
-      toast('הוסרה ההצמדה');
-    } else {
-      pinnedTaskId = taskId;
-      db.ref('team/pinned/'+currentUser).set(taskId);
-      toast('📌 משימה הוצמדה לראש הרשימה!');
-    }
-  }
-
   // ── TASK CARD ──────────────────────────────────────
   function buildStepsHtml(t, canEdit) {
     const steps = t.steps ? Object.entries(t.steps) : [];
@@ -4206,12 +4173,11 @@ header{
     const statusMap = {open:'status-open',progress:'status-progress',blocked:'status-blocked',done:'status-done'};
 
     return `
-    <div class="task-card s-${t.status||'open'} ${t.id === pinnedTaskId ? 'is-pinned' : ''}" data-tid="${t.id}">
+    <div class="task-card s-${t.status||'open'}" data-tid="${t.id}">
       <div class="tc-top">
         ${t.project ? '<div style="font-size:10px;color:#00e5ff;font-weight:700;margin-bottom:3px">📁 '+esc(t.project)+'</div>' : ''}
         <div class="tc-name">${esc(t.name)}</div>
         <div class="tc-actions">
-          <button class="task-pin-btn ${t.id === pinnedTaskId ? 'pinned' : ''}" onclick="event.stopPropagation();togglePinTask('${t.id}')" title="הצמד לראש">📌</button>
           ${canEdit ? '<button class="iBtn edit" onclick="openEdit(\''+t.id+'\')" >✏️</button>' : ''}
           ${canDelete ? '<button class="iBtn del" onclick="delTask(\''+t.id+'\')" >🗑</button>' : ''}
         </div>
