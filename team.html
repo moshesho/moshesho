@@ -4321,8 +4321,8 @@ header{
     document.getElementById('mTaskName').value  = t.name||'';
     document.getElementById('mProjectName').value = t.project||'';
     document.getElementById('mTaskNotes').value = t.notes||'';
-    document.getElementById('mDeadline').value  = t.deadline||'';
     mDeadlineVal = t.deadline||'';
+    document.getElementById('mDeadline').value = mDeadlineVal;
 
     // load existing assignees into mAssigneesList
     mAssigneesList = t.assignees ? [...t.assignees] : (t.assignee ? [t.assignee] : []);
@@ -4392,12 +4392,31 @@ header{
       name, priority:mPrio, status:mStatus,
       project:document.getElementById('mProjectName').value.trim()||null,
       notes:document.getElementById('mTaskNotes').value.trim()||null,
-      deadline:(document.getElementById('mDeadline').value || mDeadlineVal) || null
+      deadline:(mDeadlineVal || document.getElementById('mDeadline').value) || null
     };
     if (editId) {
-      // update existing task with all assignees (no duplicates)
       const [first] = mAssigneesList;
-      db.ref('team/tasks/'+editId).update({...base, assignee:first, assignees:mAssigneesList, updatedBy:currentUser, updatedAt:Date.now()});
+      // Find ALL related tasks (same name/group) and update them all
+      const editTask = tasks.find(t => t.id === editId);
+      const relatedTasks = editTask?.groupId
+        ? tasks.filter(t => t.groupId === editTask.groupId)
+        : [editTask];
+      const updates = {};
+      (relatedTasks||[editTask]).forEach(rt => {
+        if (!rt) return;
+        updates['team/tasks/'+rt.id+'/deadline'] = base.deadline;
+        updates['team/tasks/'+rt.id+'/name']     = base.name;
+        updates['team/tasks/'+rt.id+'/priority'] = base.priority;
+        updates['team/tasks/'+rt.id+'/status']   = base.status;
+        updates['team/tasks/'+rt.id+'/project']  = base.project;
+        updates['team/tasks/'+rt.id+'/notes']    = base.notes;
+        updates['team/tasks/'+rt.id+'/updatedBy']= currentUser;
+        updates['team/tasks/'+rt.id+'/updatedAt']= Date.now();
+      });
+      // Also update assignees on main editId
+      updates['team/tasks/'+editId+'/assignees'] = mAssigneesList;
+      updates['team/tasks/'+editId+'/assignee']  = first;
+      db.ref().update(updates);
       toast('✏️ עודכן!');
     } else {
       mAssigneesList.forEach(uid => {
