@@ -2822,8 +2822,8 @@ header{
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('userSelectScreen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    // load pinned task from localStorage
-    try { pinnedTaskId = localStorage.getItem('pinned_'+uid) || null; } catch(e){}
+    // load pinned tasks from localStorage
+    try { const p = localStorage.getItem('pinned_'+uid); pinnedTasks = new Set(p ? JSON.parse(p) : []); } catch(e){ pinnedTasks = new Set(); }
     // simulate click on dash tab to force render
     setTimeout(() => {
       const dashBtn = document.querySelector('.tab.active') || document.querySelector('[onclick*="dash"]');
@@ -3587,13 +3587,12 @@ header{
     const byStatus = {open:[],progress:[],blocked:[],done:[]};
     filtered.forEach(t=>(byStatus[t.status]||byStatus.open).push(t));
 
-    // Pinned task at top
-    if (pinnedTaskId && taskStatusFilter === 'all') {
-      const pinned = filtered.find(t => t.id === pinnedTaskId);
-      if (pinned) {
-        const pinLabel = {progress:'🟡 בביצוע',open:'🔵 פתוח',blocked:'⏳ ממתין',done:'✅ בוצע'}[pinned.status]||'';
-        html += `<div class="sec-lbl" style="color:gold">📌 מוצמד — ${pinLabel}</div>`;
-        html += taskCard(pinned, isAdmin||isManager);
+    // Pinned tasks at top
+    if (pinnedTasks.size > 0 && taskStatusFilter === 'all') {
+      const pinnedList = filtered.filter(t => pinnedTasks.has(t.id));
+      if (pinnedList.length > 0) {
+        html += `<div class="sec-lbl" style="color:gold">📌 מוצמדות (${pinnedList.length})</div>`;
+        pinnedList.forEach(t => html += taskCard(t, isAdmin||isManager));
       }
     }
     const order = taskStatusFilter !== 'all'
@@ -3603,7 +3602,7 @@ header{
     order.forEach(s=>{
       if (!byStatus[s].length) return;
       html += `<div class="sec-lbl">${labels[s]} (${byStatus[s].length})</div>`;
-      byStatus[s].filter(t => !(t.id === pinnedTaskId && taskStatusFilter === 'all')).forEach(t=>html+=taskCard(t,isAdmin||isManager));
+      byStatus[s].filter(t => !(pinnedTasks.has(t.id) && taskStatusFilter === 'all')).forEach(t=>html+=taskCard(t,isAdmin||isManager));
     });
 
     if (!filtered.length) {
@@ -3998,15 +3997,14 @@ header{
 
 
   function togglePinTask(taskId) {
-    if (pinnedTaskId === taskId) {
-      pinnedTaskId = null;
-      try { localStorage.removeItem('pinned_'+currentUser); } catch(e){}
+    if (pinnedTasks.has(taskId)) {
+      pinnedTasks.delete(taskId);
       toast('הוסרה ההצמדה');
     } else {
-      pinnedTaskId = taskId;
-      try { localStorage.setItem('pinned_'+currentUser, taskId); } catch(e){}
+      pinnedTasks.add(taskId);
       toast('📌 משימה הוצמדה לראש הרשימה!');
     }
+    try { localStorage.setItem('pinned_'+currentUser, JSON.stringify([...pinnedTasks])); } catch(e){}
     render();
   }
 
@@ -4215,12 +4213,12 @@ header{
     const statusMap = {open:'status-open',progress:'status-progress',blocked:'status-blocked',done:'status-done'};
 
     return `
-    <div class="task-card s-${t.status||'open'} ${t.id === pinnedTaskId ? 'is-pinned' : ''}" data-tid="${t.id}">
+    <div class="task-card s-${t.status||'open'} ${pinnedTasks.has(t.id) ? 'is-pinned' : ''}" data-tid="${t.id}">
       <div class="tc-top">
         ${t.project ? '<div style="font-size:10px;color:#00e5ff;font-weight:700;margin-bottom:3px">📁 '+esc(t.project)+'</div>' : ''}
         <div class="tc-name">${esc(t.name)}</div>
         <div class="tc-actions">
-          <button class="task-pin-btn ${t.id === pinnedTaskId ? 'pinned' : ''}" onclick="event.stopPropagation();togglePinTask('${t.id}')" title="הצמד לראש">📌</button>
+          <button class="task-pin-btn ${pinnedTasks.has(t.id) ? 'pinned' : ''}" onclick="event.stopPropagation();togglePinTask('${t.id}')" title="הצמד לראש">📌</button>
           ${canEdit ? '<button class="iBtn edit" onclick="openEdit(\''+t.id+'\')" >✏️</button>' : ''}
           ${canDelete ? '<button class="iBtn del" onclick="delTask(\''+t.id+'\')" >🗑</button>' : ''}
         </div>
