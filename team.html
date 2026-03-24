@@ -2061,6 +2061,7 @@ header{
   let mAssignees  = []; // multi-select
   let mPrio       = 3;
   let mStatus     = 'open';
+  let mDeadlineVal = '';
 
   // ── Firebase ──────────────────────────────────────
   firebase.initializeApp({
@@ -4388,12 +4389,12 @@ header{
     const name = document.getElementById('mTaskName').value.trim();
     if (!name) return toast('⚠️ חסר שם');
     if (!mAssigneesList.length) return toast('⚠️ בחר לפחות אחראי אחד');
-    const _dl = mDeadlineVal || document.getElementById('mDeadline').value;
+    const _dl = document.getElementById('mDeadline').value || mDeadlineVal;
     const base = {
       name, priority:mPrio, status:mStatus,
       project:document.getElementById('mProjectName').value.trim()||null,
       notes:document.getElementById('mTaskNotes').value.trim()||null,
-      deadline:(mDeadlineVal || document.getElementById('mDeadline').value) || null
+      deadline: document.getElementById('mDeadline').value || mDeadlineVal || null
     };
     if (editId) {
       const [first] = mAssigneesList;
