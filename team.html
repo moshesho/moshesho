@@ -1679,7 +1679,7 @@ header{
   .cal-month-user-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
   .cal-month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
   .cal-month-dow{text-align:center;font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);padding:2px 0 4px}
-  .cal-month-day{text-align:center;padding:5px 2px;border-radius:6px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.03);min-height:26px;display:flex;align-items:center;justify-content:center}
+  .cal-month-day{text-align:center;padding:3px 2px;border-radius:6px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.03);min-height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center}
   .cal-mday-today{background:rgba(0,229,255,0.12)!important;color:var(--cyan)!important;font-weight:900!important;border:1px solid rgba(0,229,255,0.3)}
   .cal-mday-away{background:rgba(255,59,92,0.15)!important;border:1px solid rgba(255,59,92,0.3)!important;font-size:13px!important}
   .cal-mday-link{cursor:pointer;transition:transform .15s,box-shadow .15s}
@@ -3978,7 +3978,8 @@ header{
           let onclick = '';
           if (ev) {
             cls += ' cal-mday-away cal-mday-link';
-            inner = TYPE_ICON[ev.type]||'📌';
+            const dayNum = d.date.slice(8).replace(/^0/,'');
+            inner = `<span style="font-size:9px;opacity:0.7;display:block;line-height:1.1">${dayNum}</span>${TYPE_ICON[ev.type]||'📌'}`;
             title = `title="${TYPE_LABEL[ev.type]||''}: ${ev.name||''}"`;
             const sectionId = uid === currentUser ? 'cal-section-me' : `cal-section-${uid}`;
             const evCardId  = `cal-evcard-${uid}-${ev.id}`;
