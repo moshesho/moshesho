@@ -1665,6 +1665,23 @@ header{
 
 
   /* ── CAL SECTION DIVIDER ── */
+  /* ── CAL NAV BAR ── */
+  .cal-nav-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:18px;background:rgba(0,170,255,0.06);border:1px solid rgba(0,170,255,0.15);border-radius:14px;padding:10px 14px}
+  .cal-nav-btn{background:rgba(0,170,255,0.1);border:1px solid rgba(0,170,255,0.25);color:var(--cyan);font-size:22px;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;line-height:1}
+  .cal-nav-btn:hover{background:rgba(0,170,255,0.22);border-color:var(--cyan)}
+  .cal-nav-center{flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+  .cal-nav-title{font-size:14px;font-weight:900;color:#fff;letter-spacing:0.5px}
+  .cal-nav-modes{display:flex;gap:4px;background:rgba(0,0,0,0.3);border-radius:20px;padding:3px}
+  .cal-mode-btn{padding:4px 16px;border-radius:16px;border:none;background:transparent;color:rgba(255,255,255,0.45);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+  .cal-mode-btn.active{background:var(--blue);color:#fff;box-shadow:0 0 10px rgba(0,170,255,0.4)}
+  /* ── MONTH GRID ── */
+  .cal-month-user-block{margin-bottom:20px;background:rgba(255,255,255,0.02);border:1px solid rgba(0,170,255,0.1);border-radius:12px;padding:10px 12px}
+  .cal-month-user-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .cal-month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .cal-month-dow{text-align:center;font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);padding:2px 0 4px}
+  .cal-month-day{text-align:center;padding:5px 2px;border-radius:6px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.03);min-height:26px;display:flex;align-items:center;justify-content:center}
+  .cal-mday-today{background:rgba(0,229,255,0.12)!important;color:var(--cyan)!important;font-weight:900!important;border:1px solid rgba(0,229,255,0.3)}
+  .cal-mday-away{background:rgba(255,59,92,0.15)!important;border:1px solid rgba(255,59,92,0.3)!important;font-size:13px!important}
   .cal-section::after {
     content: '';
     display: block;
@@ -3798,6 +3815,8 @@ header{
 
   // ── CALENDAR ───────────────────────────────────────
   let calEvents = {};
+  let calViewMode = 'week';   // 'week' | 'month'
+  let calNavOffset = 0;       // weeks offset (week mode) or months offset (month mode)
 
   function initCalListener() {
     db.ref('team/calendar').on('value', snap => {
@@ -3807,12 +3826,13 @@ header{
   }
 
   function renderCal(wrap) {
-    const canSeeAll = true; // everyone sees weekly status
+    const canSeeAll = true;
     const canSeeAllCalendars = ['moshe','assaf','hazi'].includes(currentUser);
     const TYPE_ICON  = {flight:'✈️', vacation:'🏖️', sick:'🤒', other:'📌'};
     const TYPE_LABEL = {flight:'טיסה', vacation:'חופשה', sick:'מחלה', other:'אחר'};
     const TYPE_CLS   = {flight:'cal-type-flight', vacation:'cal-type-vacation', sick:'cal-type-sick', other:'cal-type-other'};
     const ALL_UIDS   = ['moshe','assaf','hazi','elad','alik','rif','tal'];
+    const todayStr   = new Date().toISOString().split('T')[0];
 
     function evCard(ev, uid, showEdit) {
       const del_fn = `delCalEvent('${uid}','${ev.id}')`;
@@ -3828,109 +3848,165 @@ header{
       </div>`;
     }
 
-    let html = '<div class="cal-wrap">';
+    // ── compute view dates ──────────────────────────────
+    const today = new Date();
+    let viewDays = [];
+    let viewTitle = '';
 
-    // Overview - weekly view
-    if (true) { // everyone sees weekly status
-      // Get current week Mon-Thu (skip Fri/Sat)
-      const today = new Date();
-      const dow = today.getDay(); // 0=Sun,1=Mon,...,6=Sat
-      // Find Sunday of this week
+    if (calViewMode === 'week') {
+      const dow = today.getDay();
       const sunday = new Date(today);
-      sunday.setDate(today.getDate() - dow);
-      
-      // Build week days Sun-Thu (0-4), skip Fri(5) Sat(6)
-      const weekDays = [];
-      const dayNames = ['א','ב','ג','ד','ה'];
-      for (let i=0; i<=4; i++) {
+      sunday.setDate(today.getDate() - dow + (calNavOffset * 7));
+      const dayNames = ['א\'','ב\'','ג\'','ד\'','ה\''];
+      for (let i = 0; i <= 4; i++) {
         const d = new Date(sunday);
         d.setDate(sunday.getDate() + i);
-        weekDays.push({
-          date: d.toISOString().split('T')[0],
-          label: dayNames[i]
-        });
+        viewDays.push({ date: d.toISOString().split('T')[0], label: dayNames[i] });
       }
+      const from = viewDays[0].date.slice(5).split('-').reverse().join('/');
+      const to   = viewDays[4].date.slice(5).split('-').reverse().join('/');
+      const yr   = viewDays[0].date.slice(0,4);
+      viewTitle  = calNavOffset === 0 ? `שבוע נוכחי  (${from} – ${to})` : `${from} – ${to} / ${yr}`;
+    } else {
+      // month mode
+      const base = new Date(today.getFullYear(), today.getMonth() + calNavOffset, 1);
+      const yr = base.getFullYear(), mo = base.getMonth();
+      const daysInMonth = new Date(yr, mo+1, 0).getDate();
+      const MONTH_HE = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+      viewTitle = MONTH_HE[mo] + ' ' + yr;
+      const DAY_SHORT = ['א','ב','ג','ד','ה','ו','ש'];
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dt = new Date(yr, mo, d);
+        const dow = dt.getDay(); // 0=Sun … 6=Sat
+        const iso = dt.toISOString().split('T')[0];
+        viewDays.push({ date: iso, label: DAY_SHORT[dow], dow });
+      }
+    }
 
-      html += '<div class="cal-section">';
-      html += '<div class="cal-section-title">👥 סטטוס צוות שבועי</div>';
-      
-      // Header row with day names
-      html += '<div style="display:flex;gap:4px;margin-bottom:8px;padding-right:120px">';
-      weekDays.forEach(d => {
-        const isToday = d.date === today.toISOString().split('T')[0];
-        html += `<div style="flex:1;text-align:center;font-size:11px;font-weight:${isToday?900:600};color:${isToday?'var(--cyan)':'rgba(255,255,255,0.4)'};font-family:Arial">${d.label}<br><span style="font-size:9px">${d.date.slice(8)}</span></div>`;
+    // ── nav bar ─────────────────────────────────────────
+    let html = '<div class="cal-wrap">';
+    html += `<div class="cal-nav-bar">
+      <button class="cal-nav-btn" onclick="calNavOffset--;renderCalTab()">&#8250;</button>
+      <div class="cal-nav-center">
+        <span class="cal-nav-title">${viewTitle}</span>
+        <div class="cal-nav-modes">
+          <button class="cal-mode-btn ${calViewMode==='week'?'active':''}" onclick="calViewMode='week';calNavOffset=0;renderCalTab()">שבוע</button>
+          <button class="cal-mode-btn ${calViewMode==='month'?'active':''}" onclick="calViewMode='month';calNavOffset=0;renderCalTab()">חודש</button>
+        </div>
+      </div>
+      <button class="cal-nav-btn" onclick="calNavOffset++;renderCalTab()">&#8249;</button>
+    </div>`;
+
+    // ── team status grid ────────────────────────────────
+    const visibleUids = ALL_UIDS.filter(uid => !(uid==='hazi' && currentUser!=='moshe'));
+
+    html += '<div class="cal-section">';
+    html += '<div class="cal-section-title">👥 סטטוס צוות</div>';
+
+    if (calViewMode === 'week') {
+      // Header
+      html += '<div style="display:flex;gap:3px;margin-bottom:8px;padding-right:90px">';
+      viewDays.forEach(d => {
+        const isToday = d.date === todayStr;
+        html += `<div style="flex:1;text-align:center;font-size:11px;font-weight:${isToday?900:600};color:${isToday?'var(--cyan)':'rgba(255,255,255,0.4)'}">
+          ${d.label}<br><span style="font-size:9px">${d.date.slice(8)}</span>
+        </div>`;
       });
       html += '</div>';
 
-      ALL_UIDS.filter(uid => !(uid==='hazi' && currentUser!=='moshe')).forEach(uid => {
+      visibleUids.forEach(uid => {
         if (!USERS[uid]) return;
         const evs = calEvents[uid] ? Object.values(calEvents[uid]) : [];
-        
-        html += '<div style="display:flex;align-items:center;gap:4px;margin-bottom:6px">';
-        // Avatar + name
-        html += `<div style="display:flex;align-items:center;gap:8px;width:120px;flex-shrink:0">
-          <div class="cal-avatar">${USERS[uid].initials}</div>
-          <div style="font-size:13px;font-weight:800;color:#fff">${USERS[uid].name.split(' ')[0]}</div>
+        html += '<div style="display:flex;align-items:center;gap:3px;margin-bottom:5px">';
+        html += `<div style="display:flex;align-items:center;gap:6px;width:90px;flex-shrink:0">
+          <div class="cal-avatar" style="width:30px;height:30px;font-size:10px">${USERS[uid].initials}</div>
+          <div style="font-size:12px;font-weight:800;color:#fff">${USERS[uid].name.split(' ')[0]}</div>
         </div>`;
-        
-        // Day cells
-        weekDays.forEach(d => {
+        viewDays.forEach(d => {
           const ev = evs.find(e => e.from <= d.date && e.to >= d.date);
-          const isToday = d.date === today.toISOString().split('T')[0];
+          const isToday = d.date === todayStr;
           if (ev) {
-            html += `<div style="flex:1;text-align:center;padding:4px 2px;border-radius:6px;background:rgba(255,59,92,0.15);border:1px solid rgba(255,59,92,0.3);font-size:11px;font-weight:700;color:#ff3b5c">
-              ${TYPE_ICON[ev.type]||'📌'}
-            </div>`;
+            html += `<div title="${TYPE_LABEL[ev.type]||'אירוע'}" style="flex:1;text-align:center;padding:4px 1px;border-radius:6px;background:rgba(255,59,92,0.15);border:1px solid rgba(255,59,92,0.3);font-size:12px">${TYPE_ICON[ev.type]||'📌'}</div>`;
           } else {
-            html += `<div style="flex:1;text-align:center;padding:4px 2px;border-radius:6px;background:${isToday?'rgba(0,255,157,0.1)':'rgba(0,255,157,0.05)'};border:1px solid ${isToday?'rgba(0,255,157,0.3)':'rgba(0,255,157,0.1)'};font-size:11px;color:rgba(0,255,157,0.7)">
-              💼
-            </div>`;
+            html += `<div style="flex:1;text-align:center;padding:4px 1px;border-radius:6px;background:${isToday?'rgba(0,255,157,0.12)':'rgba(0,255,157,0.04)'};border:1px solid ${isToday?'rgba(0,255,157,0.3)':'rgba(0,255,157,0.08)'};font-size:11px;color:rgba(0,255,157,0.6)">💼</div>`;
           }
         });
         html += '</div>';
       });
-      html += '</div>';
+
+    } else {
+      // ── MONTH MODE ──
+      // We render: name row + calendar grid per user, compact
+      visibleUids.forEach(uid => {
+        if (!USERS[uid]) return;
+        const evs = calEvents[uid] ? Object.values(calEvents[uid]) : [];
+
+        html += `<div class="cal-month-user-block">`;
+        html += `<div class="cal-month-user-header">
+          <div class="cal-avatar" style="width:28px;height:28px;font-size:10px">${USERS[uid].initials}</div>
+          <span style="font-size:13px;font-weight:800;color:#fff">${USERS[uid].name.split(' ')[0]}</span>
+        </div>`;
+
+        // Day-of-week headers (Sun=א … Sat=ש)
+        const DOW_LABELS = ['א','ב','ג','ד','ה','ו','ש'];
+        html += '<div class="cal-month-grid">';
+        DOW_LABELS.forEach(l => { html += `<div class="cal-month-dow">${l}</div>`; });
+
+        // blank cells before first day
+        const firstDow = viewDays[0].dow; // 0=Sun
+        for (let i = 0; i < firstDow; i++) html += '<div></div>';
+
+        viewDays.forEach(d => {
+          const ev = evs.find(e => e.from <= d.date && e.to >= d.date);
+          const isToday = d.date === todayStr;
+          let cls = 'cal-month-day';
+          let inner = d.date.slice(8).replace(/^0/,'');
+          let title = '';
+          if (ev) { cls += ' cal-mday-away'; inner = TYPE_ICON[ev.type]||'📌'; title = `title="${TYPE_LABEL[ev.type]||''}"` ; }
+          else if (isToday) cls += ' cal-mday-today';
+          html += `<div class="${cls}" ${title}>${inner}</div>`;
+        });
+
+        html += '</div></div>'; // cal-month-grid, cal-month-user-block
+      });
     }
 
-    // My events
+    html += '</div>'; // cal-section
+
+    // ── My events ──────────────────────────────────────
     const myEvs = calEvents[currentUser]
       ? Object.entries(calEvents[currentUser]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
       : [];
     html += '<div class="cal-section"><div class="cal-section-title">📅 היומן שלי</div>';
-    if (myEvs.length) {
-      myEvs.forEach(e => { html += evCard(e, currentUser, true); });
-    } else {
-      html += '<div class="cal-empty">אין אירועים מתוכננים</div>';
-    }
+    if (myEvs.length) { myEvs.forEach(e => { html += evCard(e, currentUser, true); }); }
+    else html += '<div class="cal-empty">אין אירועים מתוכננים</div>';
     html += `<button class="cal-add-btn" onclick="openCalModal('${currentUser}')">➕ הוסף אירוע</button></div>`;
 
-    // Other users - everyone can view, only admins can edit
-    {
-      ALL_UIDS.filter(uid => {
-        if (uid === currentUser) return false;
-        if (uid === 'hazi' && currentUser !== 'moshe') return false;
-        if (currentUser === 'assaf' && uid === 'hazi') return false;
-        return true;
-      }).forEach(uid => {
-        if (!USERS[uid]) return;
-        const evs = calEvents[uid]
-          ? Object.entries(calEvents[uid]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
-          : [];
-        const canEditOther = currentUser === 'moshe' || currentUser === 'assaf';
-        html += `<div class="cal-section"><div class="cal-section-title">${USERS[uid].name}</div>`;
-        if (evs.length) {
-          evs.forEach(e => { html += evCard(e, uid, canEditOther); });
-        } else {
-          html += '<div class="cal-empty">אין אירועים</div>';
-        }
-        if (currentUser === 'moshe' || currentUser === 'assaf') html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף לו אירוע</button>`;
-        html += '</div>';
-      });
-    }
+    // ── Other users ────────────────────────────────────
+    ALL_UIDS.filter(uid => {
+      if (uid === currentUser) return false;
+      if (uid === 'hazi' && currentUser !== 'moshe') return false;
+      if (currentUser === 'assaf' && uid === 'hazi') return false;
+      return true;
+    }).forEach(uid => {
+      if (!USERS[uid]) return;
+      const evs = calEvents[uid]
+        ? Object.entries(calEvents[uid]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
+        : [];
+      const canEditOther = currentUser === 'moshe' || currentUser === 'assaf';
+      html += `<div class="cal-section"><div class="cal-section-title">${USERS[uid].name}</div>`;
+      if (evs.length) { evs.forEach(e => { html += evCard(e, uid, canEditOther); }); }
+      else html += '<div class="cal-empty">אין אירועים</div>';
+      if (currentUser === 'moshe' || currentUser === 'assaf') html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף לו אירוע</button>`;
+      html += '</div>';
+    });
 
     html += '</div>';
     wrap.innerHTML = html;
   }
+
+  function renderCalTab() { renderCal(document.getElementById('mainContent')); }
+
   let calEditId = null, calEditUid = null;
 
   function openCalModal(uid, eventId) {
