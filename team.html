@@ -3865,7 +3865,7 @@ header{
       const dow = today.getDay();
       const sunday = new Date(today);
       sunday.setDate(today.getDate() - dow + (calNavOffset * 7));
-      const dayNames = ['א\'','ב\'','ג\'','ד\'','ה\''];
+      const dayNames = ['ראשון','שני','שלישי','רביעי','חמישי'];
       for (let i = 0; i <= 4; i++) {
         const d = new Date(sunday);
         d.setDate(sunday.getDate() + i);
@@ -3916,8 +3916,8 @@ header{
       html += '<div style="display:flex;gap:3px;margin-bottom:8px;padding-right:90px">';
       viewDays.forEach(d => {
         const isToday = d.date === todayStr;
-        html += `<div style="flex:1;text-align:center;font-size:11px;font-weight:${isToday?900:600};color:${isToday?'var(--cyan)':'rgba(255,255,255,0.4)'}">
-          ${d.label}<br><span style="font-size:9px">${d.date.slice(8)}</span>
+        html += `<div style="flex:1;text-align:center;font-size:10px;font-weight:${isToday?900:600};color:${isToday?'var(--cyan)':'rgba(255,255,255,0.4)'}">
+          ${d.label}<br><span style="font-size:9px;opacity:0.7">${d.date.slice(8)}</span>
         </div>`;
       });
       html += '</div>';
@@ -3958,7 +3958,7 @@ header{
         </div>`;
 
         // Day-of-week headers (Sun=א … Sat=ש)
-        const DOW_LABELS = ['א','ב','ג','ד','ה','ו','ש'];
+        const DOW_LABELS = ['א'','ב'','ג'','ד'','ה'','ו'','ש']; // Sun=א Mon=ב ... Sat=ש
         html += '<div class="cal-month-grid">';
         DOW_LABELS.forEach(l => { html += `<div class="cal-month-dow">${l}</div>`; });
 
