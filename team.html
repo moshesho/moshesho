@@ -1689,7 +1689,7 @@ header{
     40% {box-shadow:0 0 0 5px rgba(0,229,255,0.7),0 0 40px rgba(0,229,255,0.35);border-color:rgba(0,229,255,0.7)!important;background:rgba(0,229,255,0.10)!important;transform:scale(1.01)}
     100%{box-shadow:none;border-color:inherit!important;background:inherit!important;transform:scale(1)}
   }
-  .cal-ev-highlight{animation:calHighlight 2s ease-out;transition:none!important}
+  .cal-ev-highlight{animation:calHighlight 0.6s ease-in-out 4;transition:none!important}
   .cal-section::after {
     content: '';
     display: block;
@@ -4034,7 +4034,7 @@ header{
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
       // flash highlight
       target.classList.add('cal-ev-highlight');
-      setTimeout(() => target.classList.remove('cal-ev-highlight'), 1800);
+      setTimeout(() => target.classList.remove('cal-ev-highlight'), 2600);
     });
   }
 
