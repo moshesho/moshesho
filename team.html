@@ -1682,6 +1682,10 @@ header{
   .cal-month-day{text-align:center;padding:5px 2px;border-radius:6px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.03);min-height:26px;display:flex;align-items:center;justify-content:center}
   .cal-mday-today{background:rgba(0,229,255,0.12)!important;color:var(--cyan)!important;font-weight:900!important;border:1px solid rgba(0,229,255,0.3)}
   .cal-mday-away{background:rgba(255,59,92,0.15)!important;border:1px solid rgba(255,59,92,0.3)!important;font-size:13px!important}
+  .cal-mday-link{cursor:pointer;transition:transform .15s,box-shadow .15s}
+  .cal-mday-link:hover{transform:scale(1.18);box-shadow:0 0 10px rgba(255,59,92,0.5);z-index:1;position:relative}
+  @keyframes calHighlight{0%{box-shadow:0 0 0 3px rgba(0,229,255,0.8),0 0 20px rgba(0,229,255,0.4)}50%{box-shadow:0 0 0 5px rgba(0,229,255,0.6),0 0 30px rgba(0,229,255,0.3)}100%{box-shadow:none}}
+  .cal-ev-highlight{animation:calHighlight 1.8s ease-out;border-color:rgba(0,229,255,0.6)!important;background:rgba(0,229,255,0.08)!important}
   .cal-section::after {
     content: '';
     display: block;
@@ -3837,7 +3841,7 @@ header{
     function evCard(ev, uid, showEdit) {
       const del_fn = `delCalEvent('${uid}','${ev.id}')`;
       const edt_fn = `openCalModal('${uid}','${ev.id}')`;
-      return `<div class="cal-event ${TYPE_CLS[ev.type]||'cal-type-other'}">
+      return `<div id="cal-evcard-${uid}-${ev.id}" class="cal-event ${TYPE_CLS[ev.type]||'cal-type-other'}">
         <div class="cal-event-icon">${TYPE_ICON[ev.type]||'📌'}</div>
         <div class="cal-event-info">
           <div class="cal-event-name">${esc(ev.name||TYPE_LABEL[ev.type]||'אירוע')}</div>
@@ -3926,7 +3930,9 @@ header{
           const ev = evs.find(e => e.from <= d.date && e.to >= d.date);
           const isToday = d.date === todayStr;
           if (ev) {
-            html += `<div title="${TYPE_LABEL[ev.type]||'אירוע'}" style="flex:1;text-align:center;padding:4px 1px;border-radius:6px;background:rgba(255,59,92,0.15);border:1px solid rgba(255,59,92,0.3);font-size:12px">${TYPE_ICON[ev.type]||'📌'}</div>`;
+            const sectionId2 = uid === currentUser ? 'cal-section-me' : `cal-section-${uid}`;
+            const evCardId2  = `cal-evcard-${uid}-${ev.id}`;
+            html += `<div title="${TYPE_LABEL[ev.type]||'אירוע'}: ${ev.name||''}" onclick="scrollToCalEvent('${sectionId2}','${evCardId2}')" style="flex:1;text-align:center;padding:4px 1px;border-radius:6px;background:rgba(255,59,92,0.15);border:1px solid rgba(255,59,92,0.3);font-size:12px;cursor:pointer">${TYPE_ICON[ev.type]||'📌'}</div>`;
           } else {
             html += `<div style="flex:1;text-align:center;padding:4px 1px;border-radius:6px;background:${isToday?'rgba(0,255,157,0.12)':'rgba(0,255,157,0.04)'};border:1px solid ${isToday?'rgba(0,255,157,0.3)':'rgba(0,255,157,0.08)'};font-size:11px;color:rgba(0,255,157,0.6)">💼</div>`;
           }
@@ -3962,9 +3968,16 @@ header{
           let cls = 'cal-month-day';
           let inner = d.date.slice(8).replace(/^0/,'');
           let title = '';
-          if (ev) { cls += ' cal-mday-away'; inner = TYPE_ICON[ev.type]||'📌'; title = `title="${TYPE_LABEL[ev.type]||''}"` ; }
-          else if (isToday) cls += ' cal-mday-today';
-          html += `<div class="${cls}" ${title}>${inner}</div>`;
+          let onclick = '';
+          if (ev) {
+            cls += ' cal-mday-away cal-mday-link';
+            inner = TYPE_ICON[ev.type]||'📌';
+            title = `title="${TYPE_LABEL[ev.type]||''}: ${ev.name||''}"`;
+            const sectionId = uid === currentUser ? 'cal-section-me' : `cal-section-${uid}`;
+            const evCardId  = `cal-evcard-${uid}-${ev.id}`;
+            onclick = `onclick="scrollToCalEvent('${sectionId}','${evCardId}')"`;
+          } else if (isToday) cls += ' cal-mday-today';
+          html += `<div class="${cls}" ${title} ${onclick}>${inner}</div>`;
         });
 
         html += '</div></div>'; // cal-month-grid, cal-month-user-block
@@ -3977,8 +3990,8 @@ header{
     const myEvs = calEvents[currentUser]
       ? Object.entries(calEvents[currentUser]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
       : [];
-    html += '<div class="cal-section"><div class="cal-section-title">📅 היומן שלי</div>';
-    if (myEvs.length) { myEvs.forEach(e => { html += evCard(e, currentUser, true); }); }
+    html += '<div class="cal-section" id="cal-section-me"><div class="cal-section-title">📅 היומן שלי</div>';
+    if (myEvs.length) { myEvs.forEach(e => { html += evCard(e, currentUser, true, 'cal-section-me'); }); }
     else html += '<div class="cal-empty">אין אירועים מתוכננים</div>';
     html += `<button class="cal-add-btn" onclick="openCalModal('${currentUser}')">➕ הוסף אירוע</button></div>`;
 
@@ -3994,7 +4007,7 @@ header{
         ? Object.entries(calEvents[uid]).map(([id,v])=>({id,...v})).sort((a,b)=>a.from.localeCompare(b.from))
         : [];
       const canEditOther = currentUser === 'moshe' || currentUser === 'assaf';
-      html += `<div class="cal-section"><div class="cal-section-title">${USERS[uid].name}</div>`;
+      html += `<div class="cal-section" id="cal-section-${uid}"><div class="cal-section-title">${USERS[uid].name}</div>`;
       if (evs.length) { evs.forEach(e => { html += evCard(e, uid, canEditOther); }); }
       else html += '<div class="cal-empty">אין אירועים</div>';
       if (currentUser === 'moshe' || currentUser === 'assaf') html += `<button class="cal-add-btn" onclick="openCalModal('${uid}')">➕ הוסף לו אירוע</button>`;
@@ -4006,6 +4019,20 @@ header{
   }
 
   function renderCalTab() { renderCal(document.getElementById('mainContent')); }
+
+  function scrollToCalEvent(sectionId, evCardId) {
+    // small delay to let any re-render settle
+    requestAnimationFrame(() => {
+      const card = document.getElementById(evCardId);
+      const section = document.getElementById(sectionId);
+      const target = card || section;
+      if (!target) return;
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // flash highlight
+      target.classList.add('cal-ev-highlight');
+      setTimeout(() => target.classList.remove('cal-ev-highlight'), 1800);
+    });
+  }
 
   let calEditId = null, calEditUid = null;
 
