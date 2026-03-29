@@ -3840,7 +3840,8 @@ header{
     const TYPE_LABEL = {flight:'טיסה', vacation:'חופשה', sick:'מחלה', other:'אחר'};
     const TYPE_CLS   = {flight:'cal-type-flight', vacation:'cal-type-vacation', sick:'cal-type-sick', other:'cal-type-other'};
     const ALL_UIDS   = ['moshe','assaf','hazi','elad','alik','rif','tal'];
-    const todayStr   = new Date().toISOString().split('T')[0];
+    const _tn = new Date();
+    const todayStr = _tn.getFullYear() + '-' + String(_tn.getMonth()+1).padStart(2,'0') + '-' + String(_tn.getDate()).padStart(2,'0');
 
     function evCard(ev, uid, showEdit) {
       const del_fn = `delCalEvent('${uid}','${ev.id}')`;
@@ -3869,7 +3870,8 @@ header{
       for (let i = 0; i <= 4; i++) {
         const d = new Date(sunday);
         d.setDate(sunday.getDate() + i);
-        viewDays.push({ date: d.toISOString().split('T')[0], label: dayNames[i] });
+        const iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        viewDays.push({ date: iso, label: dayNames[i] });
       }
       const from = viewDays[0].date.slice(5).split('-').reverse().join('/');
       const to   = viewDays[4].date.slice(5).split('-').reverse().join('/');
@@ -3886,7 +3888,8 @@ header{
       for (let d = 1; d <= daysInMonth; d++) {
         const dt = new Date(yr, mo, d);
         const dow = dt.getDay(); // 0=Sun … 6=Sat
-        const iso = dt.toISOString().split('T')[0];
+        // Use local date string (not toISOString which is UTC and can shift the date)
+        const iso = yr + '-' + String(mo+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
         viewDays.push({ date: iso, label: DAY_SHORT[dow], dow });
       }
     }
