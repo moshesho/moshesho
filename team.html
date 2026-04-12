@@ -3553,7 +3553,8 @@ header{
     const u = USERS[currentUser];
     const isAdmin = u.role==='admin';
     const isManager = u.role==='manager';
-    const canSeeAll = isAdmin || isManager;
+    const isITMember = ['elad','alik','rif','tal'].includes(currentUser);
+    const canSeeAll = isAdmin || isManager || isITMember;
     const myTasks = canSeeAll ? tasks : tasks.filter(t=>isAssignedTo(t, currentUser));
 
     let html = '';
@@ -3577,11 +3578,15 @@ header{
       <button class="filter-chip f-urgent ${taskPrioFilter==='urgent'?'active':''}" onclick="setTPrioF(taskPrioFilter==='urgent'?'all':'urgent')">🔴 דחוף</button>
     </div>`;
 
-    // ── PERSON FILTER (admin/manager only) ──
+    // ── PERSON FILTER ──
     if (canSeeAll) {
+      // IT members see only IT team; admin/manager see everyone
+      const filterUids = (isAdmin || isManager)
+        ? ['elad','alik','rif','tal','moshe','assaf','omer']
+        : ['elad','alik','rif','tal'];
       html += `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
         <button class="mchip ${taskPersonFilter==='all'?'sel':''}" onclick="setTPF('all')" style="font-size:11px">👥 כולם</button>
-        ${['elad','alik','rif','tal','moshe','assaf','omer'].map(uid=>{
+        ${filterUids.map(uid=>{
           const cnt = tasks.filter(t=>isAssignedTo(t,uid)&&t.status!=='done').length;
           return `<button class="mchip ${taskPersonFilter===uid?'sel':''}" onclick="setTPF('${uid}')" style="font-size:11px">${USERS[uid].name.split(' ')[0]} <span style="font-size:10px;opacity:.7">${cnt}</span></button>`;
         }).join('')}
@@ -3589,8 +3594,15 @@ header{
     }
 
     // ── APPLY ALL FILTERS ──
+    // IT members see only IT team tasks (not moshe/assaf/hazi/omer)
+    const itUids = ['elad','alik','rif','tal'];
+    let baseTasks = (isAdmin || isManager)
+      ? tasks
+      : isITMember
+        ? tasks.filter(t => itUids.some(uid => isAssignedTo(t, uid)))
+        : myTasks;
     let filtered = canSeeAll
-      ? (taskPersonFilter==='all' ? tasks : tasks.filter(t=>isAssignedTo(t,taskPersonFilter)))
+      ? (taskPersonFilter==='all' ? baseTasks : baseTasks.filter(t=>isAssignedTo(t,taskPersonFilter)))
       : myTasks;
 
     // status filter
@@ -3630,7 +3642,7 @@ header{
     order.forEach(s=>{
       if (!byStatus[s].length) return;
       html += `<div class="sec-lbl">${labels[s]} (${byStatus[s].length})</div>`;
-      byStatus[s].filter(t => !(pinnedTasks.has(t.id) && taskStatusFilter === 'all')).forEach(t=>html+=taskCard(t,isAdmin||isManager));
+      byStatus[s].filter(t => !(pinnedTasks.has(t.id) && taskStatusFilter === 'all')).forEach(t=>html+=taskCard(t,isAdmin||isManager));  // IT members: canEdit=false via taskCard internal check
     });
 
     if (!filtered.length) {
